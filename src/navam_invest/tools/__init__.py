@@ -14,6 +14,13 @@ from navam_invest.tools.file_reader import list_local_files, read_local_file
 # FRED tools
 from navam_invest.tools.fred import get_economic_indicator, get_key_macro_indicators
 
+# NewsAPI tools
+from navam_invest.tools.newsapi import (
+    get_company_news,
+    get_top_financial_headlines,
+    search_market_news,
+)
+
 # Financial Modeling Prep tools
 from navam_invest.tools.fmp import (
     get_company_fundamentals,
@@ -55,6 +62,10 @@ TOOLS: Dict[str, BaseTool] = {
     # Macro Data (FRED)
     "get_economic_indicator": get_economic_indicator,
     "get_key_macro_indicators": get_key_macro_indicators,
+    # News & Sentiment (NewsAPI)
+    "search_market_news": search_market_news,
+    "get_top_financial_headlines": get_top_financial_headlines,
+    "get_company_news": get_company_news,
     # Treasury Data
     "get_treasury_yield_curve": get_treasury_yield_curve,
     "get_treasury_rate": get_treasury_rate,
@@ -93,6 +104,11 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
             "screen_stocks",
         ],
         "macro": ["get_economic_indicator", "get_key_macro_indicators"],
+        "news": [
+            "search_market_news",
+            "get_top_financial_headlines",
+            "get_company_news",
+        ],
         "treasury": [
             "get_treasury_yield_curve",
             "get_treasury_rate",
@@ -131,6 +147,7 @@ def bind_api_keys_to_tools(
     alpha_vantage_key: str = "",
     fmp_key: str = "",
     fred_key: str = "",
+    newsapi_key: str = "",
 ) -> List[BaseTool]:
     """Bind API keys to tools securely using wrapper functions.
 
@@ -142,6 +159,7 @@ def bind_api_keys_to_tools(
         alpha_vantage_key: Alpha Vantage API key
         fmp_key: Financial Modeling Prep API key
         fred_key: FRED API key
+        newsapi_key: NewsAPI.org API key
 
     Returns:
         List of tools with API keys pre-bound
@@ -198,7 +216,24 @@ def bind_api_keys_to_tools(
             else:
                 bound_tools.append(tool)
 
-        # Tools that don't need API keys (Treasury, SEC)
+        # NewsAPI tools
+        elif tool_name in [
+            "search_market_news",
+            "get_top_financial_headlines",
+            "get_company_news",
+        ]:
+            if newsapi_key and callable_func:
+                bound_func = _create_bound_wrapper(callable_func, newsapi_key)
+                bound_tool = StructuredTool.from_function(
+                    coroutine=bound_func,
+                    name=tool.name,
+                    description=tool.description,
+                )
+                bound_tools.append(bound_tool)
+            else:
+                bound_tools.append(tool)
+
+        # Tools that don't need API keys (Treasury, SEC, Files)
         else:
             bound_tools.append(tool)
 
@@ -224,6 +259,10 @@ __all__ = [
     # FRED
     "get_economic_indicator",
     "get_key_macro_indicators",
+    # NewsAPI
+    "search_market_news",
+    "get_top_financial_headlines",
+    "get_company_news",
     # Treasury
     "get_treasury_yield_curve",
     "get_treasury_rate",

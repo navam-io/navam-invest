@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     # Macro Data APIs
     fred_api_key: Optional[str] = None
 
+    # News APIs
+    newsapi_api_key: Optional[str] = None
+
     # Model configuration
     anthropic_model: str = "claude-3-7-sonnet-20250219"
     temperature: float = 0.0
