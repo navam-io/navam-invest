@@ -1,14 +1,20 @@
 # Release 0.1.8
 
 ## Status
-IN DEVELOPMENT
+Published
 
 ## Features
 
-(Features will be added as development progresses)
+### Bug Fixes
+- **API Key Security**: Fixed API key exposure in FMP error messages by adding HTTPStatusError handling
+- **Tool Parameter Handling**: Fixed duplicate `api_key` parameter error in bound tool wrappers
+
+### Enhancements
+- **Stock Screener**: Enhanced FMP stock screener with comprehensive filtering parameters (price ranges, beta, volume, dividends, sector, exchange)
+- **Error Messages**: Improved error handling with clear messaging about FMP API tier limitations
 
 ## Release Date
-TBD
+2025-10-05
 
 ## PyPI Package
-Not yet published
+https://pypi.org/project/navam-invest/0.1.8/
