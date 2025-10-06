@@ -25,7 +25,7 @@ def invest() -> None:
 @app.command()
 def version() -> None:
     """Show version information."""
-    console.print("[bold]Navam Invest v0.1.3[/bold]")
+    console.print("[bold]Navam Invest v0.1.4[/bold]")
     console.print("AI-powered investment advisor for retail investors")
 
 

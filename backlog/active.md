@@ -1,7 +1,5 @@
 # Active Backlog
 
-[ ] Read refer/specs/about.md to understand the Navam Invest product vision and stack. Refer refer/specs/tui-spec-by-chatgpt.md for TUI specifications. Update CLAUDE.md files within the project with crisp reference to these docs to memorize these concepts.
-
 [ ] Create next release of `navam_invest` package which adds more agents and tools based on refer/specs/api-tools.md prioritized list of APIs.
 
 ## Completed Items
@@ -11,3 +9,4 @@ All completed features have been moved to their respective release files:
 - `release-0.1.1.md` - PyPI publication
 - `release-0.1.2.md` - Configuration error handling patch
 - `release-0.1.3.md` - CLI command improvement (navam invest)
+- `release-0.1.4.md` - Product vision & architecture documentation

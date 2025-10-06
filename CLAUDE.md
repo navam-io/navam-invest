@@ -8,6 +8,37 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Core Dependency**: `anthropic>=0.40.0` - The package leverages Claude's AI capabilities for investment analysis and decision support.
 
+## Product Vision & Architecture
+
+**Vision**: Navam Invest is an AI-powered investment-advisory platform that brings institutional-grade portfolio intelligence to individual retail investors managing $50K–$1M portfolios. It replaces traditional wealth-management fees (1% AUM) with a team of specialized AI agents that research, analyze, optimize, and explain—using free public data sources (FRED, SEC EDGAR, Alpha Vantage).
+
+**Core Value Proposition**:
+- **Autonomous**: Digital investment committee that continuously monitors holdings, risk, and tax efficiency
+- **Explainable**: Educational language and audit trails for full transparency
+- **Accessible**: Local-first Python application with no subscription fees
+
+**Architecture Stack** (see `refer/specs/about.md` for details):
+
+1. **Agent Orchestration**: LangGraph coordinates specialized AI agents with full audit trails and cross-session memory
+2. **AI Reasoning**: Anthropic Claude (default), with support for OpenAI, Gemini, DeepSeek, and local Ollama models
+3. **User Interface**: Textual-based TUI + Typer CLI providing chat-style interaction with real-time agent streaming
+4. **Data Sources**: FRED (macro), SEC EDGAR (fundamentals), Alpha Vantage (market data)
+5. **Packaging**: Python library (`navam_invest`) for extensibility and integration
+
+**TUI/CLI Design Principles** (see `refer/specs/tui-spec-by-chatgpt.md`):
+
+- **Chat-first**: Conversational interface with streaming LLM responses and markdown rendering
+- **Textual Framework**: Full-screen TUI with panels, scroll, mouse support, hot-reload dev
+- **Rich Integration**: Colored output, tables, progress bars, syntax highlighting
+- **Async Streaming**: Real-time agent reasoning display with `anyio`/`asyncio`
+- **Session Persistence**: SQLite/SQLModel for chat logs, portfolios, and audit trails
+- **Slash Commands**: `/portfolio`, `/research`, `/help` for agent switching and workflows
+- **Keybindings**: `Ctrl+C` (clear), `Ctrl+Q` (quit) for terminal-native UX
+
+**Current Implementation Status**:
+- ✅ v0.1.3: Core agents (portfolio, research), API tools (Alpha Vantage, FRED), Textual TUI, CLI (`navam invest`)
+- 🚧 Next: Additional agents (tax, screener, optimizer), enhanced TUI panels, persistence layer
+
 ## Development Environment Setup
 
 ```bash
