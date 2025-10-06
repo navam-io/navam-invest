@@ -13,6 +13,7 @@
 
 [Features](#-features) •
 [Quick Start](#-quick-start) •
+[Examples](#-example-interactions) •
 [Documentation](#-documentation) •
 [Contributing](#-contributing)
 
@@ -35,14 +36,14 @@
 
 ## 📖 Overview
 
-`navam-invest` brings institutional-grade portfolio intelligence to individual retail investors. Built with [LangGraph](https://langchain-ai.github.io/langgraph/) and powered by [Anthropic's Claude](https://www.anthropic.com/claude), it provides specialized AI agents for portfolio analysis, market research, and investment insights—all accessible through an interactive terminal interface.
+`navam-invest` brings **institutional-grade portfolio intelligence** to individual retail investors. Built with [LangGraph](https://langchain-ai.github.io/langgraph/) and powered by [Anthropic's Claude](https://www.anthropic.com/claude), it provides specialized AI agents for portfolio analysis, market research, and investment insights—all accessible through an interactive terminal interface.
 
 ### Why Navam Invest?
 
 - **🎯 Institutional Intelligence**: Access the same analytical depth once reserved for institutional portfolios
 - **🔒 Privacy-First**: Run locally with your own API keys—your data stays yours
 - **💡 Transparent**: Full audit trails and explainable AI reasoning
-- **🆓 Free Data Sources**: Leverages high-quality public APIs (FRED, Alpha Vantage)
+- **🆓 Free Data Sources**: Leverages high-quality public APIs (free tiers available)
 - **🔧 Extensible**: Modular architecture makes it easy to add new agents and data sources
 
 ---
@@ -58,11 +59,12 @@
 **Portfolio Analysis Agent**
 - Real-time stock quotes and metrics
 - Company fundamentals & financial ratios
-- **News & social sentiment analysis**
-- **Insider sentiment tracking (MSPR)**
-- **Analyst recommendation trends**
+- **News & social sentiment analysis** 🆕
+- **Insider sentiment tracking (MSPR)** 🆕
+- **Analyst recommendation trends** 🆕
 - SEC filings (10-K, 10-Q, 13F)
 - Multi-criteria stock screening
+- Local file reading (CSV, JSON, Excel)
 
 </td>
 <td width="50%">
@@ -73,22 +75,23 @@
 - Federal Reserve data (FRED)
 - Economic regime detection
 - Debt-to-GDP analysis
+- Market news & sentiment
 
 </td>
 </tr>
 </table>
 
-### 📊 **Real API Integrations** (23 Tools Across 6 Data Sources)
+### 📊 **Real API Integrations** (23 Tools Across 7 Data Sources)
 
-| API | Tools | Purpose | Cost |
-|-----|-------|---------|------|
-| **Alpha Vantage** | 2 | Stock prices, company fundamentals, technical indicators | Free tier: 25 calls/day |
-| **Financial Modeling Prep** | 4 | Financial statements, ratios, insider trades, screening | Free tier: 250 calls/day |
-| **Finnhub** | 5 | News sentiment, social sentiment, insider sentiment, analyst recommendations | Free tier: 60 calls/min |
-| **FRED (St. Louis Fed)** | 2 | Economic indicators, macro data | Free (unlimited) |
-| **U.S. Treasury** | 4 | Yield curves, treasury rates, debt data | Free (unlimited) |
-| **SEC EDGAR** | 5 | Corporate filings (10-K, 10-Q, 13F) | Free (10 req/sec) |
-| **NewsAPI.org** | 3 | Market news, headlines, company news | Free tier: 100 calls/day |
+| API | Tools | Purpose | Free Tier |
+|-----|-------|---------|-----------|
+| **Alpha Vantage** | 2 | Stock prices, company overviews, technical indicators | 25-500 calls/day |
+| **Financial Modeling Prep** | 4 | Financial statements, ratios, insider trades, screening | 250 calls/day |
+| **Finnhub** 🆕 | 5 | News sentiment, social sentiment, insider sentiment, analyst ratings | 60 calls/min |
+| **FRED (St. Louis Fed)** | 2 | Economic indicators, macro data | Unlimited |
+| **U.S. Treasury** | 4 | Yield curves, treasury rates, debt metrics | Unlimited |
+| **SEC EDGAR** | 5 | Corporate filings (10-K, 10-Q, 13F) | 10 req/sec |
+| **NewsAPI.org** | 3 | Market news, headlines, company news | 100 calls/day |
 | **Anthropic Claude** | - | AI reasoning and tool orchestration | Pay-as-you-go |
 
 ### 💬 **Interactive Terminal UI**
@@ -96,8 +99,9 @@
 - **Chat Interface**: Natural language interaction with AI agents
 - **Real-time Streaming**: Watch agents think and reason in real-time
 - **Markdown Rendering**: Beautiful formatted output with tables and lists
-- **Agent Switching**: Seamlessly switch between specialized agents
+- **Agent Switching**: Seamlessly switch between specialized agents (`/portfolio`, `/research`)
 - **Command Palette**: Quick access to common actions
+- **File Reading**: Analyze local portfolio files (CSV, JSON, Excel)
 
 ### 🏗️ **Built on Modern Tech**
 
@@ -119,7 +123,7 @@ Textual (Terminal UI) + Typer (CLI) + httpx (Async HTTP)
 
 ### Installation
 
-#### Option 1: Install from PyPI
+#### Option 1: Install from PyPI (Recommended)
 
 ```bash
 pip install navam-invest
@@ -149,16 +153,23 @@ pip install -e ".[dev]"
 
    # Optional (but recommended for full functionality)
    ALPHA_VANTAGE_API_KEY=your_key_here
-   FRED_API_KEY=your_key_here
    FMP_API_KEY=your_key_here
+   FINNHUB_API_KEY=your_key_here
+   FRED_API_KEY=your_key_here
+   NEWSAPI_API_KEY=your_key_here
    ```
 
-3. **Get API Keys** (all free tiers available):
-   - **Anthropic**: [console.anthropic.com](https://console.anthropic.com/) (pay-as-you-go)
-   - **Alpha Vantage**: [alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key) (free)
-   - **FRED**: [fredaccount.stlouisfed.org/apikeys](https://fredaccount.stlouisfed.org/apikeys) (free)
-   - **FMP**: [financialmodelingprep.com/developer](https://financialmodelingprep.com/developer) (free)
-   - **Treasury & SEC**: No API keys required!
+3. **Get API Keys** (all have free tiers):
+
+   | Service | Link | Notes |
+   |---------|------|-------|
+   | **Anthropic** | [console.anthropic.com](https://console.anthropic.com/) | Required - Pay-as-you-go ($3-15/M tokens) |
+   | **Alpha Vantage** | [alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key) | Free tier: 25 calls/day |
+   | **FMP** | [financialmodelingprep.com/developer](https://financialmodelingprep.com/developer) | Free tier: 250 calls/day |
+   | **Finnhub** | [finnhub.io/register](https://finnhub.io/register) | Free tier: 60 calls/min |
+   | **FRED** | [fredaccount.stlouisfed.org/apikeys](https://fredaccount.stlouisfed.org/apikeys) | Free - Unlimited |
+   | **NewsAPI** | [newsapi.org/register](https://newsapi.org/register) | Free tier: 100 calls/day |
+   | **Treasury & SEC** | - | No API keys required! |
 
 ### Usage
 
@@ -168,56 +179,244 @@ pip install -e ".[dev]"
 navam invest
 ```
 
-#### Example Interactions
+This opens an interactive chat interface where you can talk to AI agents in natural language.
 
-**Portfolio Analysis:**
+---
+
+## 💡 Example Interactions
+
+### Portfolio Analysis Examples
+
+<details>
+<summary><b>📈 Stock Price & Overview</b></summary>
+
 ```
 You: What's the current price of AAPL?
-Portfolio Agent: [Fetches real-time data and provides formatted response]
 
-You: Show me Apple's financial ratios
-Portfolio Agent: [Displays liquidity, profitability, leverage ratios]
-
-You: Any recent insider trading at AAPL?
-Portfolio Agent: [Shows latest insider buy/sell activity with dates and volumes]
-
-You: Find me the latest 10-K for Apple
-Portfolio Agent: [Retrieves SEC filing with direct link to document]
+Portfolio Agent:
+**AAPL - Stock Price**
+Symbol: AAPL
+Price: $178.25
+Change: +2.45 (+1.39%)
+Volume: 45,234,567
+Market Cap: $2.81T
 ```
+</details>
 
-**Market Research:**
+<details>
+<summary><b>💰 Financial Fundamentals</b></summary>
+
+```
+You: Show me Apple's financial ratios
+
+Portfolio Agent:
+**AAPL - Financial Ratios**
+
+**Liquidity:**
+Current Ratio: 0.98
+Quick Ratio: 0.83
+
+**Profitability:**
+Gross Margin: 0.44
+Operating Margin: 0.30
+Net Margin: 0.25
+
+**Returns:**
+ROE: 1.47
+ROA: 0.28
+
+**Leverage:**
+Debt Ratio: 0.32
+```
+</details>
+
+<details>
+<summary><b>🔍 Sentiment Analysis (NEW!)</b></summary>
+
+```
+You: What's the sentiment around TSLA?
+
+Portfolio Agent:
+**TSLA - News Sentiment Analysis**
+
+**Sentiment Scores:**
+Company News Score: 0.75
+Sector Average: 0.62
+Bullish: 68% | Bearish: 32%
+
+**News Buzz:**
+Articles Last Week: 45
+Weekly Average: 32
+Buzz Score: 1.4
+
+**Social Media Sentiment:**
+Reddit Mentions: 2,500 | Score: 0.65 (Positive)
+Twitter Mentions: 5,200 | Score: 0.58 (Positive)
+
+**Insider Sentiment:**
+MSPR: 0.15 (Net buying)
+Sentiment: 🟢 Bullish
+
+**Analyst Recommendations:**
+Strong Buy: 12 | Buy: 8 | Hold: 5 | Sell: 1
+Consensus: 🟢 Bullish
+```
+</details>
+
+<details>
+<summary><b>📋 SEC Filings</b></summary>
+
+```
+You: Find me the latest 10-K for Apple
+
+Portfolio Agent:
+**AAPL - Latest 10-K Filing**
+
+Filing Date: 2024-11-01
+Period: FY 2024
+Form: 10-K (Annual Report)
+
+Document: https://www.sec.gov/cgi-bin/viewer?action=view&cik=0000320193&accession_number=...
+
+Key Sections:
+- Business Overview
+- Risk Factors
+- Financial Statements
+- Management Discussion & Analysis
+```
+</details>
+
+<details>
+<summary><b>🎯 Stock Screening</b></summary>
+
+```
+You: Screen for tech stocks with market cap > $10B and P/E < 20
+
+Portfolio Agent:
+**Stock Screener Results**
+
+**GOOGL** - Alphabet Inc
+Sector: Technology | Price: $141.50
+Market Cap: $1,750,234,567,890 | P/E: 18.2
+
+**MSFT** - Microsoft Corporation
+Sector: Technology | Price: $378.25
+Market Cap: $2,801,456,789,012 | P/E: 19.5
+
+**META** - Meta Platforms Inc
+Sector: Technology | Price: $485.30
+Market Cap: $1,234,567,890,123 | P/E: 16.8
+```
+</details>
+
+### Market Research Examples
+
+<details>
+<summary><b>📊 Economic Indicators</b></summary>
+
 ```
 You: /research
-You: What's the current GDP?
-Research Agent: [Fetches latest GDP data from FRED with date and trend]
+You: Show me key economic indicators
 
-You: Show me the Treasury yield curve
-Research Agent: [Displays full curve from 1M to 30Y with current rates]
+Research Agent:
+**Key Macroeconomic Indicators**
 
-You: What's the 2Y-10Y spread telling us?
-Research Agent: [Calculates spread with economic interpretation (normal/inverted/flat)]
+**GDP Growth (Real):** 2.4% (Q3 2024)
+**Unemployment Rate:** 3.9% (October 2024)
+**CPI Inflation:** 3.2% (YoY, October 2024)
+**Fed Funds Rate:** 5.25-5.50% (Current)
 
-You: Give me key economic indicators
-Research Agent: [Shows dashboard of GDP, unemployment, CPI, fed funds rate]
+Economic Regime: Late Cycle Expansion
 ```
+</details>
 
-#### TUI Commands
+<details>
+<summary><b>📈 Treasury Yield Curve</b></summary>
+
+```
+You: Show me the Treasury yield curve
+
+Research Agent:
+**U.S. Treasury Yield Curve** (2025-10-06)
+
+1 Month:   5.42%
+3 Month:   5.38%
+6 Month:   5.32%
+1 Year:    5.15%
+2 Year:    4.82%
+5 Year:    4.35%
+10 Year:   4.28%
+30 Year:   4.42%
+
+**2Y-10Y Spread:** -0.54% (Inverted - Recession signal)
+**Curve Shape:** Inverted (Short rates > Long rates)
+```
+</details>
+
+<details>
+<summary><b>📰 Market News</b></summary>
+
+```
+You: What's the latest market news?
+
+Research Agent:
+**Top Financial Headlines**
+
+1. **Fed Signals Pause on Rate Hikes**
+   Source: Reuters | 2 hours ago
+   Summary: Federal Reserve officials indicate they may hold rates steady...
+
+2. **Tech Stocks Rally on AI Optimism**
+   Source: Bloomberg | 4 hours ago
+   Summary: Major tech companies surge as investors bet on AI growth...
+
+3. **Oil Prices Fall on Demand Concerns**
+   Source: CNBC | 6 hours ago
+   Summary: Crude oil drops 3% amid worries about global economic slowdown...
+```
+</details>
+
+### File Analysis Example
+
+<details>
+<summary><b>📁 Local Portfolio Analysis</b></summary>
+
+```
+You: Analyze my portfolio in portfolio.csv
+
+Portfolio Agent:
+**Portfolio Analysis**
+
+Reading file: portfolio.csv
+
+**Holdings:**
+AAPL: 100 shares @ $178.25 = $17,825
+MSFT: 50 shares @ $378.25 = $18,912.50
+GOOGL: 75 shares @ $141.50 = $10,612.50
+
+**Total Value:** $47,350
+**Sector Allocation:**
+- Technology: 100%
+
+**Recommendations:**
+- Portfolio is highly concentrated in tech sector
+- Consider diversification into other sectors
+- Current tech sentiment is bullish based on recent news
+```
+</details>
+
+### TUI Commands Reference
 
 | Command | Action |
 |---------|--------|
 | `/portfolio` | Switch to Portfolio Analysis Agent |
 | `/research` | Switch to Market Research Agent |
+| `/examples` | Show example queries |
 | `/help` | Show help message |
-| `Ctrl+C` | Clear chat history |
+| `/quit` or `/exit` | Exit application |
+| `/clear` | Clear chat history |
+| `Ctrl+C` | Clear input or chat |
 | `Ctrl+Q` | Quit application |
-
-#### CLI Commands
-
-```bash
-navam invest    # Launch interactive chat interface
-navam version   # Show version information
-navam --help    # Show help
-```
 
 ---
 
@@ -231,12 +430,15 @@ navam-invest/
 │   ├── agents/              # 🤖 LangGraph agent implementations
 │   │   ├── portfolio.py     #    Portfolio analysis with ReAct pattern
 │   │   └── research.py      #    Market research with macro tools
-│   ├── tools/               # 🔧 API integration tools (17 tools total)
+│   ├── tools/               # 🔧 API integration tools (23 tools total)
 │   │   ├── alpha_vantage.py #    Stock price & fundamentals
-│   │   ├── fred.py          #    Economic indicators & macro data
 │   │   ├── fmp.py           #    Financial statements & ratios
+│   │   ├── finnhub.py       #    🆕 Sentiment & alternative data
+│   │   ├── fred.py          #    Economic indicators & macro data
 │   │   ├── treasury.py      #    Yield curves & treasury data
 │   │   ├── sec_edgar.py     #    Corporate filings (10-K, 10-Q, 13F)
+│   │   ├── newsapi.py       #    Market news & headlines
+│   │   ├── file_reader.py   #    Local file reading
 │   │   └── __init__.py      #    Unified tools registry
 │   ├── tui/                 # 💬 Textual-based user interface
 │   │   └── app.py           #    Chat interface with streaming
@@ -245,7 +447,9 @@ navam-invest/
 │   └── cli.py               # 🖥️ Typer CLI entry point
 ├── tests/                   # ✅ Test suite (pytest + async)
 │   ├── test_config.py
-│   └── test_tools.py
+│   ├── test_tools.py
+│   ├── test_finnhub.py      # 🆕 Finnhub tests
+│   └── test_newsapi.py
 ├── refer/                   # 📖 Reference documentation
 │   ├── langgraph/           #    LangGraph docs & examples
 │   └── specs/               #    Project specifications
@@ -297,7 +501,7 @@ navam-invest/
 
 #### Agent Design Pattern
 
-Both agents implement the **ReAct (Reasoning + Acting)** pattern:
+Both agents implement the **ReAct (Reasoning + Acting)** pattern with tool calling:
 
 ```
 User Query → Agent Reasoning → Tool Selection → Tool Execution → Response Formatting
@@ -305,16 +509,19 @@ User Query → Agent Reasoning → Tool Selection → Tool Execution → Respons
      └──────────────────── Streaming Updates ←──────────────────────────┘
 ```
 
-**Portfolio Analysis Agent (17 tools available):**
+**Portfolio Analysis Agent (19 tools available):**
 - **Market Data**: `get_stock_price`, `get_stock_overview` (Alpha Vantage)
 - **Fundamentals**: `get_company_fundamentals`, `get_financial_ratios`, `get_insider_trades`, `screen_stocks` (FMP)
+- **Sentiment** 🆕: `get_company_news_sentiment`, `get_social_sentiment`, `get_insider_sentiment`, `get_recommendation_trends`, `get_finnhub_company_news` (Finnhub)
 - **Filings**: `search_company_by_ticker`, `get_latest_10k`, `get_latest_10q`, `get_institutional_holdings`, `get_company_filings` (SEC)
-- **Use cases**: Stock analysis, fundamental screening, insider tracking, regulatory research
+- **News**: `search_market_news`, `get_company_news`, `get_top_financial_headlines` (NewsAPI)
+- **Files**: `read_local_file`, `list_local_files` (Local)
 
-**Market Research Agent (6 tools available):**
+**Market Research Agent (11 tools available):**
 - **Macro**: `get_economic_indicator`, `get_key_macro_indicators` (FRED)
 - **Treasury**: `get_treasury_yield_curve`, `get_treasury_rate`, `get_treasury_yield_spread`, `get_debt_to_gdp` (Treasury)
-- **Use cases**: Macro analysis, yield curve interpretation, regime detection, economic trends
+- **News**: `search_market_news`, `get_company_news`, `get_top_financial_headlines` (NewsAPI)
+- **Files**: `read_local_file`, `list_local_files` (Local)
 
 ---
 
@@ -340,13 +547,13 @@ pip install -e ".[dev]"
 pytest
 
 # Run specific test file
-pytest tests/test_tools.py -v
+pytest tests/test_finnhub.py -v
 
 # Run with coverage report
 pytest --cov=src/navam_invest --cov-report=term-missing
 ```
 
-**Current Coverage:** 7/7 tests passing ✅
+**Current Coverage:** 36/36 tests passing ✅ (34% overall coverage)
 
 ### Code Quality
 
@@ -368,7 +575,7 @@ black src/ tests/ && ruff check src/ tests/ && mypy src/
 
 - **Black** - Code formatting (88 char line length)
 - **Ruff** - Fast Python linter
-- **MyPy** - Static type checking
+- **MyPy** - Static type checking (strict mode enabled)
 - **pytest** - Testing framework with async support
 - **Textual DevTools** - TUI hot-reload (`textual run --dev`)
 
@@ -411,32 +618,37 @@ See `CLAUDE.md` for comprehensive guide on adding new LangGraph agents and tools
 
 ## 📋 Roadmap
 
-### ✅ v0.1.5 (Released 2025-10-05)
-- [x] Financial Modeling Prep integration (fundamentals, ratios, insider trades, screening)
-- [x] U.S. Treasury data integration (yield curves, spreads, debt metrics)
-- [x] SEC EDGAR integration (10-K, 10-Q, 13F filings)
-- [x] Unified tools registry (17 tools across 5 categories)
+### ✅ v0.1.11 (In Development)
+- [x] Finnhub integration (news sentiment, social sentiment, insider sentiment, analyst recommendations)
+- [x] API alternatives research and strategy
+- [x] Enhanced portfolio agent with sentiment analysis
+- [ ] Complete documentation updates
+
+### 🚀 v0.1.12-0.1.15 (Next)
+- [ ] Tiingo integration (historical fundamentals, quarterly tracking)
+- [ ] Enhanced agent system prompts
+- [ ] Multi-agent workflow foundations
+- [ ] Custom screening engine (Phase 1)
 
 ### v0.2.0 (Planned)
-- [ ] Tier 2 macro APIs (World Bank, OECD)
-- [ ] Alternative data (CoinGecko crypto, NewsAPI sentiment)
-- [ ] Portfolio optimization agent (MPT, Black-Litterman)
-- [ ] Tax-loss harvesting agent
+- [ ] Custom hybrid stock screener (local computation + caching)
+- [ ] Additional specialized agents (Quill, Screen Forge, News Sentry, Macro Lens)
+- [ ] Multi-agent supervisor for coordinated analysis
+- [ ] Portfolio optimization tools (PyPortfolioOpt integration)
 - [ ] Conversation persistence with LangGraph checkpointers
 - [ ] Enhanced TUI with portfolio display panels
 
 ### v0.3.0 (Planned)
-- [ ] Multi-agent supervisor for coordinated analysis
-- [ ] Backtesting framework with historical data
+- [ ] Tax-loss harvesting agent
 - [ ] Risk metrics dashboard (VaR, beta, Sharpe)
-- [ ] Custom screening agents
+- [ ] Backtesting framework with historical data
 - [ ] Export capabilities (CSV/JSON/PDF)
 
 ### Future
 - [ ] Web UI (Streamlit or FastAPI + HTMX)
-- [ ] Mobile app (React Native)
 - [ ] LangGraph Cloud deployment
-- [ ] Social trading features
+- [ ] Mobile app (React Native)
+- [ ] Broker integrations (Alpaca, Interactive Brokers)
 
 ---
 
@@ -459,15 +671,18 @@ Built with these amazing open-source projects:
 Data sources:
 - [Alpha Vantage](https://www.alphavantage.co/) - Stock market data
 - [Financial Modeling Prep](https://financialmodelingprep.com/) - Fundamentals & financials
+- [Finnhub](https://finnhub.io/) - Alternative data & sentiment analysis
 - [FRED](https://fred.stlouisfed.org/) - Economic data from St. Louis Fed
 - [U.S. Treasury](https://fiscaldata.treasury.gov/) - Treasury yields & debt data
 - [SEC EDGAR](https://www.sec.gov/edgar) - Corporate filings
+- [NewsAPI](https://newsapi.org/) - Market news & headlines
 
 ---
 
 ## 🔗 Links
 
 - **Homepage**: [github.com/navam-io/navam-invest](https://github.com/navam-io/navam-invest)
+- **PyPI Package**: [pypi.org/project/navam-invest](https://pypi.org/project/navam-invest/)
 - **Documentation**: [View on GitHub](https://github.com/navam-io/navam-invest/tree/main/refer)
 - **Issues**: [Report bugs](https://github.com/navam-io/navam-invest/issues)
 - **Discussions**: [Join the conversation](https://github.com/navam-io/navam-invest/discussions)
