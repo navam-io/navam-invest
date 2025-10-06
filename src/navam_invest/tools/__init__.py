@@ -112,6 +112,8 @@ def _create_bound_wrapper(original_func, api_key: str):
 
     @wraps(original_func)
     async def wrapper(*args, **kwargs):
+        # Remove api_key from kwargs if LLM passed it to avoid duplicate
+        kwargs.pop('api_key', None)
         return await original_func(*args, api_key=api_key, **kwargs)
 
     return wrapper
