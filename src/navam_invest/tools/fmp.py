@@ -186,35 +186,71 @@ async def get_insider_trades(symbol: str, api_key: str, limit: int = 10) -> str:
 async def screen_stocks(
     api_key: str,
     market_cap_more_than: Optional[int] = None,
+    market_cap_lower_than: Optional[int] = None,
+    price_more_than: Optional[float] = None,
+    price_lower_than: Optional[float] = None,
     beta_more_than: Optional[float] = None,
+    beta_lower_than: Optional[float] = None,
     volume_more_than: Optional[int] = None,
+    volume_lower_than: Optional[int] = None,
     dividend_more_than: Optional[float] = None,
+    dividend_lower_than: Optional[float] = None,
+    sector: Optional[str] = None,
+    exchange: Optional[str] = None,
     limit: int = 20,
 ) -> str:
     """Screen stocks based on fundamental criteria.
 
+    Note: Stock screener may have limited functionality on free FMP API tier.
+    Free tier typically limited to US exchanges.
+
     Args:
         api_key: Financial Modeling Prep API key
         market_cap_more_than: Minimum market cap
+        market_cap_lower_than: Maximum market cap
+        price_more_than: Minimum stock price
+        price_lower_than: Maximum stock price
         beta_more_than: Minimum beta
+        beta_lower_than: Maximum beta
         volume_more_than: Minimum trading volume
+        volume_lower_than: Maximum trading volume
         dividend_more_than: Minimum dividend yield
+        dividend_lower_than: Maximum dividend yield
+        sector: Sector filter (e.g., 'Technology', 'Financial Services')
+        exchange: Exchange filter (e.g., 'NYSE', 'NASDAQ')
         limit: Maximum results to return (default: 20)
 
     Returns:
         List of stocks matching criteria
     """
     try:
-        params: Dict[str, Any] = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit, "isActivelyTrading": "true"}
 
+        # Add filter parameters
         if market_cap_more_than is not None:
             params["marketCapMoreThan"] = market_cap_more_than
+        if market_cap_lower_than is not None:
+            params["marketCapLowerThan"] = market_cap_lower_than
+        if price_more_than is not None:
+            params["priceMoreThan"] = price_more_than
+        if price_lower_than is not None:
+            params["priceLowerThan"] = price_lower_than
         if beta_more_than is not None:
             params["betaMoreThan"] = beta_more_than
+        if beta_lower_than is not None:
+            params["betaLowerThan"] = beta_lower_than
         if volume_more_than is not None:
             params["volumeMoreThan"] = volume_more_than
+        if volume_lower_than is not None:
+            params["volumeLowerThan"] = volume_lower_than
         if dividend_more_than is not None:
             params["dividendMoreThan"] = dividend_more_than
+        if dividend_lower_than is not None:
+            params["dividendLowerThan"] = dividend_lower_than
+        if sector is not None:
+            params["sector"] = sector
+        if exchange is not None:
+            params["exchange"] = exchange
 
         data = await _fetch_fmp("stock-screener", api_key, **params)
 
@@ -231,12 +267,21 @@ async def screen_stocks(
             price = stock.get("price", "N/A")
             market_cap = stock.get("marketCap", "N/A")
             volume = stock.get("volume", "N/A")
+            sector_name = stock.get("sector", "N/A")
 
             result.append(
                 f"\n**{symbol}** - {name}\n"
-                f"Price: ${price} | Market Cap: ${market_cap:,} | Volume: {volume:,}"
+                f"Sector: {sector_name} | Price: ${price}\n"
+                f"Market Cap: ${market_cap:,} | Volume: {volume:,}"
             )
 
         return "\n".join(result)
     except Exception as e:
-        return f"Error running stock screener: {str(e)}"
+        error_msg = str(e)
+        if "access denied" in error_msg.lower() or "403" in error_msg:
+            return (
+                "Stock screener unavailable: This endpoint may require a paid FMP API plan. "
+                "The free tier has limited access to stock screening features. "
+                "Please check your FMP subscription at https://financialmodelingprep.com/pricing"
+            )
+        return f"Error running stock screener: {error_msg}"
