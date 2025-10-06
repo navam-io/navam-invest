@@ -1,7 +1,7 @@
 # Release 0.1.9
 
 ## Status
-IN DEVELOPMENT
+Published
 
 ## Features
 
@@ -25,7 +25,7 @@ IN DEVELOPMENT
 - Analyze custom JSON data structures
 
 ## Release Date
-TBD
+2025-10-06
 
 ## PyPI Package
-Not yet published
+https://pypi.org/project/navam-invest/0.1.9/
