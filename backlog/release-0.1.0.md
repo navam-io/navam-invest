@@ -150,3 +150,206 @@ This enhancement provides:
 
 ## Release Date
 2025-10-05
+
+---
+
+[x] Read refer/specs/about.md to understand the Navam Invest product vision and stack. Create minimal first release of `navam_invest` package which uses LangGraph, Anthropic API via .env or user environment, simple demonstration of couple of agents, tools based on refer/specs/api-tools.md prioritized list of APIs. Refer refer/specs/tui-spec-by-chatgpt.md for TUI specifications. This is a minimal end-to-end technology stack demonstration which we will build on. It should demonstrate the TUI, real API integration, calls to Anthropic API, agents in action via LangGraph.
+
+## Implementation Details
+
+### Overview
+Created a complete end-to-end technology stack demonstration featuring:
+- LangGraph-powered AI agents
+- Real API integrations (Alpha Vantage, FRED)
+- Interactive Textual TUI
+- Anthropic Claude integration
+- Comprehensive testing
+
+### Package Structure
+```
+src/navam_invest/
+├── agents/              # LangGraph agent implementations
+│   ├── portfolio.py     # Portfolio analysis agent with ReAct pattern
+│   └── research.py      # Market research agent with macro tools
+├── tools/               # API integration tools
+│   ├── alpha_vantage.py # Stock price and fundamentals (2 tools)
+│   └── fred.py          # Economic indicators and macro data (2 tools)
+├── tui/                 # Textual-based user interface
+│   └── app.py           # Full-featured chat interface with streaming
+├── config/              # Configuration management
+│   └── settings.py      # Pydantic settings with .env support
+└── cli.py               # Typer CLI entry point
+```
+
+### Dependencies Added
+**Core:**
+- `langgraph>=0.2.0` - Agent orchestration
+- `langchain-anthropic>=0.3.0` - Claude integration
+- `langchain-core>=0.3.0` - Tool framework
+- `textual>=1.0.0` - Terminal UI
+- `typer>=0.15.0` - CLI framework
+- `httpx>=0.28.0` - Async HTTP client
+- `pydantic-settings>=2.0.0` - Configuration management
+- `python-dotenv>=1.0.0` - Environment variable support
+
+**Development:**
+- `pytest-asyncio>=0.24.0` - Async testing support
+- `textual-dev>=1.0.0` - TUI hot-reload development
+
+### AI Agents Implemented
+
+#### 1. Portfolio Analysis Agent (`agents/portfolio.py`)
+- **Architecture**: LangGraph with ReAct pattern
+- **Tools**:
+  - `get_stock_price` - Real-time stock quotes
+  - `get_stock_overview` - Company fundamentals and metrics
+- **Features**: Tool-calling, streaming responses, stateful conversation
+
+#### 2. Market Research Agent (`agents/research.py`)
+- **Architecture**: LangGraph with ReAct pattern
+- **Tools**:
+  - `get_economic_indicator` - Specific FRED series data
+  - `get_key_macro_indicators` - Summary of GDP, unemployment, CPI, fed funds
+- **Features**: Macroeconomic analysis, real-time data access
+
+### API Tools Implemented
+
+#### Alpha Vantage Tools (`tools/alpha_vantage.py`)
+- **get_stock_price**: Async tool for current quotes, change %, volume
+- **get_stock_overview**: Company profile, sector, P/E, EPS, dividend yield
+- **Features**: Error handling, async/await, formatted markdown output
+
+#### FRED Tools (`tools/fred.py`)
+- **get_economic_indicator**: Fetch any FRED series by ID
+- **get_key_macro_indicators**: Pre-configured dashboard of key metrics
+- **Features**: Series metadata, latest observations, formatted output
+
+### TUI Implementation (`tui/app.py`)
+
+#### Features
+- **Chat Interface**: Textual RichLog with markdown rendering
+- **Agent Switching**: `/portfolio` and `/research` commands
+- **Streaming**: Real-time agent response streaming via astream()
+- **Commands**:
+  - `/portfolio` - Switch to portfolio agent
+  - `/research` - Switch to market research agent
+  - `/help` - Show help
+  - `Ctrl+C` - Clear chat
+  - `Ctrl+Q` - Quit
+
+#### Architecture
+- Async event handling with Textual
+- Agent initialization on mount
+- Message streaming with proper state management
+- Markdown formatting for rich output
+
+### CLI Implementation (`cli.py`)
+
+#### Commands
+- `navam` - Default help message
+- `navam tui` - Launch interactive TUI
+- `navam version` - Show version info
+- `navam --help` - Full help documentation
+
+### Configuration Management
+
+#### Settings (`config/settings.py`)
+- Pydantic Settings with .env support
+- Required: `ANTHROPIC_API_KEY`
+- Optional: `ALPHA_VANTAGE_API_KEY`, `FRED_API_KEY`
+- Defaults: Claude 3.7 Sonnet, temperature=0.0
+
+#### Environment Setup
+- `.env.example` provided with all required keys
+- Documented API key sources in README
+
+### Testing
+
+#### Test Coverage
+- `tests/test_config.py` - Configuration management (3 tests)
+- `tests/test_tools.py` - API tools with mocked responses (4 tests)
+- **Total**: 7 tests, all passing
+- **Coverage**: 29% (core functionality tested)
+
+#### Testing Strategy
+- Async test support with pytest-asyncio
+- Mock API responses to avoid rate limits
+- Focus on tool functionality and config validation
+
+### Documentation
+
+#### README Updates
+- Quick Start guide with installation steps
+- Configuration instructions with API key links
+- Usage examples and TUI commands
+- Architecture section with tech stack
+- Complete project structure diagram
+
+### Key Technical Decisions
+
+1. **LangGraph over LangChain alone**: Stateful workflows, ReAct pattern support
+2. **Textual for TUI**: Modern, feature-rich terminal UI with async support
+3. **Typer for CLI**: Clean, type-safe command interface
+4. **Async httpx**: Better performance for API calls
+5. **Pydantic Settings**: Type-safe configuration with .env support
+
+### Demonstration Capabilities
+
+The package successfully demonstrates:
+1. ✅ **TUI**: Interactive chat interface with markdown rendering
+2. ✅ **API Integration**: Real calls to Alpha Vantage and FRED
+3. ✅ **Anthropic API**: Claude-powered reasoning and tool use
+4. ✅ **LangGraph**: Two functional agents with tool-calling
+5. ✅ **Streaming**: Real-time agent responses in TUI
+6. ✅ **Testing**: Passing test suite with async support
+
+### Usage Example
+
+```bash
+# Setup
+cp .env.example .env
+# Add API keys to .env
+
+# Install
+pip install -e ".[dev]"
+
+# Run
+navam tui
+
+# In TUI:
+"What's the current price of AAPL?"
+"Show me Apple's fundamentals"
+"/research"
+"What's the current GDP?"
+```
+
+### Files Created/Modified
+
+**New Files:**
+- `src/navam_invest/agents/portfolio.py`
+- `src/navam_invest/agents/research.py`
+- `src/navam_invest/tools/alpha_vantage.py`
+- `src/navam_invest/tools/fred.py`
+- `src/navam_invest/tui/app.py`
+- `src/navam_invest/config/settings.py`
+- `src/navam_invest/cli.py`
+- `tests/test_config.py`
+- `tests/test_tools.py`
+- `.env.example`
+
+**Modified Files:**
+- `pyproject.toml` - Added dependencies and CLI entry point
+- `README.md` - Complete usage and architecture documentation
+- `backlog/active.md` - Marked feature as complete
+
+### Next Steps Ready
+
+The foundation is now in place for:
+1. Adding more sophisticated agents (tax optimizer, portfolio rebalancer)
+2. Implementing additional API integrations (SEC EDGAR, more FRED series)
+3. Adding persistence with checkpointers for conversation history
+4. Enhancing TUI with panels for portfolio display
+5. Publishing to PyPI
+
+## Release Date
+2025-10-05

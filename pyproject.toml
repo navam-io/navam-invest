@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "navam-invest"
-version = "0.1.0"
+version = "0.1.2"
 description = "AI agents and tools for the retail investor"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -26,16 +26,31 @@ classifiers = [
 ]
 dependencies = [
     "anthropic>=0.40.0",
+    "langgraph>=0.2.0",
+    "langchain-anthropic>=0.3.0",
+    "langchain-core>=0.3.0",
+    "textual>=1.0.0",
+    "typer>=0.15.0",
+    "rich>=13.0.0",
+    "httpx>=0.28.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0.0",
     "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.24.0",
     "black>=24.0.0",
     "ruff>=0.1.0",
     "mypy>=1.8.0",
+    "textual-dev>=1.0.0",
 ]
+
+[project.scripts]
+navam = "navam_invest.cli:app"
 
 [project.urls]
 Homepage = "https://github.com/navam-io/navam-invest"
@@ -44,6 +59,22 @@ Issues = "https://github.com/navam-io/navam-invest/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/navam_invest"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/README.md",
+    "/LICENSE",
+    "/.env.example",
+    "/pyproject.toml",
+]
+exclude = [
+    "/.claude",
+    "/backlog",
+    "/refer",
+    "/CLAUDE.md",
+]
 
 [tool.black]
 line-length = 88
