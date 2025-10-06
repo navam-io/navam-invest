@@ -32,7 +32,7 @@ from navam_invest.tools.fmp import (
 # Finnhub tools
 from navam_invest.tools.finnhub import (
     get_company_news_sentiment,
-    get_company_news as get_finnhub_company_news,
+    get_finnhub_company_news,
     get_insider_sentiment,
     get_recommendation_trends,
     get_social_sentiment,

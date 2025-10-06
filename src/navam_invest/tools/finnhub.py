@@ -265,10 +265,10 @@ async def get_recommendation_trends(symbol: str, api_key: str) -> str:
 
 
 @tool
-async def get_company_news(
+async def get_finnhub_company_news(
     symbol: str, api_key: str, from_date: Optional[str] = None, to_date: Optional[str] = None
 ) -> str:
-    """Get recent company news articles.
+    """Get recent company news articles from Finnhub.
 
     Retrieves news headlines, summaries, and sources for company-specific news.
 
