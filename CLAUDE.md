@@ -101,16 +101,52 @@ All project configuration is consolidated in `pyproject.toml`:
 - Package metadata and dependencies
 - Tool configurations (Black, Ruff, MyPy, Pytest)
 
-### Backlog Management
-This project uses a structured backlog system:
+### Backlog Management & Release Workflow
+
+This project uses a structured backlog system synchronized with package versioning:
 
 - **`backlog/active.md`** - Current features/tasks being developed
-- **`backlog/release-{semver}.md`** - Completed features for each release
+- **`backlog/release-{semver}.md`** - Completed features for each published release
 
-When completing a feature:
-1. Mark as complete in `backlog/active.md`
-2. Move to appropriate `backlog/release-{semver}.md` with implementation details
-3. Clear completed items from active backlog
+**CRITICAL: Release File Management Rules**
+
+1. **Update Current Release, Don't Create New**:
+   - Always update the **current** `release-{semver}.md` file matching `pyproject.toml` version
+   - Example: If `pyproject.toml` shows `version = "0.1.5"`, update `release-0.1.5.md`
+   - DO NOT create `release-0.1.6.md` until package is published to PyPI
+
+2. **Version Increment Flow**:
+   ```
+   Development → Update release-0.1.5.md
+   Ready to Publish → Update version in pyproject.toml to 0.1.6
+   Publish to PyPI → Create release-0.1.6.md for next development cycle
+   ```
+
+3. **Never Skip Versions**:
+   - Package version in `pyproject.toml` must match latest release file
+   - If current is `0.1.5`, next must be `0.1.6` (not `0.2.0` or `0.1.7`)
+   - Increment patch (0.1.x) for fixes/features, minor (0.x.0) for breaking changes
+
+4. **When Completing a Feature**:
+   ```bash
+   # ✅ CORRECT: Update current release file
+   - Mark complete in backlog/active.md
+   - Add implementation details to backlog/release-0.1.5.md (current version)
+   - Keep version in pyproject.toml unchanged until ready to publish
+
+   # ❌ WRONG: Don't create new release file during development
+   - Don't create release-0.1.6.md
+   - Don't increment pyproject.toml version yet
+   ```
+
+5. **Publishing to PyPI Checklist**:
+   - [ ] All features documented in current `release-{semver}.md`
+   - [ ] Update `pyproject.toml` version (e.g., 0.1.5 → 0.1.6)
+   - [ ] Run tests: `pytest`
+   - [ ] Build package: `python -m build`
+   - [ ] Upload to PyPI: `twine upload dist/*`
+   - [ ] Create **new** release file for next cycle (e.g., `release-0.1.6.md`)
+   - [ ] Commit with message: `chore: Release v0.1.6 to PyPI`
 
 ### Custom Claude Code Commands
 

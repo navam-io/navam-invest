@@ -8,7 +8,7 @@ from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
 from navam_invest.config.settings import get_settings
-from navam_invest.tools.fred import get_economic_indicator, get_key_macro_indicators
+from navam_invest.tools import get_tools_by_category
 
 
 class ResearchState(TypedDict):
@@ -32,20 +32,26 @@ async def create_research_agent() -> StateGraph:
         temperature=settings.temperature,
     )
 
-    # Bind tools with API keys pre-configured
-    fred_key = settings.fred_api_key or ""
+    # Get all research-relevant tools (macro + treasury)
+    macro_tools = get_tools_by_category("macro")
+    treasury_tools = get_tools_by_category("treasury")
+    tools = macro_tools + treasury_tools
 
-    tools = [get_economic_indicator, get_key_macro_indicators]
     llm_with_tools = llm.bind_tools(tools)
 
     # Define agent node
     async def call_model(state: ResearchState) -> dict:
         """Call the LLM with tools."""
-        # Inject API key context into system message
+        # Build API key context
+        fred_key = settings.fred_api_key or ""
+
+        # Inject comprehensive system message with API keys
         system_msg = HumanMessage(
             content=f"You are a market research assistant specializing in macroeconomic analysis. "
-            f"Use the FRED API key: {fred_key} when calling tools. "
-            f"Help users understand economic indicators and market conditions."
+            f"Use FRED API key: {fred_key} for economic indicators (GDP, CPI, unemployment, rates). "
+            f"U.S. Treasury tools for yield curves and spreads require no API key. "
+            f"Help users understand economic indicators, yield curve dynamics, market regimes, and macro trends. "
+            f"Provide context on what yield spreads indicate about economic conditions."
         )
 
         messages = [system_msg] + state["messages"]

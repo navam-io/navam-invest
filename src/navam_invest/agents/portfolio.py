@@ -8,7 +8,7 @@ from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
 from navam_invest.config.settings import get_settings
-from navam_invest.tools.alpha_vantage import get_stock_overview, get_stock_price
+from navam_invest.tools import get_tools_by_category
 
 
 class PortfolioState(TypedDict):
@@ -32,20 +32,29 @@ async def create_portfolio_agent() -> StateGraph:
         temperature=settings.temperature,
     )
 
-    # Bind tools with API keys pre-configured
-    alpha_key = settings.alpha_vantage_api_key or ""
+    # Get all portfolio-relevant tools (market + fundamentals + SEC)
+    market_tools = get_tools_by_category("market")
+    fundamentals_tools = get_tools_by_category("fundamentals")
+    sec_tools = get_tools_by_category("sec")
+    tools = market_tools + fundamentals_tools + sec_tools
 
-    tools = [get_stock_price, get_stock_overview]
     llm_with_tools = llm.bind_tools(tools)
 
     # Define agent node
     async def call_model(state: PortfolioState) -> dict:
         """Call the LLM with tools."""
-        # Inject API key context into system message
+        # Build API key context
+        alpha_key = settings.alpha_vantage_api_key or ""
+        fmp_key = settings.fmp_api_key or ""
+
+        # Inject comprehensive system message with API keys
         system_msg = HumanMessage(
-            content=f"You are a portfolio analysis assistant. "
-            f"Use the Alpha Vantage API key: {alpha_key} when calling tools. "
-            f"Help users analyze stocks and provide investment insights."
+            content=f"You are a portfolio analysis assistant with access to comprehensive market data. "
+            f"Use Alpha Vantage API key: {alpha_key} for stock prices and overviews. "
+            f"Use FMP API key: {fmp_key} for fundamentals, ratios, insider trades, and screening. "
+            f"SEC EDGAR tools require no API key. "
+            f"Help users analyze stocks, fundamentals, insider activity, and SEC filings. "
+            f"Provide detailed investment insights and recommendations."
         )
 
         messages = [system_msg] + state["messages"]

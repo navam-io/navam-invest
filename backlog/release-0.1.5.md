@@ -198,6 +198,47 @@ Implements **Tier 1 APIs** from `refer/specs/api-tools.md`:
 
 **Next Phase**: Tier 2 Macro APIs (World Bank, OECD) + Tier 3 Alternative Data
 
+---
+
+## Agent-Tool Integration Update
+
+### Implementation
+
+**Problem Identified**: After adding 13 new tools, agents were still using only the original 4 tools (23% utilization).
+
+#### Agent Updates
+
+**Portfolio Agent** (`agents/portfolio.py`):
+- Changed from hardcoded imports to category-based tool loading
+- Now uses **11 tools** (market + fundamentals + SEC):
+  ```python
+  market_tools = get_tools_by_category("market")          # 2 tools
+  fundamentals_tools = get_tools_by_category("fundamentals")  # 4 tools
+  sec_tools = get_tools_by_category("sec")                # 5 tools
+  ```
+- Enhanced system prompt with comprehensive API key context
+
+**Research Agent** (`agents/research.py`):
+- Changed from hardcoded imports to category-based tool loading
+- Now uses **6 tools** (macro + treasury):
+  ```python
+  macro_tools = get_tools_by_category("macro")      # 2 tools
+  treasury_tools = get_tools_by_category("treasury")  # 4 tools
+  ```
+- Enhanced system prompt with yield curve interpretation guidance
+
+**Configuration** (`config/settings.py`):
+- Added `fmp_api_key: Optional[str] = None`
+- Organized API keys by category (Market Data vs Macro Data)
+
+### Results
+
+- **Tool Utilization**: 4/17 (23%) → 17/17 (100%)
+- **Portfolio Agent**: 2 → 11 tools
+- **Research Agent**: 2 → 6 tools
+- **Architecture**: Scalable category-based loading enables future expansion
+- **Tests**: All 7 tests passing ✅
+
 ### Release Date
 2025-10-05
 

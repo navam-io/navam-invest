@@ -22,10 +22,11 @@ class Settings(BaseSettings):
     # Anthropic API
     anthropic_api_key: str
 
-    # Alpha Vantage API
+    # Market Data APIs
     alpha_vantage_api_key: Optional[str] = None
+    fmp_api_key: Optional[str] = None  # Financial Modeling Prep
 
-    # FRED API
+    # Macro Data APIs
     fred_api_key: Optional[str] = None
 
     # Model configuration

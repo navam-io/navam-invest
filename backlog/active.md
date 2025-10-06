@@ -1,6 +1,10 @@
 # Active Backlog
 
-[ ] When running `navam invest` provide `/quit` command to quit instead of control+q as the latter interferes with VS Code terminal. Update the chat footer accordingly.
+[ ] Review the src/navam_invest/agents/ code and system prompts using api_key references. Is this secure way to pass API credentials to tools? Can't we check API keys as part of the tool initialization code? What is the best practice for LangGraph - verify with latest docs and examples?
+
+[ ] When running `navam invest` and user enters the `/porfolio` or `/research` commands. Provide few usable prompt examples which provide good coverage of all tools. Add `/examples` command to randomly rotate among a pre-hydrated set of prompts based on the agent active.
+
+[ ] When running `navam invest` provide `/quit` command to quit instead of control+q as the latter interferes with VS Code terminal. Similarly add `/clear` command to clear chat. Update the chat footer accordingly. Add `/help` command to chat footer.
 
 [ ] Provide a capability to read files within the folder where `navam invest` is running and bring files content into conversation context.
 
@@ -16,4 +20,4 @@ All completed features have been moved to their respective release files:
 - `release-0.1.2.md` - Configuration error handling patch
 - `release-0.1.3.md` - CLI command improvement (navam invest)
 - `release-0.1.4.md` - Product vision & architecture documentation
-- `release-0.1.5.md` - Tier 1 API tools expansion (FMP, Treasury, SEC EDGAR) - 13 new tools added
+- `release-0.1.5.md` - Tier 1 API tools expansion (FMP, Treasury, SEC EDGAR) + Agent-tool integration (17 tools, 100% utilization)
