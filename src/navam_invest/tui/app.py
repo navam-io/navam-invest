@@ -1,6 +1,7 @@
 """Textual-based TUI for Navam Invest."""
 
 import asyncio
+import random
 from typing import Optional
 
 from langchain_core.messages import HumanMessage
@@ -12,6 +13,29 @@ from textual.widgets import Footer, Header, Input, RichLog
 from navam_invest.agents.portfolio import create_portfolio_agent
 from navam_invest.agents.research import create_research_agent
 from navam_invest.config.settings import ConfigurationError
+
+# Example prompts for each agent
+PORTFOLIO_EXAMPLES = [
+    "What's the current price and overview of AAPL?",
+    "Show me the fundamentals and financial ratios for TSLA",
+    "What insider trades have happened at MSFT recently?",
+    "Screen for tech stocks with P/E ratio under 20 and market cap over $10B",
+    "Get the latest 10-K filing for GOOGL",
+    "Show me institutional holdings (13F filings) for NVDA",
+    "Compare the financial ratios of AAPL and MSFT",
+    "What does the latest 10-Q for AMZN reveal about their business?",
+]
+
+RESEARCH_EXAMPLES = [
+    "What's the current GDP growth rate?",
+    "Show me key macro indicators: GDP, CPI, and unemployment",
+    "What does the Treasury yield curve look like today?",
+    "Calculate the 10-year minus 2-year yield spread",
+    "What's the current debt-to-GDP ratio?",
+    "How has inflation (CPI) trended over the past year?",
+    "What's the current federal funds rate?",
+    "Is the yield curve inverted? What does that signal?",
+]
 
 
 class ChatUI(App):
@@ -56,7 +80,7 @@ class ChatUI(App):
         yield RichLog(id="chat-log", highlight=True, markup=True)
         yield Container(
             Input(
-                placeholder="Ask about stocks or economic indicators (/help for commands, /quit to exit)...",
+                placeholder="Ask about stocks or economic indicators (/examples for ideas, /help for commands)...",
                 id="user-input",
             ),
             id="input-container",
@@ -74,12 +98,14 @@ class ChatUI(App):
                 "**Commands:**\n"
                 "- `/portfolio` - Switch to portfolio analysis agent\n"
                 "- `/research` - Switch to market research agent\n"
+                "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
                 "- `/quit` - Exit the application\n"
                 "- `/help` - Show all commands\n\n"
                 "**Keyboard Shortcuts:**\n"
                 "- `Ctrl+C` - Clear chat\n"
-                "- `Ctrl+Q` - Quit\n"
+                "- `Ctrl+Q` - Quit\n\n"
+                "**Tip:** Type `/examples` to see what you can ask!\n"
             )
         )
 
@@ -178,6 +204,7 @@ class ChatUI(App):
                     "\n**Available Commands:**\n"
                     "- `/portfolio` - Switch to portfolio analysis agent\n"
                     "- `/research` - Switch to market research agent\n"
+                    "- `/examples` - Show example prompts for current agent\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"
                     "- `/help` - Show this help message\n"
@@ -189,6 +216,29 @@ class ChatUI(App):
         elif command == "/research":
             self.current_agent = "research"
             chat_log.write("\n[green]✓ Switched to Market Research agent[/green]\n")
+        elif command == "/examples":
+            # Show examples for current agent
+            examples = (
+                PORTFOLIO_EXAMPLES
+                if self.current_agent == "portfolio"
+                else RESEARCH_EXAMPLES
+            )
+            agent_name = (
+                "Portfolio Analysis" if self.current_agent == "portfolio" else "Market Research"
+            )
+
+            # Randomly select 4 examples to show
+            selected_examples = random.sample(examples, min(4, len(examples)))
+
+            examples_text = "\n".join(f"{i+1}. {ex}" for i, ex in enumerate(selected_examples))
+
+            chat_log.write(
+                Markdown(
+                    f"\n**Example prompts for {agent_name} agent:**\n\n"
+                    f"{examples_text}\n\n"
+                    f"💡 Try copying one of these or ask your own question!\n"
+                )
+            )
         elif command == "/clear":
             self.action_clear()
         elif command == "/quit":

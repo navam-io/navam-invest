@@ -1,10 +1,10 @@
 # Active Backlog
 
-[ ] When running `navam invest` and user enters the `/porfolio` or `/research` commands. Provide few usable prompt examples which provide good coverage of all tools. Add `/examples` command to randomly rotate among a pre-hydrated set of prompts based on the agent active.
-
 [ ] Provide a capability to read files within the folder where `navam invest` is running and bring files content into conversation context.
 
 [ ] Make user prompt area multi-line capable.
+
+[ ] Make chat response area selectable for copying text
 
 [ ] Create next release of `navam_invest` package which adds more agents and tools based on refer/specs/api-tools.md prioritized list of APIs.
 
