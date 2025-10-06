@@ -110,43 +110,42 @@ This project uses a structured backlog system synchronized with package versioni
 
 **CRITICAL: Release File Management Rules**
 
-1. **Update Current Release, Don't Create New**:
-   - Always update the **current** `release-{semver}.md` file matching `pyproject.toml` version
-   - Example: If `pyproject.toml` shows `version = "0.1.5"`, update `release-0.1.5.md`
-   - DO NOT create `release-0.1.6.md` until package is published to PyPI
+**Version-First Workflow**: Version is incremented at START of development, not at publish time.
 
-2. **Version Increment Flow**:
-   ```
-   Development → Update release-0.1.5.md
-   Ready to Publish → Update version in pyproject.toml to 0.1.6
-   Publish to PyPI → Create release-0.1.6.md for next development cycle
-   ```
+1. **Starting New Development Cycle**:
+   - After publishing v0.1.5 to PyPI, increment version immediately:
+     - Update `pyproject.toml`: `version = "0.1.6"`
+     - Create `release-0.1.6.md` with status "IN DEVELOPMENT"
+   - Now you can develop features that will be published as v0.1.6
 
-3. **Never Skip Versions**:
-   - Package version in `pyproject.toml` must match latest release file
-   - If current is `0.1.5`, next must be `0.1.6` (not `0.2.0` or `0.1.7`)
-   - Increment patch (0.1.x) for fixes/features, minor (0.x.0) for breaking changes
-
-4. **When Completing a Feature**:
+2. **During Development**:
    ```bash
    # ✅ CORRECT: Update current release file
    - Mark complete in backlog/active.md
-   - Add implementation details to backlog/release-0.1.5.md (current version)
-   - Keep version in pyproject.toml unchanged until ready to publish
+   - Add implementation details to backlog/release-0.1.6.md (current version)
+   - Keep version in pyproject.toml UNCHANGED at 0.1.6
 
-   # ❌ WRONG: Don't create new release file during development
-   - Don't create release-0.1.6.md
-   - Don't increment pyproject.toml version yet
+   # ❌ WRONG: Don't increment version during development
+   - Don't change pyproject.toml version
+   - Don't create release-0.1.7.md yet
    ```
 
-5. **Publishing to PyPI Checklist**:
+3. **Publishing to PyPI** (use `/code:package`):
+   - [ ] Verify `pyproject.toml` version matches current `release-{version}.md`
    - [ ] All features documented in current `release-{semver}.md`
-   - [ ] Update `pyproject.toml` version (e.g., 0.1.5 → 0.1.6)
    - [ ] Run tests: `pytest`
    - [ ] Build package: `python -m build`
    - [ ] Upload to PyPI: `twine upload dist/*`
-   - [ ] Create **new** release file for next cycle (e.g., `release-0.1.6.md`)
+   - [ ] Update `release-{version}.md`: change "IN DEVELOPMENT" to published date
+   - [ ] Create **new** release file for next cycle (e.g., `release-0.1.7.md`)
+   - [ ] Increment `pyproject.toml` to next version (e.g., 0.1.6 → 0.1.7)
    - [ ] Commit with message: `chore: Release v0.1.6 to PyPI`
+
+4. **Version Synchronization Rules**:
+   - `pyproject.toml` version ALWAYS matches the current development `release-{version}.md` file
+   - Example: `version = "0.1.7"` in pyproject.toml → `release-0.1.7.md` exists with status "IN DEVELOPMENT"
+   - Published versions have `release-{version}.md` with PyPI URL and date (no "IN DEVELOPMENT")
+   - Never skip versions: 0.1.5 → 0.1.6 → 0.1.7 (increment patch for fixes/features, minor for breaking changes)
 
 ### Custom Claude Code Commands
 
