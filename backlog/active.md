@@ -1,6 +1,6 @@
 # Active Backlog
 
-[ ] Provide a capability to read files within the folder where `navam invest` is running and bring files content into conversation context.
+[ ] Review refer/specs/api-tools.md and research online for open APIs and APIs with decent free-tier limits to replace FMP API as it is not offering many capabilities in free tier.
 
 [ ] Make chat response area selectable for copying text
 

@@ -8,6 +8,9 @@ from langchain_core.tools import BaseTool, StructuredTool
 # Alpha Vantage tools
 from navam_invest.tools.alpha_vantage import get_stock_overview, get_stock_price
 
+# File reading tools
+from navam_invest.tools.file_reader import list_local_files, read_local_file
+
 # FRED tools
 from navam_invest.tools.fred import get_economic_indicator, get_key_macro_indicators
 
@@ -41,6 +44,9 @@ TOOLS: Dict[str, BaseTool] = {
     # Market Data (Alpha Vantage)
     "get_stock_price": get_stock_price,
     "get_stock_overview": get_stock_overview,
+    # File Reading (Local Data)
+    "read_local_file": read_local_file,
+    "list_local_files": list_local_files,
     # Fundamentals (FMP)
     "get_company_fundamentals": get_company_fundamentals,
     "get_financial_ratios": get_financial_ratios,
@@ -79,6 +85,7 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
     """
     category_map = {
         "market": ["get_stock_price", "get_stock_overview"],
+        "files": ["read_local_file", "list_local_files"],
         "fundamentals": [
             "get_company_fundamentals",
             "get_financial_ratios",
@@ -206,6 +213,9 @@ __all__ = [
     # Alpha Vantage
     "get_stock_price",
     "get_stock_overview",
+    # File Reading
+    "read_local_file",
+    "list_local_files",
     # FMP
     "get_company_fundamentals",
     "get_financial_ratios",

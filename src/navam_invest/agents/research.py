@@ -32,10 +32,11 @@ async def create_research_agent() -> StateGraph:
         temperature=settings.temperature,
     )
 
-    # Get all research-relevant tools (macro + treasury)
+    # Get all research-relevant tools (macro + treasury + files)
     macro_tools = get_tools_by_category("macro")
     treasury_tools = get_tools_by_category("treasury")
-    tools = macro_tools + treasury_tools
+    file_tools = get_tools_by_category("files")
+    tools = macro_tools + treasury_tools + file_tools
 
     # Securely bind API keys to tools (keeps credentials out of LLM context)
     tools_with_keys = bind_api_keys_to_tools(

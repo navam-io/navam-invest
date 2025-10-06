@@ -32,11 +32,12 @@ async def create_portfolio_agent() -> StateGraph:
         temperature=settings.temperature,
     )
 
-    # Get all portfolio-relevant tools (market + fundamentals + SEC)
+    # Get all portfolio-relevant tools (market + fundamentals + SEC + files)
     market_tools = get_tools_by_category("market")
+    file_tools = get_tools_by_category("files")
     fundamentals_tools = get_tools_by_category("fundamentals")
     sec_tools = get_tools_by_category("sec")
-    tools = market_tools + fundamentals_tools + sec_tools
+    tools = market_tools + file_tools + fundamentals_tools + sec_tools
 
     # Securely bind API keys to tools (keeps credentials out of LLM context)
     tools_with_keys = bind_api_keys_to_tools(
@@ -53,9 +54,14 @@ async def create_portfolio_agent() -> StateGraph:
         # Clean system message without API keys
         system_msg = HumanMessage(
             content="You are a portfolio analysis assistant with access to comprehensive market data. "
-            "You have tools for stock prices, company overviews, financial fundamentals, ratios, "
-            "insider trading activity, stock screening, and SEC filings (10-K, 10-Q, 13F). "
-            "Help users analyze stocks, fundamentals, insider activity, and regulatory filings. "
+            "You have tools for:\n"
+            "- Reading local files (CSV, JSON, Excel, etc.) from the user's working directory\n"
+            "- Stock prices, company overviews, financial fundamentals, and ratios\n"
+            "- Insider trading activity and stock screening\n"
+            "- SEC filings (10-K, 10-Q, 13F)\n\n"
+            "Help users analyze their portfolio data files, stocks, fundamentals, insider activity, "
+            "and regulatory filings. When users have portfolio data in local files, use the file "
+            "reading tools to access and analyze their holdings. "
             "Provide detailed investment insights and recommendations based on the data you retrieve."
         )
 
