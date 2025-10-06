@@ -1,7 +1,7 @@
 # Release 0.1.10
 
 ## Status
-IN DEVELOPMENT
+Published
 
 ## Features
 
@@ -34,7 +34,7 @@ IN DEVELOPMENT
 - Get news-driven insights for investment decisions
 
 ## Release Date
-TBD
+2025-10-06
 
 ## PyPI Package
-Not yet published
+https://pypi.org/project/navam-invest/0.1.10/

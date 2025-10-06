@@ -21,3 +21,4 @@ All completed features have been moved to their respective release files:
 - `release-0.1.7.md` - TUI command enhancements (/quit, /clear, /examples)
 - `release-0.1.8.md` - FMP screener enhancements and bug fixes
 - `release-0.1.9.md` - Local file reading capability
+- `release-0.1.10.md` - NewsAPI.org integration for market news and sentiment
