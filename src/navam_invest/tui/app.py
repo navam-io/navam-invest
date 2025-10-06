@@ -40,7 +40,7 @@ class ChatUI(App):
 
     BINDINGS = [
         ("ctrl+q", "quit", "Quit"),
-        ("ctrl+c", "clear", "Clear Chat"),
+        ("ctrl+c", "clear", "Clear"),
     ]
 
     def __init__(self) -> None:
@@ -56,7 +56,7 @@ class ChatUI(App):
         yield RichLog(id="chat-log", highlight=True, markup=True)
         yield Container(
             Input(
-                placeholder="Ask about stocks or economic indicators (type /help for commands)...",
+                placeholder="Ask about stocks or economic indicators (/help for commands, /quit to exit)...",
                 id="user-input",
             ),
             id="input-container",
@@ -74,7 +74,10 @@ class ChatUI(App):
                 "**Commands:**\n"
                 "- `/portfolio` - Switch to portfolio analysis agent\n"
                 "- `/research` - Switch to market research agent\n"
-                "- `/help` - Show this help message\n"
+                "- `/clear` - Clear chat history\n"
+                "- `/quit` - Exit the application\n"
+                "- `/help` - Show all commands\n\n"
+                "**Keyboard Shortcuts:**\n"
                 "- `Ctrl+C` - Clear chat\n"
                 "- `Ctrl+Q` - Quit\n"
             )
@@ -175,6 +178,8 @@ class ChatUI(App):
                     "\n**Available Commands:**\n"
                     "- `/portfolio` - Switch to portfolio analysis agent\n"
                     "- `/research` - Switch to market research agent\n"
+                    "- `/clear` - Clear chat history\n"
+                    "- `/quit` - Exit the application\n"
                     "- `/help` - Show this help message\n"
                 )
             )
@@ -184,6 +189,10 @@ class ChatUI(App):
         elif command == "/research":
             self.current_agent = "research"
             chat_log.write("\n[green]✓ Switched to Market Research agent[/green]\n")
+        elif command == "/clear":
+            self.action_clear()
+        elif command == "/quit":
+            self.exit()
         else:
             chat_log.write(f"\n[yellow]Unknown command: {command}[/yellow]\n")
 
