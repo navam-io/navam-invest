@@ -54,6 +54,7 @@ async def create_portfolio_agent() -> StateGraph:
         alpha_vantage_key=settings.alpha_vantage_api_key or "",
         fmp_key=settings.fmp_api_key or "",
         finnhub_key=settings.finnhub_api_key or "",
+        tiingo_key=settings.tiingo_api_key or "",
         newsapi_key=settings.newsapi_api_key or "",
     )
 
@@ -64,10 +65,11 @@ async def create_portfolio_agent() -> StateGraph:
         """Call the LLM with tools."""
         # Clean system message without API keys
         system_msg = HumanMessage(
-            content="You are a portfolio analysis assistant with access to comprehensive market data and sentiment analysis. "
+            content="You are a portfolio analysis assistant with access to comprehensive market data, historical fundamentals, and sentiment analysis. "
             "You have tools for:\n"
             "- Reading local files (CSV, JSON, Excel, etc.) from the user's working directory\n"
             "- Stock prices, company overviews, financial fundamentals, and ratios\n"
+            "- **Historical fundamentals** (5 years of daily metrics, quarterly statements, multi-year trends via Tiingo)\n"
             "- Insider trading activity and stock screening\n"
             "- **Alternative data & sentiment** (news sentiment, social media sentiment, insider sentiment, analyst recommendations)\n"
             "- SEC filings (10-K, 10-Q, 13F)\n"
@@ -75,6 +77,7 @@ async def create_portfolio_agent() -> StateGraph:
             "Help users analyze their portfolio data files, stocks, fundamentals, insider activity, "
             "regulatory filings, and market sentiment from multiple sources. When users have portfolio data in local files, use the file "
             "reading tools to access and analyze their holdings. "
+            "For long-term fundamental analysis, use Tiingo tools to access up to 5 years of historical data and quarterly statements. "
             "Provide detailed investment insights and recommendations based on the data you retrieve, "
             "including sentiment analysis (news sentiment, social media buzz, insider trading patterns, and analyst recommendations)."
         )

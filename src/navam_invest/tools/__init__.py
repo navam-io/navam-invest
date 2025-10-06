@@ -38,6 +38,14 @@ from navam_invest.tools.finnhub import (
     get_social_sentiment,
 )
 
+# Tiingo tools
+from navam_invest.tools.tiingo import (
+    get_fundamentals_daily,
+    get_fundamentals_definitions,
+    get_fundamentals_statements,
+    get_historical_fundamentals,
+)
+
 # SEC EDGAR tools
 from navam_invest.tools.sec_edgar import (
     get_company_filings,
@@ -74,6 +82,11 @@ TOOLS: Dict[str, BaseTool] = {
     "get_insider_sentiment": get_insider_sentiment,
     "get_recommendation_trends": get_recommendation_trends,
     "get_finnhub_company_news": get_finnhub_company_news,
+    # Historical Fundamentals (Tiingo)
+    "get_fundamentals_daily": get_fundamentals_daily,
+    "get_fundamentals_statements": get_fundamentals_statements,
+    "get_fundamentals_definitions": get_fundamentals_definitions,
+    "get_historical_fundamentals": get_historical_fundamentals,
     # Macro Data (FRED)
     "get_economic_indicator": get_economic_indicator,
     "get_key_macro_indicators": get_key_macro_indicators,
@@ -117,6 +130,10 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
             "get_financial_ratios",
             "get_insider_trades",
             "screen_stocks",
+            "get_fundamentals_daily",
+            "get_fundamentals_statements",
+            "get_fundamentals_definitions",
+            "get_historical_fundamentals",
         ],
         "sentiment": [
             "get_company_news_sentiment",
@@ -169,6 +186,7 @@ def bind_api_keys_to_tools(
     alpha_vantage_key: str = "",
     fmp_key: str = "",
     finnhub_key: str = "",
+    tiingo_key: str = "",
     fred_key: str = "",
     newsapi_key: str = "",
 ) -> List[BaseTool]:
@@ -182,6 +200,7 @@ def bind_api_keys_to_tools(
         alpha_vantage_key: Alpha Vantage API key
         fmp_key: Financial Modeling Prep API key
         finnhub_key: Finnhub API key
+        tiingo_key: Tiingo API key
         fred_key: FRED API key
         newsapi_key: NewsAPI.org API key
 
@@ -237,6 +256,24 @@ def bind_api_keys_to_tools(
         ]:
             if finnhub_key and callable_func:
                 bound_func = _create_bound_wrapper(callable_func, finnhub_key)
+                bound_tool = StructuredTool.from_function(
+                    coroutine=bound_func,
+                    name=tool.name,
+                    description=tool.description,
+                )
+                bound_tools.append(bound_tool)
+            else:
+                bound_tools.append(tool)
+
+        # Tiingo tools
+        elif tool_name in [
+            "get_fundamentals_daily",
+            "get_fundamentals_statements",
+            "get_fundamentals_definitions",
+            "get_historical_fundamentals",
+        ]:
+            if tiingo_key and callable_func:
+                bound_func = _create_bound_wrapper(callable_func, tiingo_key)
                 bound_tool = StructuredTool.from_function(
                     coroutine=bound_func,
                     name=tool.name,
@@ -305,6 +342,11 @@ __all__ = [
     "get_insider_sentiment",
     "get_recommendation_trends",
     "get_finnhub_company_news",
+    # Tiingo
+    "get_fundamentals_daily",
+    "get_fundamentals_statements",
+    "get_fundamentals_definitions",
+    "get_historical_fundamentals",
     # FRED
     "get_economic_indicator",
     "get_key_macro_indicators",

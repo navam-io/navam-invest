@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     alpha_vantage_api_key: Optional[str] = None
     fmp_api_key: Optional[str] = None  # Financial Modeling Prep
     finnhub_api_key: Optional[str] = None  # Finnhub alternative data
+    tiingo_api_key: Optional[str] = None  # Tiingo historical fundamentals
 
     # Macro Data APIs
     fred_api_key: Optional[str] = None
