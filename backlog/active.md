@@ -1,8 +1,8 @@
 # Active Backlog
 
-[ ] Reflect on refer/specs/agents-tools.md and refer/specs/multi-agents.md to decide 1. how to refactor current agents and tools, and 2. build next set of agents, tools, and multi-agent workflow.
-
 [ ] Implement Tiingo integration for historical fundamentals and quarterly tracking - See refer/specs/api-alternatives-report.md
+
+[ ] Reflect on refer/specs/agents-tools.md and refer/specs/multi-agents.md to decide 1. how to refactor current agents and tools, and 2. build next set of agents, tools, and multi-agent workflow. You can also split this backlog item into multiple open items accordingly.
 
 
 ## Completed Items

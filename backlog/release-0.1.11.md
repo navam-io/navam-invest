@@ -155,7 +155,7 @@ Integrated Finnhub API to provide alternative data and sentiment analysis capabi
 **Documentation**: Complete Finnhub integration with sentiment analysis tools
 
 ## Release Date
-TBD
+2025-10-06
 
 ## PyPI Package
-Not yet published
+https://pypi.org/project/navam-invest/0.1.11/
