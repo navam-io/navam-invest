@@ -16,16 +16,16 @@ console = Console()
 
 
 @app.command()
-def tui() -> None:
-    """Launch the interactive TUI (Text User Interface)."""
-    console.print("[bold green]Launching Navam Invest TUI...[/bold green]")
+def invest() -> None:
+    """Launch the interactive investment advisor chat interface."""
+    console.print("[bold green]Launching Navam Invest...[/bold green]")
     asyncio.run(run_tui())
 
 
 @app.command()
 def version() -> None:
     """Show version information."""
-    console.print("[bold]Navam Invest v0.1.2[/bold]")
+    console.print("[bold]Navam Invest v0.1.3[/bold]")
     console.print("AI-powered investment advisor for retail investors")
 
 
@@ -33,13 +33,13 @@ def version() -> None:
 def main(ctx: typer.Context) -> None:
     """Navam Invest - AI-powered investment advisor.
 
-    Run 'navam tui' to launch the interactive interface.
+    Run 'navam invest' to launch the interactive interface.
     """
     if ctx.invoked_subcommand is None:
         console.print(
             "[bold cyan]Navam Invest[/bold cyan] - AI-powered investment advisor\n"
         )
-        console.print("Usage: [bold]navam tui[/bold] - Launch interactive interface")
+        console.print("Usage: [bold]navam invest[/bold] - Launch interactive interface")
         console.print("       [bold]navam version[/bold] - Show version")
         console.print("\nRun [bold]navam --help[/bold] for more information.")
 

@@ -97,7 +97,7 @@ class ChatUI(App):
                     f"**Quick Setup:**\n\n"
                     f"1. Copy the example file: `cp .env.example .env`\n"
                     f"2. Edit `.env` and add your API key\n"
-                    f"3. Restart the application: `navam tui`\n\n"
+                    f"3. Restart the application: `navam invest`\n\n"
                     f"Press `Ctrl+Q` to quit."
                 )
             )

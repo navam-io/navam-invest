@@ -137,10 +137,10 @@ pip install -e ".[dev]"
 
 ### Usage
 
-#### Launch the Interactive TUI
+#### Launch the Interactive Interface
 
 ```bash
-navam tui
+navam invest
 ```
 
 #### Example Interactions
@@ -177,7 +177,7 @@ Research Agent: [Shows dashboard of GDP, unemployment, CPI, fed funds rate]
 #### CLI Commands
 
 ```bash
-navam tui       # Launch interactive TUI
+navam invest    # Launch interactive chat interface
 navam version   # Show version information
 navam --help    # Show help
 ```
