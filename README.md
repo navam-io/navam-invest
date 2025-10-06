@@ -20,6 +20,18 @@
 
 ---
 
+## 🆕 What's New in v0.1.5
+
+**Tier 1 API Tools Expansion** - Added 13 new tools across 3 major APIs:
+
+- ✨ **Financial Modeling Prep**: Comprehensive fundamentals, ratios, insider trades, stock screening
+- ✨ **U.S. Treasury Data**: Full yield curves (1M-30Y), spreads, debt metrics - no API key needed!
+- ✨ **SEC EDGAR**: Corporate filings (10-K, 10-Q, 13F) with direct links
+
+**Tool Count**: 4 → 17 tools (+325% growth) | **Full release notes**: [v0.1.5](backlog/release-0.1.5.md)
+
+---
+
 ## 📖 Overview
 
 `navam-invest` brings institutional-grade portfolio intelligence to individual retail investors. Built with [LangGraph](https://langchain-ai.github.io/langgraph/) and powered by [Anthropic's Claude](https://www.anthropic.com/claude), it provides specialized AI agents for portfolio analysis, market research, and investment insights—all accessible through an interactive terminal interface.
@@ -44,30 +56,35 @@
 
 **Portfolio Analysis Agent**
 - Real-time stock quotes and metrics
-- Company fundamentals analysis
-- Investment insights and recommendations
-- Technical indicators
+- Company fundamentals & financial ratios
+- Insider trading activity tracking
+- SEC filings (10-K, 10-Q, 13F)
+- Multi-criteria stock screening
 
 </td>
 <td width="50%">
 
 **Market Research Agent**
 - Macroeconomic indicators (GDP, CPI, unemployment)
+- Treasury yield curves & spreads
 - Federal Reserve data (FRED)
-- Economic trend analysis
-- Market condition assessment
+- Economic regime detection
+- Debt-to-GDP analysis
 
 </td>
 </tr>
 </table>
 
-### 📊 **Real API Integrations**
+### 📊 **Real API Integrations** (17 Tools Across 5 Data Sources)
 
-| API | Purpose | Cost |
-|-----|---------|------|
-| **Alpha Vantage** | Stock prices, company fundamentals | Free tier: 25 calls/day |
-| **FRED (St. Louis Fed)** | Economic indicators, macro data | Free (unlimited) |
-| **Anthropic Claude** | AI reasoning and tool orchestration | Pay-as-you-go |
+| API | Tools | Purpose | Cost |
+|-----|-------|---------|------|
+| **Alpha Vantage** | 2 | Stock prices, company fundamentals, technical indicators | Free tier: 25 calls/day |
+| **Financial Modeling Prep** | 4 | Financial statements, ratios, insider trades, screening | Free tier: 250 calls/day |
+| **FRED (St. Louis Fed)** | 2 | Economic indicators, macro data | Free (unlimited) |
+| **U.S. Treasury** | 4 | Yield curves, treasury rates, debt data | Free (unlimited) |
+| **SEC EDGAR** | 5 | Corporate filings (10-K, 10-Q, 13F) | Free (10 req/sec) |
+| **Anthropic Claude** | - | AI reasoning and tool orchestration | Pay-as-you-go |
 
 ### 💬 **Interactive Terminal UI**
 
@@ -125,15 +142,18 @@ pip install -e ".[dev]"
    # Required
    ANTHROPIC_API_KEY=sk-ant-...
 
-   # Optional (but recommended)
+   # Optional (but recommended for full functionality)
    ALPHA_VANTAGE_API_KEY=your_key_here
    FRED_API_KEY=your_key_here
+   FMP_API_KEY=your_key_here
    ```
 
 3. **Get API Keys** (all free tiers available):
    - **Anthropic**: [console.anthropic.com](https://console.anthropic.com/) (pay-as-you-go)
    - **Alpha Vantage**: [alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key) (free)
    - **FRED**: [fredaccount.stlouisfed.org/apikeys](https://fredaccount.stlouisfed.org/apikeys) (free)
+   - **FMP**: [financialmodelingprep.com/developer](https://financialmodelingprep.com/developer) (free)
+   - **Treasury & SEC**: No API keys required!
 
 ### Usage
 
@@ -150,8 +170,14 @@ navam invest
 You: What's the current price of AAPL?
 Portfolio Agent: [Fetches real-time data and provides formatted response]
 
-You: Show me Apple's fundamentals
-Portfolio Agent: [Displays P/E ratio, EPS, market cap, sector info, etc.]
+You: Show me Apple's financial ratios
+Portfolio Agent: [Displays liquidity, profitability, leverage ratios]
+
+You: Any recent insider trading at AAPL?
+Portfolio Agent: [Shows latest insider buy/sell activity with dates and volumes]
+
+You: Find me the latest 10-K for Apple
+Portfolio Agent: [Retrieves SEC filing with direct link to document]
 ```
 
 **Market Research:**
@@ -159,6 +185,12 @@ Portfolio Agent: [Displays P/E ratio, EPS, market cap, sector info, etc.]
 You: /research
 You: What's the current GDP?
 Research Agent: [Fetches latest GDP data from FRED with date and trend]
+
+You: Show me the Treasury yield curve
+Research Agent: [Displays full curve from 1M to 30Y with current rates]
+
+You: What's the 2Y-10Y spread telling us?
+Research Agent: [Calculates spread with economic interpretation (normal/inverted/flat)]
 
 You: Give me key economic indicators
 Research Agent: [Shows dashboard of GDP, unemployment, CPI, fed funds rate]
@@ -194,9 +226,13 @@ navam-invest/
 │   ├── agents/              # 🤖 LangGraph agent implementations
 │   │   ├── portfolio.py     #    Portfolio analysis with ReAct pattern
 │   │   └── research.py      #    Market research with macro tools
-│   ├── tools/               # 🔧 API integration tools
+│   ├── tools/               # 🔧 API integration tools (17 tools total)
 │   │   ├── alpha_vantage.py #    Stock price & fundamentals
-│   │   └── fred.py          #    Economic indicators & macro data
+│   │   ├── fred.py          #    Economic indicators & macro data
+│   │   ├── fmp.py           #    Financial statements & ratios
+│   │   ├── treasury.py      #    Yield curves & treasury data
+│   │   ├── sec_edgar.py     #    Corporate filings (10-K, 10-Q, 13F)
+│   │   └── __init__.py      #    Unified tools registry
 │   ├── tui/                 # 💬 Textual-based user interface
 │   │   └── app.py           #    Chat interface with streaming
 │   ├── config/              # ⚙️ Configuration management
@@ -264,13 +300,16 @@ User Query → Agent Reasoning → Tool Selection → Tool Execution → Respons
      └──────────────────── Streaming Updates ←──────────────────────────┘
 ```
 
-**Portfolio Analysis Agent:**
-- Tools: `get_stock_price`, `get_stock_overview`
-- Use cases: Stock analysis, fundamentals, investment research
+**Portfolio Analysis Agent (17 tools available):**
+- **Market Data**: `get_stock_price`, `get_stock_overview` (Alpha Vantage)
+- **Fundamentals**: `get_company_fundamentals`, `get_financial_ratios`, `get_insider_trades`, `screen_stocks` (FMP)
+- **Filings**: `search_company_by_ticker`, `get_latest_10k`, `get_latest_10q`, `get_institutional_holdings`, `get_company_filings` (SEC)
+- **Use cases**: Stock analysis, fundamental screening, insider tracking, regulatory research
 
-**Market Research Agent:**
-- Tools: `get_economic_indicator`, `get_key_macro_indicators`
-- Use cases: Macro analysis, economic trends, regime detection
+**Market Research Agent (6 tools available):**
+- **Macro**: `get_economic_indicator`, `get_key_macro_indicators` (FRED)
+- **Treasury**: `get_treasury_yield_curve`, `get_treasury_rate`, `get_treasury_yield_spread`, `get_debt_to_gdp` (Treasury)
+- **Use cases**: Macro analysis, yield curve interpretation, regime detection, economic trends
 
 ---
 
@@ -367,24 +406,31 @@ See `CLAUDE.md` for comprehensive guide on adding new LangGraph agents and tools
 
 ## 📋 Roadmap
 
+### ✅ v0.1.5 (Released 2025-10-05)
+- [x] Financial Modeling Prep integration (fundamentals, ratios, insider trades, screening)
+- [x] U.S. Treasury data integration (yield curves, spreads, debt metrics)
+- [x] SEC EDGAR integration (10-K, 10-Q, 13F filings)
+- [x] Unified tools registry (17 tools across 5 categories)
+
 ### v0.2.0 (Planned)
+- [ ] Tier 2 macro APIs (World Bank, OECD)
+- [ ] Alternative data (CoinGecko crypto, NewsAPI sentiment)
 - [ ] Portfolio optimization agent (MPT, Black-Litterman)
 - [ ] Tax-loss harvesting agent
-- [ ] SEC EDGAR filings integration
-- [ ] Conversation persistence with checkpointers
-- [ ] TUI panels for portfolio display
+- [ ] Conversation persistence with LangGraph checkpointers
+- [ ] Enhanced TUI with portfolio display panels
 
 ### v0.3.0 (Planned)
 - [ ] Multi-agent supervisor for coordinated analysis
-- [ ] Backtesting framework
-- [ ] Risk metrics dashboard
+- [ ] Backtesting framework with historical data
+- [ ] Risk metrics dashboard (VaR, beta, Sharpe)
 - [ ] Custom screening agents
-- [ ] Export to CSV/JSON
+- [ ] Export capabilities (CSV/JSON/PDF)
 
 ### Future
 - [ ] Web UI (Streamlit or FastAPI + HTMX)
 - [ ] Mobile app (React Native)
-- [ ] Cloud deployment option
+- [ ] LangGraph Cloud deployment
 - [ ] Social trading features
 
 ---
@@ -407,7 +453,10 @@ Built with these amazing open-source projects:
 
 Data sources:
 - [Alpha Vantage](https://www.alphavantage.co/) - Stock market data
+- [Financial Modeling Prep](https://financialmodelingprep.com/) - Fundamentals & financials
 - [FRED](https://fred.stlouisfed.org/) - Economic data from St. Louis Fed
+- [U.S. Treasury](https://fiscaldata.treasury.gov/) - Treasury yields & debt data
+- [SEC EDGAR](https://www.sec.gov/edgar) - Corporate filings
 
 ---
 
