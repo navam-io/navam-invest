@@ -13,9 +13,21 @@ async def _fetch_fmp(
     async with httpx.AsyncClient() as client:
         url = f"https://financialmodelingprep.com/api/v3/{endpoint}"
         params_with_key = {"apikey": api_key, **params}
-        response = await client.get(url, params=params_with_key, timeout=30.0)
-        response.raise_for_status()
-        return response.json()
+        try:
+            response = await client.get(url, params=params_with_key, timeout=30.0)
+            response.raise_for_status()
+            return response.json()
+        except httpx.HTTPStatusError as e:
+            # Don't expose API key in error message
+            status_code = e.response.status_code
+            if status_code == 403:
+                raise Exception(
+                    "FMP API access denied. Please check your API key is valid and has sufficient permissions."
+                )
+            elif status_code == 401:
+                raise Exception("FMP API authentication failed. Please verify your API key.")
+            else:
+                raise Exception(f"FMP API error: HTTP {status_code}")
 
 
 @tool
