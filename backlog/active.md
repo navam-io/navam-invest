@@ -2,8 +2,6 @@
 
 [ ] Provide a capability to read files within the folder where `navam invest` is running and bring files content into conversation context.
 
-[ ] Make user prompt area multi-line capable.
-
 [ ] Make chat response area selectable for copying text
 
 [ ] Create next release of `navam_invest` package which adds more agents and tools based on refer/specs/api-tools.md prioritized list of APIs.
@@ -18,4 +16,5 @@ All completed features have been moved to their respective release files:
 - `release-0.1.4.md` - Product vision & architecture documentation
 - `release-0.1.5.md` - Tier 1 API tools expansion (FMP, Treasury, SEC EDGAR) + Agent-tool integration (17 tools, 100% utilization)
 - `release-0.1.6.md` - Secure API key management
-- `release-0.1.7.md` - TUI command enhancements (/quit, /clear) - IN DEVELOPMENT
+- `release-0.1.7.md` - TUI command enhancements (/quit, /clear, /examples)
+- `release-0.1.8.md` - IN DEVELOPMENT

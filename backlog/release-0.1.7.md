@@ -241,7 +241,7 @@ placeholder="Ask about stocks or economic indicators (/examples for ideas, /help
 - ✅ **Complete tool coverage**: All 17 tools represented across examples
 
 ### Release Date
-IN DEVELOPMENT
+2025-10-06
 
 ### PyPI Package
-Not yet published
+https://pypi.org/project/navam-invest/0.1.7/
