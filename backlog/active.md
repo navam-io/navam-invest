@@ -17,4 +17,5 @@ All completed features have been moved to their respective release files:
 - `release-0.1.3.md` - CLI command improvement (navam invest)
 - `release-0.1.4.md` - Product vision & architecture documentation
 - `release-0.1.5.md` - Tier 1 API tools expansion (FMP, Treasury, SEC EDGAR) + Agent-tool integration (17 tools, 100% utilization)
-- `release-0.1.6.md` - Secure API key management + TUI command enhancements (/quit, /clear)
+- `release-0.1.6.md` - Secure API key management
+- `release-0.1.7.md` - TUI command enhancements (/quit, /clear) - IN DEVELOPMENT
