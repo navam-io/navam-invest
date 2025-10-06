@@ -8,7 +8,7 @@ from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
 from navam_invest.config.settings import get_settings
-from navam_invest.tools import get_tools_by_category
+from navam_invest.tools import bind_api_keys_to_tools, get_tools_by_category
 
 
 class ResearchState(TypedDict):
@@ -25,7 +25,7 @@ async def create_research_agent() -> StateGraph:
     """
     settings = get_settings()
 
-    # Initialize model with tools
+    # Initialize model
     llm = ChatAnthropic(
         model=settings.anthropic_model,
         api_key=settings.anthropic_api_key,
@@ -37,21 +37,23 @@ async def create_research_agent() -> StateGraph:
     treasury_tools = get_tools_by_category("treasury")
     tools = macro_tools + treasury_tools
 
-    llm_with_tools = llm.bind_tools(tools)
+    # Securely bind API keys to tools (keeps credentials out of LLM context)
+    tools_with_keys = bind_api_keys_to_tools(
+        tools, fred_key=settings.fred_api_key or ""
+    )
+
+    llm_with_tools = llm.bind_tools(tools_with_keys)
 
     # Define agent node
     async def call_model(state: ResearchState) -> dict:
         """Call the LLM with tools."""
-        # Build API key context
-        fred_key = settings.fred_api_key or ""
-
-        # Inject comprehensive system message with API keys
+        # Clean system message without API keys
         system_msg = HumanMessage(
-            content=f"You are a market research assistant specializing in macroeconomic analysis. "
-            f"Use FRED API key: {fred_key} for economic indicators (GDP, CPI, unemployment, rates). "
-            f"U.S. Treasury tools for yield curves and spreads require no API key. "
-            f"Help users understand economic indicators, yield curve dynamics, market regimes, and macro trends. "
-            f"Provide context on what yield spreads indicate about economic conditions."
+            content="You are a market research assistant specializing in macroeconomic analysis. "
+            "You have tools for economic indicators (GDP, CPI, unemployment, interest rates) and "
+            "U.S. Treasury yield curves, spreads, and debt metrics. "
+            "Help users understand economic indicators, yield curve dynamics, market regimes, and macro trends. "
+            "Provide context on what yield spreads indicate about economic conditions (e.g., inverted curves signaling recession)."
         )
 
         messages = [system_msg] + state["messages"]
@@ -63,7 +65,7 @@ async def create_research_agent() -> StateGraph:
 
     # Add nodes
     workflow.add_node("agent", call_model)
-    workflow.add_node("tools", ToolNode(tools))
+    workflow.add_node("tools", ToolNode(tools_with_keys))
 
     # Add edges
     workflow.add_edge(START, "agent")

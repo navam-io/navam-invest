@@ -8,7 +8,7 @@ from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
 from navam_invest.config.settings import get_settings
-from navam_invest.tools import get_tools_by_category
+from navam_invest.tools import bind_api_keys_to_tools, get_tools_by_category
 
 
 class PortfolioState(TypedDict):
@@ -25,7 +25,7 @@ async def create_portfolio_agent() -> StateGraph:
     """
     settings = get_settings()
 
-    # Initialize model with tools
+    # Initialize model
     llm = ChatAnthropic(
         model=settings.anthropic_model,
         api_key=settings.anthropic_api_key,
@@ -38,23 +38,25 @@ async def create_portfolio_agent() -> StateGraph:
     sec_tools = get_tools_by_category("sec")
     tools = market_tools + fundamentals_tools + sec_tools
 
-    llm_with_tools = llm.bind_tools(tools)
+    # Securely bind API keys to tools (keeps credentials out of LLM context)
+    tools_with_keys = bind_api_keys_to_tools(
+        tools,
+        alpha_vantage_key=settings.alpha_vantage_api_key or "",
+        fmp_key=settings.fmp_api_key or "",
+    )
+
+    llm_with_tools = llm.bind_tools(tools_with_keys)
 
     # Define agent node
     async def call_model(state: PortfolioState) -> dict:
         """Call the LLM with tools."""
-        # Build API key context
-        alpha_key = settings.alpha_vantage_api_key or ""
-        fmp_key = settings.fmp_api_key or ""
-
-        # Inject comprehensive system message with API keys
+        # Clean system message without API keys
         system_msg = HumanMessage(
-            content=f"You are a portfolio analysis assistant with access to comprehensive market data. "
-            f"Use Alpha Vantage API key: {alpha_key} for stock prices and overviews. "
-            f"Use FMP API key: {fmp_key} for fundamentals, ratios, insider trades, and screening. "
-            f"SEC EDGAR tools require no API key. "
-            f"Help users analyze stocks, fundamentals, insider activity, and SEC filings. "
-            f"Provide detailed investment insights and recommendations."
+            content="You are a portfolio analysis assistant with access to comprehensive market data. "
+            "You have tools for stock prices, company overviews, financial fundamentals, ratios, "
+            "insider trading activity, stock screening, and SEC filings (10-K, 10-Q, 13F). "
+            "Help users analyze stocks, fundamentals, insider activity, and regulatory filings. "
+            "Provide detailed investment insights and recommendations based on the data you retrieve."
         )
 
         messages = [system_msg] + state["messages"]
@@ -66,7 +68,7 @@ async def create_portfolio_agent() -> StateGraph:
 
     # Add nodes
     workflow.add_node("agent", call_model)
-    workflow.add_node("tools", ToolNode(tools))
+    workflow.add_node("tools", ToolNode(tools_with_keys))
 
     # Add edges
     workflow.add_edge(START, "agent")

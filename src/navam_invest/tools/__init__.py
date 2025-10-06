@@ -1,8 +1,9 @@
 """Unified tools registry for navam-invest agents."""
 
+from functools import wraps
 from typing import Dict, List
 
-from langchain_core.tools import BaseTool
+from langchain_core.tools import BaseTool, StructuredTool
 
 # Alpha Vantage tools
 from navam_invest.tools.alpha_vantage import get_stock_overview, get_stock_price
@@ -106,10 +107,100 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
     return [TOOLS[name] for name in category_map[category] if name in TOOLS]
 
 
+def _create_bound_wrapper(original_func, api_key: str):
+    """Create a wrapper function that binds API key (proper closure)."""
+
+    @wraps(original_func)
+    async def wrapper(*args, **kwargs):
+        return await original_func(*args, api_key=api_key, **kwargs)
+
+    return wrapper
+
+
+def bind_api_keys_to_tools(
+    tools: List[BaseTool],
+    alpha_vantage_key: str = "",
+    fmp_key: str = "",
+    fred_key: str = "",
+) -> List[BaseTool]:
+    """Bind API keys to tools securely using wrapper functions.
+
+    This removes the need to pass API keys through system prompts,
+    improving security by keeping credentials out of LLM context.
+
+    Args:
+        tools: List of tools to bind API keys to
+        alpha_vantage_key: Alpha Vantage API key
+        fmp_key: Financial Modeling Prep API key
+        fred_key: FRED API key
+
+    Returns:
+        List of tools with API keys pre-bound
+    """
+    bound_tools = []
+
+    for tool in tools:
+        tool_name = tool.name
+
+        # Get the actual callable (coroutine for async tools, func for sync)
+        callable_func = tool.coroutine if tool.coroutine else tool.func
+
+        # Alpha Vantage tools
+        if tool_name in ["get_stock_price", "get_stock_overview"]:
+            if alpha_vantage_key and callable_func:
+                bound_func = _create_bound_wrapper(callable_func, alpha_vantage_key)
+                bound_tool = StructuredTool.from_function(
+                    coroutine=bound_func,
+                    name=tool.name,
+                    description=tool.description,
+                )
+                bound_tools.append(bound_tool)
+            else:
+                bound_tools.append(tool)  # Keep original if no key
+
+        # FMP tools
+        elif tool_name in [
+            "get_company_fundamentals",
+            "get_financial_ratios",
+            "get_insider_trades",
+            "screen_stocks",
+        ]:
+            if fmp_key and callable_func:
+                bound_func = _create_bound_wrapper(callable_func, fmp_key)
+                bound_tool = StructuredTool.from_function(
+                    coroutine=bound_func,
+                    name=tool.name,
+                    description=tool.description,
+                )
+                bound_tools.append(bound_tool)
+            else:
+                bound_tools.append(tool)
+
+        # FRED tools
+        elif tool_name in ["get_economic_indicator", "get_key_macro_indicators"]:
+            if fred_key and callable_func:
+                bound_func = _create_bound_wrapper(callable_func, fred_key)
+                bound_tool = StructuredTool.from_function(
+                    coroutine=bound_func,
+                    name=tool.name,
+                    description=tool.description,
+                )
+                bound_tools.append(bound_tool)
+            else:
+                bound_tools.append(tool)
+
+        # Tools that don't need API keys (Treasury, SEC)
+        else:
+            bound_tools.append(tool)
+
+    return bound_tools
+
+
 __all__ = [
     "TOOLS",
     "get_all_tools",
     "get_tools_by_category",
+    "bind_api_keys_to_tools",
     # Alpha Vantage
     "get_stock_price",
     "get_stock_overview",
