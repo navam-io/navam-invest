@@ -171,6 +171,15 @@
   },
   "active": "182ea928b98a17e3",
   "lastOpenFiles": [
+    "README.md.tmp.79773.1759765767356",
+    "README.md.tmp.79773.1759765759198",
+    "src/navam_invest/tools/__pycache__/finnhub.cpython-313.pyc",
+    "tests/__pycache__/test_finnhub.cpython-313-pytest-8.4.2.pyc",
+    "tests/test_finnhub.py",
+    "src/navam_invest/tools/__init__.py.tmp.79773.1759765611981",
+    "src/navam_invest/tools/__init__.py.tmp.79773.1759765594164",
+    "src/navam_invest/tools/finnhub.py",
+    "refer/specs/api-alternatives-report.md",
     "refer/specs/agents-tools.md"
   ]
 }

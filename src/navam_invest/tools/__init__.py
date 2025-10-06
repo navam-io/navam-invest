@@ -29,6 +29,15 @@ from navam_invest.tools.fmp import (
     screen_stocks,
 )
 
+# Finnhub tools
+from navam_invest.tools.finnhub import (
+    get_company_news_sentiment,
+    get_company_news as get_finnhub_company_news,
+    get_insider_sentiment,
+    get_recommendation_trends,
+    get_social_sentiment,
+)
+
 # SEC EDGAR tools
 from navam_invest.tools.sec_edgar import (
     get_company_filings,
@@ -59,6 +68,12 @@ TOOLS: Dict[str, BaseTool] = {
     "get_financial_ratios": get_financial_ratios,
     "get_insider_trades": get_insider_trades,
     "screen_stocks": screen_stocks,
+    # Alternative Data & Sentiment (Finnhub)
+    "get_company_news_sentiment": get_company_news_sentiment,
+    "get_social_sentiment": get_social_sentiment,
+    "get_insider_sentiment": get_insider_sentiment,
+    "get_recommendation_trends": get_recommendation_trends,
+    "get_finnhub_company_news": get_finnhub_company_news,
     # Macro Data (FRED)
     "get_economic_indicator": get_economic_indicator,
     "get_key_macro_indicators": get_key_macro_indicators,
@@ -103,6 +118,13 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
             "get_insider_trades",
             "screen_stocks",
         ],
+        "sentiment": [
+            "get_company_news_sentiment",
+            "get_social_sentiment",
+            "get_insider_sentiment",
+            "get_recommendation_trends",
+            "get_finnhub_company_news",
+        ],
         "macro": ["get_economic_indicator", "get_key_macro_indicators"],
         "news": [
             "search_market_news",
@@ -146,6 +168,7 @@ def bind_api_keys_to_tools(
     tools: List[BaseTool],
     alpha_vantage_key: str = "",
     fmp_key: str = "",
+    finnhub_key: str = "",
     fred_key: str = "",
     newsapi_key: str = "",
 ) -> List[BaseTool]:
@@ -158,6 +181,7 @@ def bind_api_keys_to_tools(
         tools: List of tools to bind API keys to
         alpha_vantage_key: Alpha Vantage API key
         fmp_key: Financial Modeling Prep API key
+        finnhub_key: Finnhub API key
         fred_key: FRED API key
         newsapi_key: NewsAPI.org API key
 
@@ -194,6 +218,25 @@ def bind_api_keys_to_tools(
         ]:
             if fmp_key and callable_func:
                 bound_func = _create_bound_wrapper(callable_func, fmp_key)
+                bound_tool = StructuredTool.from_function(
+                    coroutine=bound_func,
+                    name=tool.name,
+                    description=tool.description,
+                )
+                bound_tools.append(bound_tool)
+            else:
+                bound_tools.append(tool)
+
+        # Finnhub tools
+        elif tool_name in [
+            "get_company_news_sentiment",
+            "get_social_sentiment",
+            "get_insider_sentiment",
+            "get_recommendation_trends",
+            "get_finnhub_company_news",
+        ]:
+            if finnhub_key and callable_func:
+                bound_func = _create_bound_wrapper(callable_func, finnhub_key)
                 bound_tool = StructuredTool.from_function(
                     coroutine=bound_func,
                     name=tool.name,
@@ -256,6 +299,12 @@ __all__ = [
     "get_financial_ratios",
     "get_insider_trades",
     "screen_stocks",
+    # Finnhub
+    "get_company_news_sentiment",
+    "get_social_sentiment",
+    "get_insider_sentiment",
+    "get_recommendation_trends",
+    "get_finnhub_company_news",
     # FRED
     "get_economic_indicator",
     "get_key_macro_indicators",

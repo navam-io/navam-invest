@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     # Market Data APIs
     alpha_vantage_api_key: Optional[str] = None
     fmp_api_key: Optional[str] = None  # Financial Modeling Prep
+    finnhub_api_key: Optional[str] = None  # Finnhub alternative data
 
     # Macro Data APIs
     fred_api_key: Optional[str] = None

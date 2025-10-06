@@ -91,11 +91,68 @@ Conducted extensive research on alternative APIs to address FMP's limited free-t
   - API comparison matrix
 
 **Next Actions**:
-- Implement Finnhub integration (Priority 1)
+- Implement Finnhub integration (Priority 1) ✅ COMPLETED
 - Implement Tiingo integration (Priority 2)
 - Design custom screening engine (Priority 3)
 
 **Documentation**: Complete API alternatives analysis with strategic recommendations
+
+---
+
+### Finnhub Integration for Alternative Data
+
+**Implemented institutional-grade sentiment analysis tools**
+
+Integrated Finnhub API to provide alternative data and sentiment analysis capabilities, significantly enriching the Portfolio agent's analytical power.
+
+**Features Implemented**:
+
+1. **Five New Sentiment Tools**:
+   - `get_company_news_sentiment` - News sentiment scores, sector averages, bullish/bearish percentages
+   - `get_social_sentiment` - Reddit and Twitter sentiment, mentions, positive/negative scores
+   - `get_insider_sentiment` - Monthly Share Purchase Ratio (MSPR), insider trading patterns
+   - `get_recommendation_trends` - Analyst ratings distribution (strong buy, buy, hold, sell, strong sell)
+   - `get_finnhub_company_news` - Company-specific news articles with summaries
+
+2. **Configuration Updates**:
+   - Added `finnhub_api_key` to Settings (config/settings.py)
+   - Updated `.env.example` with Finnhub configuration
+   - Added Finnhub key binding to tools registry
+
+3. **Agent Enhancement**:
+   - Portfolio agent now includes sentiment analysis capabilities
+   - Updated system prompt to highlight alternative data tools
+   - Added "sentiment" category to tools registry
+
+4. **Comprehensive Testing**:
+   - 8 unit tests covering all Finnhub tools
+   - 76% code coverage for finnhub.py module
+   - Tests for success cases, no-data scenarios, and error handling
+   - All tests passing with 100% success rate
+
+**Technical Details**:
+- Async API wrapper using httpx
+- Rate limit: 50-60 calls/minute on free tier
+- Graceful error handling for 401, 403, 429 status codes
+- Secure API key binding (credentials outside LLM context)
+
+**Impact**:
+- Portfolio agent can now analyze sentiment from multiple sources (news, social media, insiders, analysts)
+- Institutional-grade alternative data available to retail investors
+- Zero API costs (100% free-tier sustainable)
+- 23 total tools available (up from 18)
+
+**Files Created**:
+- `src/navam_invest/tools/finnhub.py` - Finnhub API tools module
+- `tests/test_finnhub.py` - Comprehensive test suite
+
+**Files Modified**:
+- `src/navam_invest/tools/__init__.py` - Registry and API key binding
+- `src/navam_invest/config/settings.py` - Configuration
+- `src/navam_invest/agents/portfolio.py` - Agent enhancement
+- `.env.example` - Environment template
+
+**Documentation**: Complete Finnhub integration with sentiment analysis tools
 
 ## Release Date
 TBD

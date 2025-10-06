@@ -32,19 +32,28 @@ async def create_portfolio_agent() -> StateGraph:
         temperature=settings.temperature,
     )
 
-    # Get all portfolio-relevant tools (market + fundamentals + SEC + news + files)
+    # Get all portfolio-relevant tools (market + fundamentals + sentiment + SEC + news + files)
     market_tools = get_tools_by_category("market")
     file_tools = get_tools_by_category("files")
     fundamentals_tools = get_tools_by_category("fundamentals")
+    sentiment_tools = get_tools_by_category("sentiment")
     sec_tools = get_tools_by_category("sec")
     news_tools = get_tools_by_category("news")
-    tools = market_tools + file_tools + fundamentals_tools + sec_tools + news_tools
+    tools = (
+        market_tools
+        + file_tools
+        + fundamentals_tools
+        + sentiment_tools
+        + sec_tools
+        + news_tools
+    )
 
     # Securely bind API keys to tools (keeps credentials out of LLM context)
     tools_with_keys = bind_api_keys_to_tools(
         tools,
         alpha_vantage_key=settings.alpha_vantage_api_key or "",
         fmp_key=settings.fmp_api_key or "",
+        finnhub_key=settings.finnhub_api_key or "",
         newsapi_key=settings.newsapi_api_key or "",
     )
 
@@ -55,18 +64,19 @@ async def create_portfolio_agent() -> StateGraph:
         """Call the LLM with tools."""
         # Clean system message without API keys
         system_msg = HumanMessage(
-            content="You are a portfolio analysis assistant with access to comprehensive market data. "
+            content="You are a portfolio analysis assistant with access to comprehensive market data and sentiment analysis. "
             "You have tools for:\n"
             "- Reading local files (CSV, JSON, Excel, etc.) from the user's working directory\n"
             "- Stock prices, company overviews, financial fundamentals, and ratios\n"
             "- Insider trading activity and stock screening\n"
+            "- **Alternative data & sentiment** (news sentiment, social media sentiment, insider sentiment, analyst recommendations)\n"
             "- SEC filings (10-K, 10-Q, 13F)\n"
             "- Market news, financial headlines, and company-specific news\n\n"
             "Help users analyze their portfolio data files, stocks, fundamentals, insider activity, "
-            "regulatory filings, and market sentiment from news sources. When users have portfolio data in local files, use the file "
+            "regulatory filings, and market sentiment from multiple sources. When users have portfolio data in local files, use the file "
             "reading tools to access and analyze their holdings. "
             "Provide detailed investment insights and recommendations based on the data you retrieve, "
-            "including recent news and market sentiment analysis."
+            "including sentiment analysis (news sentiment, social media buzz, insider trading patterns, and analyst recommendations)."
         )
 
         messages = [system_msg] + state["messages"]

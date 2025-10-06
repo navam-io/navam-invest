@@ -1,6 +1,5 @@
 # Wishlist
 
-[ ] Review refer/specs/api-tools.md and research online for open APIs and APIs with decent free-tier limits to replace FMP API as it is not offering many capabilities in free tier.
 
 [ ] Add tools from following API sources https://finnhub.io/ https://www.marketaux.com and accordingly assign these tools to existing agents or create new agents which cooperate with existing ones to meet the Navam Invest product specifications.
 

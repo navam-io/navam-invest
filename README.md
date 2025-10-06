@@ -20,15 +20,16 @@
 
 ---
 
-## 🆕 What's New in v0.1.5
+## 🆕 What's New in v0.1.11 (In Development)
 
-**Tier 1 API Tools Expansion** - Added 13 new tools across 3 major APIs:
+**Alternative Data & Sentiment Analysis** - Finnhub integration for institutional-grade insights:
 
-- ✨ **Financial Modeling Prep**: Comprehensive fundamentals, ratios, insider trades, stock screening
-- ✨ **U.S. Treasury Data**: Full yield curves (1M-30Y), spreads, debt metrics - no API key needed!
-- ✨ **SEC EDGAR**: Corporate filings (10-K, 10-Q, 13F) with direct links
+- ✨ **News Sentiment**: Company news scores, sector averages, bullish/bearish percentages
+- ✨ **Social Sentiment**: Reddit and Twitter mentions, positive/negative scores
+- ✨ **Insider Sentiment**: Monthly Share Purchase Ratio (MSPR), insider trading patterns
+- ✨ **Analyst Recommendations**: Ratings distribution (strong buy, buy, hold, sell, strong sell)
 
-**Tool Count**: 4 → 17 tools (+325% growth) | **Full release notes**: [v0.1.5](backlog/release-0.1.5.md)
+**Tool Count**: 18 → 23 tools (+28% growth) | **Full release notes**: [v0.1.11](backlog/release-0.1.11.md)
 
 ---
 
@@ -57,7 +58,9 @@
 **Portfolio Analysis Agent**
 - Real-time stock quotes and metrics
 - Company fundamentals & financial ratios
-- Insider trading activity tracking
+- **News & social sentiment analysis**
+- **Insider sentiment tracking (MSPR)**
+- **Analyst recommendation trends**
 - SEC filings (10-K, 10-Q, 13F)
 - Multi-criteria stock screening
 
@@ -75,15 +78,17 @@
 </tr>
 </table>
 
-### 📊 **Real API Integrations** (17 Tools Across 5 Data Sources)
+### 📊 **Real API Integrations** (23 Tools Across 6 Data Sources)
 
 | API | Tools | Purpose | Cost |
 |-----|-------|---------|------|
 | **Alpha Vantage** | 2 | Stock prices, company fundamentals, technical indicators | Free tier: 25 calls/day |
 | **Financial Modeling Prep** | 4 | Financial statements, ratios, insider trades, screening | Free tier: 250 calls/day |
+| **Finnhub** | 5 | News sentiment, social sentiment, insider sentiment, analyst recommendations | Free tier: 60 calls/min |
 | **FRED (St. Louis Fed)** | 2 | Economic indicators, macro data | Free (unlimited) |
 | **U.S. Treasury** | 4 | Yield curves, treasury rates, debt data | Free (unlimited) |
 | **SEC EDGAR** | 5 | Corporate filings (10-K, 10-Q, 13F) | Free (10 req/sec) |
+| **NewsAPI.org** | 3 | Market news, headlines, company news | Free tier: 100 calls/day |
 | **Anthropic Claude** | - | AI reasoning and tool orchestration | Pay-as-you-go |
 
 ### 💬 **Interactive Terminal UI**
