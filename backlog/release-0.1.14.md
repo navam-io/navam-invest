@@ -1,7 +1,7 @@
 # Release 0.1.14
 
 ## Status
-IN DEVELOPMENT
+Published: October 6, 2025
 
 ## Features
 
@@ -101,7 +101,7 @@ Enhanced tools registry with agent-specific tool mapping functionality to suppor
 **Phase 2A Status**: ✅ COMPLETE (All specialized agent tasks finished)
 
 ## Release Date
-TBD
+October 6, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.14/
