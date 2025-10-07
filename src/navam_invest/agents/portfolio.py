@@ -3,7 +3,7 @@
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import SystemMessage
+# SystemMessage removed - using llm.bind(system=...)
 from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -58,36 +58,32 @@ async def create_portfolio_agent() -> StateGraph:
         newsapi_key=settings.newsapi_api_key or "",
     )
 
-    llm_with_tools = llm.bind_tools(tools_with_keys)
+    # Define system prompt for portfolio analysis
+    system_prompt = (
+        "You are a portfolio analysis assistant with access to comprehensive market data, historical fundamentals, and sentiment analysis. "
+        "You have tools for:\n"
+        "- Reading local files (CSV, JSON, Excel, etc.) from the user's working directory\n"
+        "- Stock prices, company overviews, financial fundamentals, and ratios\n"
+        "- **Historical fundamentals** (5 years of daily metrics, quarterly statements, multi-year trends via Tiingo)\n"
+        "- Insider trading activity and stock screening\n"
+        "- **Alternative data & sentiment** (news sentiment, social media sentiment, insider sentiment, analyst recommendations)\n"
+        "- SEC filings (10-K, 10-Q, 13F)\n"
+        "- Market news, financial headlines, and company-specific news\n\n"
+        "Help users analyze their portfolio data files, stocks, fundamentals, insider activity, "
+        "regulatory filings, and market sentiment from multiple sources. When users have portfolio data in local files, use the file "
+        "reading tools to access and analyze their holdings. "
+        "For long-term fundamental analysis, use Tiingo tools to access up to 5 years of historical data and quarterly statements. "
+        "Provide detailed investment insights and recommendations based on the data you retrieve, "
+        "including sentiment analysis (news sentiment, social media buzz, insider trading patterns, and analyst recommendations)."
+    )
+
+    # Bind tools and system prompt to LLM
+    llm_with_tools = llm.bind_tools(tools_with_keys).bind(system=system_prompt)
 
     # Define agent node
     async def call_model(state: PortfolioState) -> dict:
         """Call the LLM with tools."""
-        # Clean system message without API keys
-        system_msg = SystemMessage(
-            content="You are a portfolio analysis assistant with access to comprehensive market data, historical fundamentals, and sentiment analysis. "
-            "You have tools for:\n"
-            "- Reading local files (CSV, JSON, Excel, etc.) from the user's working directory\n"
-            "- Stock prices, company overviews, financial fundamentals, and ratios\n"
-            "- **Historical fundamentals** (5 years of daily metrics, quarterly statements, multi-year trends via Tiingo)\n"
-            "- Insider trading activity and stock screening\n"
-            "- **Alternative data & sentiment** (news sentiment, social media sentiment, insider sentiment, analyst recommendations)\n"
-            "- SEC filings (10-K, 10-Q, 13F)\n"
-            "- Market news, financial headlines, and company-specific news\n\n"
-            "Help users analyze their portfolio data files, stocks, fundamentals, insider activity, "
-            "regulatory filings, and market sentiment from multiple sources. When users have portfolio data in local files, use the file "
-            "reading tools to access and analyze their holdings. "
-            "For long-term fundamental analysis, use Tiingo tools to access up to 5 years of historical data and quarterly statements. "
-            "Provide detailed investment insights and recommendations based on the data you retrieve, "
-            "including sentiment analysis (news sentiment, social media buzz, insider trading patterns, and analyst recommendations)."
-        )
-
-        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
-        messages = state["messages"]
-        if not messages or messages[0].type != "system":
-            messages = [system_msg] + messages
-
-        response = await llm_with_tools.ainvoke(messages)
+        response = await llm_with_tools.ainvoke(state["messages"])
         return {"messages": [response]}
 
     # Build graph

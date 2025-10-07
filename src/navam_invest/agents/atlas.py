@@ -7,7 +7,6 @@ and investment policy guidance.
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import SystemMessage
 from langgraph.graph import END, START, StateGraph, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -54,12 +53,8 @@ async def create_atlas_agent() -> StateGraph:
         newsapi_key=settings.newsapi_api_key or "",
     )
 
-    llm_with_tools = llm.bind_tools(tools_with_keys)
-
-    async def call_model(state: AtlasState) -> dict:
-        """Call the LLM with strategic allocation tools."""
-        system_msg = SystemMessage(
-            content="""You are Atlas, an expert investment strategist specializing in strategic asset allocation and portfolio construction.
+    # Define system prompt (passed as parameter, not in messages)
+    system_prompt = """You are Atlas, an expert investment strategist specializing in strategic asset allocation and portfolio construction.
 
 Your role is to:
 1. **Strategic Asset Allocation**: Design optimal portfolio allocations across asset classes (stocks, bonds, cash, alternatives)
@@ -194,14 +189,13 @@ Provide clear, actionable recommendations:
 - Implementation Suggestions (specific funds/ETFs if asked)
 
 Always tie recommendations to investor goals, risk tolerance, and macro context."""
-        )
 
-        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
-        messages = state["messages"]
-        if not messages or messages[0].type != "system":
-            messages = [system_msg] + messages
+    # Bind tools and system prompt to LLM
+    llm_with_tools = llm.bind_tools(tools_with_keys).bind(system=system_prompt)
 
-        response = await llm_with_tools.ainvoke(messages)
+    async def call_model(state: AtlasState) -> dict:
+        """Call the LLM with strategic allocation tools."""
+        response = await llm_with_tools.ainvoke(state["messages"])
         return {"messages": [response]}
 
     def should_continue(state: AtlasState) -> str:

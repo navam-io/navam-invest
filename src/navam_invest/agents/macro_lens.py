@@ -7,7 +7,7 @@ and sector/factor allocation guidance.
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import SystemMessage
+# SystemMessage removed - using llm.bind(system=...)
 from langgraph.graph import END, START, StateGraph, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -51,12 +51,8 @@ async def create_macro_lens_agent() -> StateGraph:
         newsapi_key=settings.newsapi_api_key or "",
     )
 
-    llm_with_tools = llm.bind_tools(tools_with_keys)
-
-    async def call_model(state: MacroLensState) -> dict:
-        """Call the LLM with macro analysis tools."""
-        system_msg = SystemMessage(
-            content="""You are Macro Lens, an expert market strategist specializing in top-down macroeconomic analysis and regime identification.
+    # Define system prompt for Macro Lens strategist
+    system_prompt = """You are Macro Lens, an expert market strategist specializing in top-down macroeconomic analysis and regime identification.
 
 Your role is to:
 1. **Regime Identification**: Analyze current economic cycle phase (expansion, peak, recession, trough)
@@ -152,14 +148,13 @@ When analyzing the macro environment, provide:
 - Provide forward-looking guidance (3-6 month horizon)
 
 Remember: You are a strategist, not a portfolio manager. Focus on macro insights and directional guidance, not specific stock picks or portfolio construction (delegate to Atlas/Quill)."""
-        )
 
-        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
-        messages = state["messages"]
-        if not messages or messages[0].type != "system":
-            messages = [system_msg] + messages
+    # Bind tools and system prompt to LLM
+    llm_with_tools = llm.bind_tools(tools_with_keys).bind(system=system_prompt)
 
-        response = await llm_with_tools.ainvoke(messages)
+    async def call_model(state: MacroLensState) -> dict:
+        """Call the LLM with macro analysis tools."""
+        response = await llm_with_tools.ainvoke(state["messages"])
         return {"messages": [response]}
 
     # Build graph with agent → tools loop

@@ -3,7 +3,7 @@
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import SystemMessage
+# SystemMessage removed - using llm.bind(system=...)
 from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -46,32 +46,28 @@ async def create_research_agent() -> StateGraph:
         newsapi_key=settings.newsapi_api_key or "",
     )
 
-    llm_with_tools = llm.bind_tools(tools_with_keys)
+    # Define system prompt for market research
+    system_prompt = (
+        "You are a market research assistant specializing in macroeconomic analysis and market news. "
+        "You have tools for:\n"
+        "- Economic indicators (GDP, CPI, unemployment, interest rates)\n"
+        "- U.S. Treasury yield curves, spreads, and debt metrics\n"
+        "- Market news and financial headlines\n"
+        "- Company-specific news and sentiment\n"
+        "- Local file reading for research documents\n\n"
+        "Help users understand economic indicators, yield curve dynamics, market regimes, macro trends, "
+        "and current market sentiment from news sources. "
+        "Provide context on what yield spreads indicate about economic conditions (e.g., inverted curves signaling recession). "
+        "When analyzing market sentiment, reference recent news and headlines to support your analysis."
+    )
+
+    # Bind tools and system prompt to LLM
+    llm_with_tools = llm.bind_tools(tools_with_keys).bind(system=system_prompt)
 
     # Define agent node
     async def call_model(state: ResearchState) -> dict:
         """Call the LLM with tools."""
-        # Clean system message without API keys
-        system_msg = SystemMessage(
-            content="You are a market research assistant specializing in macroeconomic analysis and market news. "
-            "You have tools for:\n"
-            "- Economic indicators (GDP, CPI, unemployment, interest rates)\n"
-            "- U.S. Treasury yield curves, spreads, and debt metrics\n"
-            "- Market news and financial headlines\n"
-            "- Company-specific news and sentiment\n"
-            "- Local file reading for research documents\n\n"
-            "Help users understand economic indicators, yield curve dynamics, market regimes, macro trends, "
-            "and current market sentiment from news sources. "
-            "Provide context on what yield spreads indicate about economic conditions (e.g., inverted curves signaling recession). "
-            "When analyzing market sentiment, reference recent news and headlines to support your analysis."
-        )
-
-        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
-        messages = state["messages"]
-        if not messages or messages[0].type != "system":
-            messages = [system_msg] + messages
-
-        response = await llm_with_tools.ainvoke(messages)
+        response = await llm_with_tools.ainvoke(state["messages"])
         return {"messages": [response]}
 
     # Build graph

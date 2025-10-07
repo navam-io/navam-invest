@@ -3,37 +3,51 @@
 ## Status
 IN DEVELOPMENT
 
-## Features
+## Bug Fixes
 
-### Phase 2C: Enhanced Multi-Agent Workflows
+### Critical Fix: Anthropic API Tool-Use/Tool-Result Pairing
 
-This release focuses on expanding multi-agent capabilities and building additional workflows.
+**Problem**: All agents were experiencing Anthropic API error 400: "tool_use blocks must have corresponding tool_result block in the next message"
 
-**Planned Features**:
-- Extended Investment Analysis Workflow to include Atlas (Quill → Macro Lens → Atlas → Synthesis)
-- Additional multi-agent workflows (Tax Optimization, Portfolio Rebalancing, Risk Analysis)
-- Human-in-the-loop checkpoints for workflow approval/editing
-- Parallel agent execution for independent analyses
-- Workflow state persistence and resumption
-- Enhanced TUI workflow visualization
+**Root Cause**: ChatAnthropic expects system prompts via `.bind(system=...)` parameter, NOT as SystemMessage objects in the messages array. Previous implementations (v0.1.18-v0.1.20) were incorrectly prepending SystemMessage to the messages list, which broke the tool_use/tool_result message pairing required by Anthropic's API.
 
-**Architecture Enhancements**:
-- Conditional routing in workflows (dynamic agent selection)
-- Agent feedback loops (iterative refinement)
-- Workflow templates for common analysis patterns
-- Cross-workflow state sharing
+**Failed Approaches**:
+- v0.1.18: Fixed import location but kept SystemMessage in messages
+- v0.1.19: Changed HumanMessage to SystemMessage (still in messages array)
+- v0.1.20: Only prepended SystemMessage on first call (still broke pairing on subsequent calls)
 
-**Potential New Workflows**:
-1. **Tax Optimization Workflow**: Tax-Scout → Atlas → Rebalance-Bot
-2. **Risk Management Workflow**: Risk-Shield → Macro Lens → Atlas
-3. **Portfolio Construction Workflow**: Screen Forge → Quill → Risk-Shield → Atlas
+**Correct Solution** (v0.1.21):
+```python
+# BEFORE (BROKEN):
+system_msg = SystemMessage(content="You are...")
+messages = state["messages"]
+if not messages or messages[0].type != "system":
+    messages = [system_msg] + messages
+response = await llm_with_tools.ainvoke(messages)
 
-(Specific implementation details will be documented as features are completed)
+# AFTER (FIXED):
+system_prompt = "You are..."
+llm_with_tools = llm.bind_tools(tools).bind(system=system_prompt)
+response = await llm_with_tools.ainvoke(state["messages"])
+```
+
+**Files Fixed**:
+- `src/navam_invest/agents/atlas.py`
+- `src/navam_invest/agents/portfolio.py`
+- `src/navam_invest/agents/research.py`
+- `src/navam_invest/agents/quill.py`
+- `src/navam_invest/agents/screen_forge.py`
+- `src/navam_invest/agents/macro_lens.py`
+
+**Technical Details**:
+- System prompts are now bound to the LLM instance, not included in conversation messages
+- Messages array contains only user/assistant/tool messages for proper API pairing
+- This aligns with LangChain Anthropic integration best practices
 
 ---
 
 ## Release Date
-TBD
+October 6, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.21/
