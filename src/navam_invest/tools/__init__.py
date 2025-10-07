@@ -177,7 +177,7 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
     for their specialized tasks.
 
     Args:
-        agent_name: One of 'quill', 'screen_forge', 'portfolio', 'research'
+        agent_name: One of 'quill', 'screen_forge', 'macro_lens', 'portfolio', 'research'
 
     Returns:
         List of tools recommended for the specified agent
@@ -220,6 +220,23 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_social_sentiment",
             "get_insider_sentiment",
             "get_recommendation_trends",
+        ],
+        # Macro Lens (Market Strategist): Top-down macro analysis and regime identification
+        "macro_lens": [
+            # Macro indicators
+            "get_economic_indicator",
+            "get_key_macro_indicators",
+            # Treasury data
+            "get_treasury_yield_curve",
+            "get_treasury_rate",
+            "get_treasury_yield_spread",
+            "get_debt_to_gdp",
+            # Macro news
+            "search_market_news",
+            "get_top_financial_headlines",
+            # Files
+            "read_local_file",
+            "list_local_files",
         ],
         # Portfolio (Generalist - Legacy): Broad portfolio analysis
         "portfolio": [

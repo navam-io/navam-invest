@@ -14,6 +14,7 @@ from navam_invest.agents.portfolio import create_portfolio_agent
 from navam_invest.agents.research import create_research_agent
 from navam_invest.agents.quill import create_quill_agent
 from navam_invest.agents.screen_forge import create_screen_forge_agent
+from navam_invest.agents.macro_lens import create_macro_lens_agent
 from navam_invest.config.settings import ConfigurationError
 
 # Example prompts for each agent
@@ -61,6 +62,17 @@ SCREEN_FORGE_EXAMPLES = [
     "Screen for large-cap stocks with consistent earnings growth and low volatility",
 ]
 
+MACRO_LENS_EXAMPLES = [
+    "What's the current macro regime? Are we in expansion, peak, or recession?",
+    "Analyze the yield curve. Is it signaling recession risk?",
+    "What sectors should I overweight given current economic conditions?",
+    "Assess inflation trends and Fed policy implications for markets",
+    "What factor exposures (value/growth, size, quality) make sense now?",
+    "Identify top 3 macro risks to monitor over the next 6 months",
+    "How do current GDP, unemployment, and inflation compare to historical norms?",
+    "Should I be defensive or cyclical given the economic cycle phase?",
+]
+
 
 class ChatUI(App):
     """Navam Invest chat interface."""
@@ -97,6 +109,7 @@ class ChatUI(App):
         self.research_agent: Optional[object] = None
         self.quill_agent: Optional[object] = None
         self.screen_forge_agent: Optional[object] = None
+        self.macro_lens_agent: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
 
@@ -125,7 +138,8 @@ class ChatUI(App):
                 "- `/portfolio` - Switch to portfolio analysis agent\n"
                 "- `/research` - Switch to market research agent\n"
                 "- `/quill` - Switch to Quill equity research agent\n"
-                "- `/screen` - Switch to Screen Forge screening agent 🆕\n"
+                "- `/screen` - Switch to Screen Forge screening agent\n"
+                "- `/macro` - Switch to Macro Lens market strategist 🆕\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
                 "- `/quit` - Exit the application\n"
@@ -143,8 +157,9 @@ class ChatUI(App):
             self.research_agent = await create_research_agent()
             self.quill_agent = await create_quill_agent()
             self.screen_forge_agent = await create_screen_forge_agent()
+            self.macro_lens_agent = await create_macro_lens_agent()
             self.agents_initialized = True
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge)[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
             # Show helpful setup instructions for missing API keys
@@ -210,6 +225,9 @@ class ChatUI(App):
             elif self.current_agent == "screen":
                 agent = self.screen_forge_agent
                 agent_name = "Screen Forge (Equity Screening)"
+            elif self.current_agent == "macro":
+                agent = self.macro_lens_agent
+                agent_name = "Macro Lens (Market Strategist)"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -284,6 +302,7 @@ class ChatUI(App):
                     "- `/research` - Switch to market research agent\n"
                     "- `/quill` - Switch to Quill equity research agent\n"
                     "- `/screen` - Switch to Screen Forge screening agent\n"
+                    "- `/macro` - Switch to Macro Lens market strategist\n"
                     "- `/examples` - Show example prompts for current agent\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"
@@ -302,6 +321,9 @@ class ChatUI(App):
         elif command == "/screen":
             self.current_agent = "screen"
             chat_log.write("\n[green]✓ Switched to Screen Forge (Equity Screening) agent[/green]\n")
+        elif command == "/macro":
+            self.current_agent = "macro"
+            chat_log.write("\n[green]✓ Switched to Macro Lens (Market Strategist) agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -316,6 +338,9 @@ class ChatUI(App):
             elif self.current_agent == "screen":
                 examples = SCREEN_FORGE_EXAMPLES
                 agent_name = "Screen Forge (Equity Screening)"
+            elif self.current_agent == "macro":
+                examples = MACRO_LENS_EXAMPLES
+                agent_name = "Macro Lens (Market Strategist)"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"
