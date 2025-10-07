@@ -13,6 +13,7 @@ from textual.widgets import Footer, Header, Input, RichLog
 from navam_invest.agents.portfolio import create_portfolio_agent
 from navam_invest.agents.research import create_research_agent
 from navam_invest.agents.quill import create_quill_agent
+from navam_invest.agents.screen_forge import create_screen_forge_agent
 from navam_invest.config.settings import ConfigurationError
 
 # Example prompts for each agent
@@ -47,6 +48,17 @@ QUILL_EXAMPLES = [
     "What does the latest 10-K reveal about AMZN's business model?",
     "Compare META and SNAP: which is the better investment and why?",
     "Thesis on NFLX: analyze subscriber growth, margins, and competition",
+]
+
+SCREEN_FORGE_EXAMPLES = [
+    "Screen for value stocks: P/E under 15, P/B under 2, market cap over $1B",
+    "Find growth stocks with revenue growth >20% and expanding margins",
+    "Screen for quality companies: ROE >15%, net margin >10%, low debt",
+    "Identify dividend stocks with yield >3% and 5+ year payment history",
+    "Find small-cap growth stocks: market cap $300M-$2B, growth >25%",
+    "Screen for tech stocks with strong momentum and positive analyst sentiment",
+    "Find undervalued healthcare stocks with strong fundamentals",
+    "Screen for large-cap stocks with consistent earnings growth and low volatility",
 ]
 
 
@@ -84,6 +96,7 @@ class ChatUI(App):
         self.portfolio_agent: Optional[object] = None
         self.research_agent: Optional[object] = None
         self.quill_agent: Optional[object] = None
+        self.screen_forge_agent: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
 
@@ -111,7 +124,8 @@ class ChatUI(App):
                 "**Commands:**\n"
                 "- `/portfolio` - Switch to portfolio analysis agent\n"
                 "- `/research` - Switch to market research agent\n"
-                "- `/quill` - Switch to Quill equity research agent 🆕\n"
+                "- `/quill` - Switch to Quill equity research agent\n"
+                "- `/screen` - Switch to Screen Forge screening agent 🆕\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
                 "- `/quit` - Exit the application\n"
@@ -128,8 +142,9 @@ class ChatUI(App):
             self.portfolio_agent = await create_portfolio_agent()
             self.research_agent = await create_research_agent()
             self.quill_agent = await create_quill_agent()
+            self.screen_forge_agent = await create_screen_forge_agent()
             self.agents_initialized = True
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill)[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
             # Show helpful setup instructions for missing API keys
@@ -192,6 +207,9 @@ class ChatUI(App):
             elif self.current_agent == "quill":
                 agent = self.quill_agent
                 agent_name = "Quill (Equity Research)"
+            elif self.current_agent == "screen":
+                agent = self.screen_forge_agent
+                agent_name = "Screen Forge (Equity Screening)"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -265,6 +283,7 @@ class ChatUI(App):
                     "- `/portfolio` - Switch to portfolio analysis agent\n"
                     "- `/research` - Switch to market research agent\n"
                     "- `/quill` - Switch to Quill equity research agent\n"
+                    "- `/screen` - Switch to Screen Forge screening agent\n"
                     "- `/examples` - Show example prompts for current agent\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"
@@ -280,6 +299,9 @@ class ChatUI(App):
         elif command == "/quill":
             self.current_agent = "quill"
             chat_log.write("\n[green]✓ Switched to Quill (Equity Research) agent[/green]\n")
+        elif command == "/screen":
+            self.current_agent = "screen"
+            chat_log.write("\n[green]✓ Switched to Screen Forge (Equity Screening) agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -291,6 +313,9 @@ class ChatUI(App):
             elif self.current_agent == "quill":
                 examples = QUILL_EXAMPLES
                 agent_name = "Quill (Equity Research)"
+            elif self.current_agent == "screen":
+                examples = SCREEN_FORGE_EXAMPLES
+                agent_name = "Screen Forge (Equity Screening)"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"

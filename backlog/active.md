@@ -8,9 +8,9 @@
 
 ### Phase 2A: Specialized Agents (v0.1.13-0.1.14)
 [x] Build Quill (Equity Research) agent - Deep fundamental analysis and thesis building → Completed in release-0.1.13.md
-[ ] Build Screen Forge agent - Systematic stock screening and idea generation
+[x] Build Screen Forge agent - Systematic stock screening and idea generation → Completed in release-0.1.14.md
 [x] Add agent selection in TUI: `/quill` command → Completed in release-0.1.13.md
-[ ] Add agent selection in TUI: `/screen` command
+[x] Add agent selection in TUI: `/screen` command → Completed in release-0.1.14.md
 [ ] Update tools registry to map tools to specialized agents
 
 ### Phase 2B: First Multi-Agent Workflow (v0.1.15)
