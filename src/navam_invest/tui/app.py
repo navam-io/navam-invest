@@ -182,16 +182,56 @@ class ChatUI(App):
 
             chat_log.write(f"[bold green]{agent_name}:[/bold green] ")
 
-            # Stream response
+            # Stream response with detailed progress
+            tool_calls_shown = set()
             async for event in agent.astream(
-                {"messages": [HumanMessage(content=text)]}, stream_mode="values"
+                {"messages": [HumanMessage(content=text)]},
+                stream_mode=["values", "updates"]
             ):
-                if "messages" in event and event["messages"]:
-                    last_msg = event["messages"][-1]
-                    if hasattr(last_msg, "content") and last_msg.content:
-                        # Clear previous thinking and show final response
-                        if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
-                            chat_log.write(Markdown(last_msg.content))
+                # Parse the event tuple
+                if isinstance(event, tuple) and len(event) == 2:
+                    event_type, event_data = event
+
+                    # Handle node updates (shows which node executed)
+                    if event_type == "updates":
+                        for node_name, node_output in event_data.items():
+                            # Show tool execution completion
+                            if node_name == "tools" and "messages" in node_output:
+                                for msg in node_output["messages"]:
+                                    if hasattr(msg, "name"):
+                                        tool_name = msg.name
+                                        chat_log.write(f"[dim]  ✓ {tool_name} completed[/dim]\n")
+
+                            # Show agent making tool calls
+                            elif node_name == "agent" and "messages" in node_output:
+                                for msg in node_output["messages"]:
+                                    if hasattr(msg, "tool_calls") and msg.tool_calls:
+                                        for tool_call in msg.tool_calls:
+                                            call_id = tool_call.get("id", "")
+                                            if call_id not in tool_calls_shown:
+                                                tool_calls_shown.add(call_id)
+                                                tool_name = tool_call.get("name", "unknown")
+                                                tool_args = tool_call.get("args", {})
+
+                                                # Format args for display
+                                                args_preview = ", ".join(
+                                                    f"{k}={str(v)[:30]}" for k, v in list(tool_args.items())[:3]
+                                                )
+                                                if len(tool_args) > 3:
+                                                    args_preview += "..."
+
+                                                chat_log.write(
+                                                    f"[dim]  → Calling {tool_name}({args_preview})[/dim]\n"
+                                                )
+
+                    # Handle complete state values
+                    elif event_type == "values":
+                        if "messages" in event_data and event_data["messages"]:
+                            last_msg = event_data["messages"][-1]
+                            if hasattr(last_msg, "content") and last_msg.content:
+                                # Show final response only
+                                if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+                                    chat_log.write(Markdown(last_msg.content))
 
         except Exception as e:
             chat_log.write(f"\n[red]Error: {str(e)}[/red]")

@@ -68,6 +68,82 @@ Integrated Tiingo API to provide long-term fundamental analysis, quarterly track
 
 **Documentation**: Complete Tiingo integration with historical fundamental analysis
 
+---
+
+### Granular Progress Streaming for Agent Execution
+
+**Implemented real-time visibility into agent reasoning and tool execution**
+
+Enhanced the TUI chat interface to display detailed progress updates showing exactly what the AI agent is doing at each step, providing full transparency into the decision-making process.
+
+**Features Implemented**:
+
+1. **Real-time Tool Call Display**:
+   - Shows which tools/APIs the agent is calling
+   - Displays function arguments being passed (with smart truncation)
+   - Indicates tool execution completion
+   - Example: `→ Calling get_stock_price(symbol=AAPL, api_key=demo)`
+
+2. **LangGraph Streaming Integration**:
+   - Uses LangGraph's multi-mode streaming (`values` + `updates`)
+   - Captures both state updates and node execution events
+   - Tracks tool execution lifecycle from call to completion
+   - De-duplicates repeated tool calls for clean output
+
+3. **Enhanced User Experience**:
+   - Dimmed progress indicators don't distract from final answers
+   - Progress shown inline within chat response area
+   - No configuration required - works out of the box
+   - Applied to both Portfolio and Research agents
+
+4. **Implementation Details**:
+   - Modified TUI streaming logic to parse LangGraph event tuples
+   - Handles `("updates", data)` events for node execution tracking
+   - Handles `("values", data)` events for final state presentation
+   - Smart argument preview with max 3 parameters shown
+
+**Technical Changes**:
+
+**Files Modified**:
+- `src/navam_invest/tui/app.py` - Enhanced streaming event handling (lines 185-234)
+  - Changed from `stream_mode="values"` to `stream_mode=["values", "updates"]`
+  - Added tool call tracking and de-duplication
+  - Implemented smart argument formatting for display
+  - Added progress indicators for tool execution
+
+**Files Fixed**:
+- `tests/test_finnhub.py` - Fixed import of `get_finnhub_company_news` (was `get_company_news`)
+
+**User-Facing Benefits**:
+- See exactly which data sources the agent is querying
+- Understand the agent's reasoning process in real-time
+- Monitor API calls being made (for debugging/learning)
+- Build trust through transparency in AI decision-making
+
+**Example Progress Output**:
+```
+Portfolio Analyst:
+  → Calling get_stock_price(symbol=AAPL, api_key=demo)
+  ✓ get_stock_price completed
+
+Apple Inc. (AAPL) is currently trading at $150.25...
+```
+
+**Strategic Value**:
+- Aligns with product vision of "explainable" AI for retail investors
+- Educational: users learn what data sources power recommendations
+- Debugging: developers can trace agent behavior
+- Trust-building: full transparency in agent actions
+- Foundation for future multi-agent orchestration visibility
+
+**Testing**:
+- All 48 tests passing
+- Tested streaming with Portfolio and Research agents
+- Verified tool call tracking and de-duplication
+- Confirmed argument formatting and truncation
+
+**Documentation**: Granular progress streaming with real-time tool execution visibility
+
 ## Release Date
 TBD
 

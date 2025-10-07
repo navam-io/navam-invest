@@ -8,7 +8,7 @@ from navam_invest.tools.finnhub import (
     get_social_sentiment,
     get_insider_sentiment,
     get_recommendation_trends,
-    get_company_news,
+    get_finnhub_company_news,
 )
 
 
@@ -167,7 +167,7 @@ async def test_get_company_news():
     ) as mock_fetch:
         mock_fetch.return_value = mock_response
 
-        result = await get_company_news.ainvoke(
+        result = await get_finnhub_company_news.ainvoke(
             {"symbol": "GOOGL", "api_key": "test_key"}
         )
 

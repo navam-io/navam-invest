@@ -1,6 +1,22 @@
 # Active Backlog
 
-[ ] Reflect on refer/specs/agents-tools.md and refer/specs/multi-agents.md to decide 1. how to refactor current agents and tools, and 2. build next set of agents, tools, and multi-agent workflow. You can also split this backlog item into multiple open items accordingly.
+[x] When using agents and tools stream granular progress within chat response area including which agent is active, which API is called, which tool is used, what arguments is the tool processing, etc. → Completed in release-0.1.12.md
+
+[x] Reflect on refer/specs/agents-tools.md and refer/specs/multi-agents.md to decide 1. how to refactor current agents and tools, and 2. build next set of agents, tools, and multi-agent workflow. You can also split this backlog item into multiple open items accordingly. → Analysis complete, see `backlog/agent-refactoring-plan.md` for detailed recommendations
+
+## Next Phase Items (from Agent Refactoring Plan)
+
+### Phase 2A: Specialized Agents (v0.1.13-0.1.14)
+[ ] Build Quill (Equity Research) agent - Deep fundamental analysis and thesis building
+[ ] Build Screen Forge agent - Systematic stock screening and idea generation
+[ ] Add agent selection in TUI: `/quill`, `/screen` commands
+[ ] Update tools registry to map tools to specialized agents
+
+### Phase 2B: First Multi-Agent Workflow (v0.1.15)
+[ ] Implement Workflow 1: Comprehensive Investment Analysis (Quill → Macro Lens → Atlas)
+[ ] Add workflow command: `/analyze <SYMBOL>` for end-to-end analysis
+[ ] Refactor Portfolio → Atlas (Investment Strategist) if needed
+[ ] Refactor Research → Macro Lens (Market Strategist) if needed
 
 
 ## Completed Items
