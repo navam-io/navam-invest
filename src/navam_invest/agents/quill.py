@@ -12,7 +12,7 @@ from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
 from navam_invest.config.settings import get_settings
-from navam_invest.tools import bind_api_keys_to_tools, get_tools_by_category
+from navam_invest.tools import bind_api_keys_to_tools, get_tools_for_agent
 
 
 class QuillState(TypedDict):
@@ -42,13 +42,11 @@ async def create_quill_agent() -> StateGraph:
         temperature=settings.temperature,
     )
 
-    # Get equity research tools (focused subset)
-    market_tools = get_tools_by_category("market")  # Price, overview
-    fundamentals_tools = get_tools_by_category("fundamentals")  # All fundamental tools including Tiingo
-    sec_tools = get_tools_by_category("sec")  # 10-K, 10-Q, filings
-    news_tools = get_tools_by_category("news")  # Company news
-
-    tools = market_tools + fundamentals_tools + sec_tools + news_tools
+    # Get Quill-specific tools (comprehensive equity research toolkit)
+    # Includes: Yahoo Finance (quotes, financials, earnings, analyst recs),
+    # Enhanced EDGAR (8-K, company facts, insider transactions),
+    # FMP fundamentals, Tiingo historical data, and company news
+    tools = get_tools_for_agent("quill")
 
     # Securely bind API keys to tools
     tools_with_keys = bind_api_keys_to_tools(
@@ -89,12 +87,14 @@ async def create_quill_agent() -> StateGraph:
             "- Include relevant financial metrics and trends\n"
             "- Reference specific data points from filings and fundamentals\n\n"
             "**Tools Available:**\n"
-            "- Current stock price and overview data\n"
-            "- Financial statements, ratios, and historical fundamentals (5yr)\n"
-            "- Quarterly statement tracking via Tiingo\n"
-            "- SEC filings (10-K, 10-Q) for detailed business analysis\n"
-            "- Insider trading activity patterns\n"
-            "- Company-specific news for thesis validation\n\n"
+            "- **Market Data**: Real-time quotes (Yahoo Finance), historical prices, market indices\n"
+            "- **Fundamentals**: Financial statements (Yahoo + FMP), ratios, historical fundamentals (5yr via Tiingo)\n"
+            "- **SEC Filings**: 10-K, 10-Q, 8-K (material events), company facts (XBRL), insider transactions (Form 4)\n"
+            "- **Earnings**: Historical earnings with surprises, earnings calendar, upcoming estimates (Yahoo Finance)\n"
+            "- **Analyst Coverage**: Analyst recommendations, price targets, rating changes (Yahoo Finance + Finnhub)\n"
+            "- **Ownership**: Institutional holders, 13F filings, insider trading patterns\n"
+            "- **Corporate Actions**: Dividend history, dividend yield, payment schedule\n"
+            "- **News**: Company-specific news for thesis validation and event tracking\n\n"
             "Your goal is to produce institutional-quality equity research that helps retail investors make informed decisions. "
             "Be rigorous, data-driven, and intellectually honest about both upside and downside scenarios."
         )

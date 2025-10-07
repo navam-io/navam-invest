@@ -48,11 +48,15 @@ from navam_invest.tools.tiingo import (
 
 # SEC EDGAR tools
 from navam_invest.tools.sec_edgar import (
+    get_company_facts,
     get_company_filings,
+    get_insider_transactions,
     get_institutional_holdings,
     get_latest_10k,
     get_latest_10q,
+    get_latest_8k,
     search_company_by_ticker,
+    search_filings_by_form,
 )
 
 # Treasury tools
@@ -61,6 +65,21 @@ from navam_invest.tools.treasury import (
     get_treasury_rate,
     get_treasury_yield_curve,
     get_treasury_yield_spread,
+)
+
+# Yahoo Finance tools
+from navam_invest.tools.yahoo_finance import (
+    get_analyst_recommendations,
+    get_company_info,
+    get_dividends,
+    get_earnings_calendar,
+    get_earnings_history,
+    get_financials,
+    get_historical_data,
+    get_institutional_holders,
+    get_market_indices,
+    get_options_chain,
+    get_quote,
 )
 
 # Unified tools registry
@@ -104,7 +123,23 @@ TOOLS: Dict[str, BaseTool] = {
     "get_company_filings": get_company_filings,
     "get_latest_10k": get_latest_10k,
     "get_latest_10q": get_latest_10q,
+    "get_latest_8k": get_latest_8k,
+    "get_company_facts": get_company_facts,
+    "search_filings_by_form": search_filings_by_form,
+    "get_insider_transactions": get_insider_transactions,
     "get_institutional_holdings": get_institutional_holdings,
+    # Yahoo Finance
+    "get_quote": get_quote,
+    "get_historical_data": get_historical_data,
+    "get_financials": get_financials,
+    "get_earnings_history": get_earnings_history,
+    "get_earnings_calendar": get_earnings_calendar,
+    "get_analyst_recommendations": get_analyst_recommendations,
+    "get_institutional_holders": get_institutional_holders,
+    "get_company_info": get_company_info,
+    "get_dividends": get_dividends,
+    "get_options_chain": get_options_chain,
+    "get_market_indices": get_market_indices,
 }
 
 
@@ -123,7 +158,13 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
         List of tools in the specified category
     """
     category_map = {
-        "market": ["get_stock_price", "get_stock_overview"],
+        "market": [
+            "get_stock_price",
+            "get_stock_overview",
+            "get_quote",
+            "get_historical_data",
+            "get_market_indices",
+        ],
         "files": ["read_local_file", "list_local_files"],
         "fundamentals": [
             "get_company_fundamentals",
@@ -134,6 +175,8 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
             "get_fundamentals_statements",
             "get_fundamentals_definitions",
             "get_historical_fundamentals",
+            "get_financials",
+            "get_company_info",
         ],
         "sentiment": [
             "get_company_news_sentiment",
@@ -141,8 +184,13 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
             "get_insider_sentiment",
             "get_recommendation_trends",
             "get_finnhub_company_news",
+            "get_analyst_recommendations",
         ],
-        "macro": ["get_economic_indicator", "get_key_macro_indicators"],
+        "macro": [
+            "get_economic_indicator",
+            "get_key_macro_indicators",
+            "get_market_indices",
+        ],
         "news": [
             "search_market_news",
             "get_top_financial_headlines",
@@ -159,8 +207,19 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
             "get_company_filings",
             "get_latest_10k",
             "get_latest_10q",
+            "get_latest_8k",
+            "get_company_facts",
+            "search_filings_by_form",
+            "get_insider_transactions",
             "get_institutional_holdings",
         ],
+        "earnings": [
+            "get_earnings_history",
+            "get_earnings_calendar",
+        ],
+        "options": ["get_options_chain"],
+        "dividends": ["get_dividends"],
+        "holders": ["get_institutional_holders", "get_institutional_holdings"],
     }
 
     if category not in category_map:
@@ -185,10 +244,13 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
     agent_tool_map = {
         # Quill (Equity Research): Deep fundamental analysis, thesis building, valuation
         "quill": [
-            # Market data for current pricing
+            # Market data for current pricing (Yahoo Finance + Alpha Vantage)
+            "get_quote",
             "get_stock_price",
             "get_stock_overview",
-            # Fundamentals for analysis (excluding screening tool)
+            "get_historical_data",
+            # Fundamentals (Yahoo Finance + FMP + Tiingo)
+            "get_financials",
             "get_company_fundamentals",
             "get_financial_ratios",
             "get_insider_trades",
@@ -196,30 +258,51 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_fundamentals_statements",
             "get_fundamentals_definitions",
             "get_historical_fundamentals",
-            # SEC filings for deep-dive analysis
+            "get_company_info",
+            # SEC filings for deep-dive analysis (Enhanced EDGAR)
             "search_company_by_ticker",
             "get_company_filings",
             "get_latest_10k",
             "get_latest_10q",
+            "get_latest_8k",
+            "get_company_facts",
+            "search_filings_by_form",
+            "get_insider_transactions",
             "get_institutional_holdings",
+            # Earnings analysis (Yahoo Finance)
+            "get_earnings_history",
+            "get_earnings_calendar",
+            # Analyst sentiment (Yahoo Finance + Finnhub)
+            "get_analyst_recommendations",
+            "get_recommendation_trends",
+            # Institutional ownership (Yahoo Finance)
+            "get_institutional_holders",
             # Company-specific news for thesis validation
             "get_company_news",
             "get_finnhub_company_news",
+            # Dividends
+            "get_dividends",
         ],
         # Screen Forge (Equity Screening): Systematic screening, idea generation
         "screen_forge": [
-            # Market data for validation
+            # Market data for validation (Yahoo Finance + Alpha Vantage)
+            "get_quote",
             "get_stock_price",
             "get_stock_overview",
+            "get_historical_data",
             # Screening and fundamentals
             "screen_stocks",
             "get_company_fundamentals",
             "get_financial_ratios",
+            "get_financials",
             # Sentiment for conviction signals
             "get_company_news_sentiment",
             "get_social_sentiment",
             "get_insider_sentiment",
             "get_recommendation_trends",
+            "get_analyst_recommendations",
+            # Earnings momentum
+            "get_earnings_history",
         ],
         # Macro Lens (Market Strategist): Top-down macro analysis and regime identification
         "macro_lens": [
@@ -231,6 +314,9 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_treasury_rate",
             "get_treasury_yield_spread",
             "get_debt_to_gdp",
+            # Market indices (Yahoo Finance)
+            "get_market_indices",
+            "get_historical_data",
             # Macro news
             "search_market_news",
             "get_top_financial_headlines",
@@ -512,5 +598,21 @@ __all__ = [
     "get_company_filings",
     "get_latest_10k",
     "get_latest_10q",
+    "get_latest_8k",
+    "get_company_facts",
+    "search_filings_by_form",
+    "get_insider_transactions",
     "get_institutional_holdings",
+    # Yahoo Finance
+    "get_quote",
+    "get_historical_data",
+    "get_financials",
+    "get_earnings_history",
+    "get_earnings_calendar",
+    "get_analyst_recommendations",
+    "get_institutional_holders",
+    "get_company_info",
+    "get_dividends",
+    "get_options_chain",
+    "get_market_indices",
 ]
