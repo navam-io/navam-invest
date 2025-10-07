@@ -7,7 +7,7 @@ and sector/factor allocation guidance.
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import SystemMessage
 from langgraph.graph import END, START, StateGraph, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -55,7 +55,7 @@ async def create_macro_lens_agent() -> StateGraph:
 
     async def call_model(state: MacroLensState) -> dict:
         """Call the LLM with macro analysis tools."""
-        system_msg = HumanMessage(
+        system_msg = SystemMessage(
             content="""You are Macro Lens, an expert market strategist specializing in top-down macroeconomic analysis and regime identification.
 
 Your role is to:

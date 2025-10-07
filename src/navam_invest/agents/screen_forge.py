@@ -7,7 +7,7 @@ Focus on factor-based screening and weekly watchlist generation.
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import SystemMessage
 from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -62,7 +62,7 @@ async def create_screen_forge_agent() -> StateGraph:
     # Define agent node with specialized screening prompt
     async def call_model(state: ScreenForgeState) -> dict:
         """Call the LLM with equity screening tools."""
-        system_msg = HumanMessage(
+        system_msg = SystemMessage(
             content="You are Screen Forge, an expert equity screener specializing in systematic stock discovery and idea generation. "
             "Your expertise includes:\n\n"
             "**Core Capabilities:**\n"

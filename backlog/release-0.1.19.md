@@ -1,39 +1,37 @@
 # Release 0.1.19
 
 ## Status
-IN DEVELOPMENT
+Published to PyPI on October 6, 2025
 
-## Features
+## Critical Bugfix Release
 
-### Phase 2C: Enhanced Multi-Agent Workflows
+This release fixes a critical runtime error introduced in v0.1.17 that caused Anthropic API 400 errors during agent tool execution.
 
-This release focuses on expanding multi-agent capabilities and building additional workflows.
+### System Message Fix
 
-**Planned Features**:
-- Extended Investment Analysis Workflow to include Atlas (Quill → Macro Lens → Atlas → Synthesis)
-- Additional multi-agent workflows (Tax Optimization, Portfolio Rebalancing, Risk Analysis)
-- Human-in-the-loop checkpoints for workflow approval/editing
-- Parallel agent execution for independent analyses
-- Workflow state persistence and resumption
-- Enhanced TUI workflow visualization
+**Issue**: All 6 agents incorrectly used `HumanMessage` for system prompts instead of `SystemMessage`
+- **Impact**: Caused Anthropic API error 400 - `invalid_request_error` related to tool_use IDs
+- **Root Cause**: System prompts prepended as HumanMessage created invalid message sequences for tool-calling
+- **Severity**: Critical - prevented all agent tool execution
 
-**Architecture Enhancements**:
-- Conditional routing in workflows (dynamic agent selection)
-- Agent feedback loops (iterative refinement)
-- Workflow templates for common analysis patterns
-- Cross-workflow state sharing
+**Fix Applied** (All 6 agents):
+- Changed `from langchain_core.messages import HumanMessage` → `SystemMessage`
+- Changed `system_msg = HumanMessage(...)` → `system_msg = SystemMessage(...)`
 
-**Potential New Workflows**:
-1. **Tax Optimization Workflow**: Tax-Scout → Atlas → Rebalance-Bot
-2. **Risk Management Workflow**: Risk-Shield → Macro Lens → Atlas
-3. **Portfolio Construction Workflow**: Screen Forge → Quill → Risk-Shield → Atlas
+**Files Fixed**:
+1. `src/navam_invest/agents/atlas.py`
+2. `src/navam_invest/agents/portfolio.py`
+3. `src/navam_invest/agents/research.py`
+4. `src/navam_invest/agents/quill.py`
+5. `src/navam_invest/agents/screen_forge.py`
+6. `src/navam_invest/agents/macro_lens.py`
 
-(Specific implementation details will be documented as features are completed)
+**Testing**: All 48 tests pass, proper message format now used for Anthropic API
 
 ---
 
 ## Release Date
-TBD
+October 6, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.19/

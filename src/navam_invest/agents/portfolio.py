@@ -3,7 +3,7 @@
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import SystemMessage
 from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -64,7 +64,7 @@ async def create_portfolio_agent() -> StateGraph:
     async def call_model(state: PortfolioState) -> dict:
         """Call the LLM with tools."""
         # Clean system message without API keys
-        system_msg = HumanMessage(
+        system_msg = SystemMessage(
             content="You are a portfolio analysis assistant with access to comprehensive market data, historical fundamentals, and sentiment analysis. "
             "You have tools for:\n"
             "- Reading local files (CSV, JSON, Excel, etc.) from the user's working directory\n"

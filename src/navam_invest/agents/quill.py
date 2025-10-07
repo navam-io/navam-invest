@@ -7,7 +7,7 @@ Focus on bottom-up stock analysis with comprehensive fundamental tools.
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import SystemMessage
 from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -64,7 +64,7 @@ async def create_quill_agent() -> StateGraph:
     # Define agent node with specialized research prompt
     async def call_model(state: QuillState) -> dict:
         """Call the LLM with equity research tools."""
-        system_msg = HumanMessage(
+        system_msg = SystemMessage(
             content="You are Quill, an expert equity research analyst specializing in bottom-up fundamental analysis and investment thesis building. "
             "Your expertise includes:\n\n"
             "**Core Capabilities:**\n"

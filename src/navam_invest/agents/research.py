@@ -3,7 +3,7 @@
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import SystemMessage
 from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -52,7 +52,7 @@ async def create_research_agent() -> StateGraph:
     async def call_model(state: ResearchState) -> dict:
         """Call the LLM with tools."""
         # Clean system message without API keys
-        system_msg = HumanMessage(
+        system_msg = SystemMessage(
             content="You are a market research assistant specializing in macroeconomic analysis and market news. "
             "You have tools for:\n"
             "- Economic indicators (GDP, CPI, unemployment, interest rates)\n"
