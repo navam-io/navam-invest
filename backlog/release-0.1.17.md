@@ -1,7 +1,7 @@
 # Release 0.1.17
 
 ## Status
-IN DEVELOPMENT
+Published to PyPI on October 6, 2025
 
 ## Features
 
@@ -169,7 +169,7 @@ Atlas serves as the **strategic allocation layer** that can:
 ---
 
 ## Release Date
-TBD
+October 6, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.17/
