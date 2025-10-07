@@ -238,6 +238,26 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "read_local_file",
             "list_local_files",
         ],
+        # Atlas (Investment Strategist): Strategic asset allocation and portfolio construction
+        "atlas": [
+            # Macro indicators for regime analysis
+            "get_economic_indicator",
+            "get_key_macro_indicators",
+            # Treasury data for duration positioning
+            "get_treasury_yield_curve",
+            "get_treasury_rate",
+            "get_treasury_yield_spread",
+            "get_debt_to_gdp",
+            # Fundamentals for equity allocation insights
+            "get_company_fundamentals",
+            "get_financial_ratios",
+            # Market news for allocation context
+            "search_market_news",
+            "get_top_financial_headlines",
+            # Files for portfolio analysis
+            "read_local_file",
+            "list_local_files",
+        ],
         # Portfolio (Generalist - Legacy): Broad portfolio analysis
         "portfolio": [
             # Market data

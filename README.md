@@ -22,19 +22,19 @@
 
 ---
 
-## 🆕 What's New in v0.1.16
+## 🆕 What's New in v0.1.17
 
-**Multi-Agent Workflows** - Coordinated agent collaboration for comprehensive analysis:
+**Atlas - Investment Strategist** - Strategic asset allocation and portfolio construction:
 
-- ✨ **Investment Analysis Workflow**: Sequential orchestration of Quill (fundamental) → Macro Lens (macro timing) → Synthesis
-- ✨ **`/analyze <SYMBOL>` Command**: One command delivers institutional-grade analysis combining bottom-up and top-down perspectives
-- ✨ **Shared State Architecture**: Agents reference each other's analysis for coherent recommendations
-- ✨ **Real-Time Multi-Agent Streaming**: Watch agents collaborate in real-time with transparent tool usage
-- ✨ **First Multi-Agent Workflow**: Foundation for future workflows (tax optimization, portfolio rebalancing, screening)
+- ✨ **Atlas Agent**: Investment strategist for strategic asset allocation, IPS development, and portfolio construction
+- ✨ **Risk Tolerance Frameworks**: Conservative (30/60/10), Moderate (60/35/5), Aggressive (85/10/5) allocations
+- ✨ **Macro-Driven Tactical Tilts**: Dynamic allocation adjustments based on economic cycle phase
+- ✨ **Rebalancing Strategies**: Threshold-based, calendar-based, and tax-aware rebalancing guidance
+- ✨ **Complete Phase 2B**: All specialized agents from refactoring plan now implemented
 
-**Example**: `/analyze AAPL` → Quill analyzes fundamentals → Macro Lens validates timing → Synthesis delivers BUY/HOLD/SELL with confidence
+**Agent Count**: 5 → **6 specialized agents** (Quill, Screen Forge, Macro Lens, Atlas, Portfolio, Research)
 
-See [Release Notes](backlog/release-0.1.16.md) for details | Previous: [v0.1.15 - Macro Lens](backlog/release-0.1.15.md)
+See [Release Notes](backlog/release-0.1.17.md) for details | Previous: [v0.1.16 - Multi-Agent Workflows](backlog/release-0.1.16.md)
 
 ---
 

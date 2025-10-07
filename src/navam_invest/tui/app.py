@@ -15,6 +15,7 @@ from navam_invest.agents.research import create_research_agent
 from navam_invest.agents.quill import create_quill_agent
 from navam_invest.agents.screen_forge import create_screen_forge_agent
 from navam_invest.agents.macro_lens import create_macro_lens_agent
+from navam_invest.agents.atlas import create_atlas_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 
@@ -74,6 +75,17 @@ MACRO_LENS_EXAMPLES = [
     "Should I be defensive or cyclical given the economic cycle phase?",
 ]
 
+ATLAS_EXAMPLES = [
+    "Design a strategic asset allocation for a 35-year-old with moderate risk tolerance",
+    "What's the optimal 60/40 portfolio given the current macro environment?",
+    "Build an investment policy statement for retirement planning (25 years away)",
+    "How should I tactically adjust my allocation in late expansion phase?",
+    "Recommend a rebalancing strategy for my portfolio",
+    "What's the right stock/bond/cash mix for a conservative investor?",
+    "Design a portfolio for maximum Sharpe ratio with 10% volatility target",
+    "Should I increase bond duration given current interest rate environment?",
+]
+
 WORKFLOW_EXAMPLES = [
     "/analyze AAPL - Complete investment analysis (fundamental + macro)",
     "/analyze MSFT - Should I invest? Get both bottom-up and top-down view",
@@ -118,6 +130,7 @@ class ChatUI(App):
         self.quill_agent: Optional[object] = None
         self.screen_forge_agent: Optional[object] = None
         self.macro_lens_agent: Optional[object] = None
+        self.atlas_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
@@ -149,7 +162,8 @@ class ChatUI(App):
                 "- `/quill` - Switch to Quill equity research agent\n"
                 "- `/screen` - Switch to Screen Forge screening agent\n"
                 "- `/macro` - Switch to Macro Lens market strategist\n"
-                "- `/analyze <SYMBOL>` - Multi-agent investment analysis 🆕\n"
+                "- `/atlas` - Switch to Atlas investment strategist 🆕\n"
+                "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
                 "- `/quit` - Exit the application\n"
@@ -168,9 +182,10 @@ class ChatUI(App):
             self.quill_agent = await create_quill_agent()
             self.screen_forge_agent = await create_screen_forge_agent()
             self.macro_lens_agent = await create_macro_lens_agent()
+            self.atlas_agent = await create_atlas_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens)[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Atlas)[/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -240,6 +255,9 @@ class ChatUI(App):
             elif self.current_agent == "macro":
                 agent = self.macro_lens_agent
                 agent_name = "Macro Lens (Market Strategist)"
+            elif self.current_agent == "atlas":
+                agent = self.atlas_agent
+                agent_name = "Atlas (Investment Strategist)"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -382,7 +400,8 @@ class ChatUI(App):
                     "- `/quill` - Switch to Quill equity research agent\n"
                     "- `/screen` - Switch to Screen Forge screening agent\n"
                     "- `/macro` - Switch to Macro Lens market strategist\n"
-                    "- `/analyze <SYMBOL>` - Multi-agent investment analysis 🆕\n"
+                    "- `/atlas` - Switch to Atlas investment strategist 🆕\n"
+                    "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                     "- `/examples` - Show example prompts for current agent\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"
@@ -404,6 +423,9 @@ class ChatUI(App):
         elif command == "/macro":
             self.current_agent = "macro"
             chat_log.write("\n[green]✓ Switched to Macro Lens (Market Strategist) agent[/green]\n")
+        elif command == "/atlas":
+            self.current_agent = "atlas"
+            chat_log.write("\n[green]✓ Switched to Atlas (Investment Strategist) agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -421,6 +443,9 @@ class ChatUI(App):
             elif self.current_agent == "macro":
                 examples = MACRO_LENS_EXAMPLES
                 agent_name = "Macro Lens (Market Strategist)"
+            elif self.current_agent == "atlas":
+                examples = ATLAS_EXAMPLES
+                agent_name = "Atlas (Investment Strategist)"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"

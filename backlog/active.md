@@ -13,11 +13,11 @@
 [x] Add agent selection in TUI: `/screen` command → Completed in release-0.1.14.md
 [x] Update tools registry to map tools to specialized agents → Completed in release-0.1.14.md
 
-### Phase 2B: First Multi-Agent Workflow (v0.1.15-0.1.16)
+### Phase 2B: First Multi-Agent Workflow (v0.1.15-0.1.16) ✅ COMPLETE
 [x] Build Macro Lens (Market Strategist) agent - Top-down macro analysis and regime identification → Completed in release-0.1.15.md
 [x] Implement Workflow 1: Comprehensive Investment Analysis (Quill → Macro Lens) → Completed in release-0.1.16.md
 [x] Add workflow command: `/analyze <SYMBOL>` for end-to-end analysis → Completed in release-0.1.16.md
-[ ] Refactor Portfolio → Atlas (Investment Strategist) if needed
+[x] Build Atlas (Investment Strategist) agent - Strategic asset allocation and portfolio construction → Completed in release-0.1.17.md
 
 
 ## Completed Items
