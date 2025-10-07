@@ -3,37 +3,41 @@
 ## Status
 IN DEVELOPMENT
 
-## Features
+## Critical Rollback
 
-### Phase 2C: Enhanced Multi-Agent Workflows
+**Problem**: Releases v0.1.17 through v0.1.21 introduced critical bugs with Anthropic API tool_use/tool_result message pairing. Multiple fix attempts failed to resolve the issue.
 
-This release focuses on expanding multi-agent capabilities and building additional workflows.
+**Solution**: Complete rollback to v0.1.16 (last known working version).
 
-**Planned Features**:
-- Extended Investment Analysis Workflow to include Atlas (Quill → Macro Lens → Atlas → Synthesis)
-- Additional multi-agent workflows (Tax Optimization, Portfolio Rebalancing, Risk Analysis)
-- Human-in-the-loop checkpoints for workflow approval/editing
-- Parallel agent execution for independent analyses
-- Workflow state persistence and resumption
-- Enhanced TUI workflow visualization
+**What was rolled back**:
+- All agent implementations restored to v0.1.16 state
+- Atlas investment strategist agent removed (introduced in v0.1.17)
+- Investment analysis workflow restored to v0.1.16
+- All agents now use HumanMessage for system prompts (v0.1.16 pattern)
 
-**Architecture Enhancements**:
-- Conditional routing in workflows (dynamic agent selection)
-- Agent feedback loops (iterative refinement)
-- Workflow templates for common analysis patterns
-- Cross-workflow state sharing
+**Failed versions** (DO NOT USE):
+- v0.1.17: Added Atlas agent, introduced bug
+- v0.1.18: Import fix attempt
+- v0.1.19: SystemMessage conversion attempt
+- v0.1.20: First-call-only prepending attempt
+- v0.1.21: bind(system=...) attempt
 
-**Potential New Workflows**:
-1. **Tax Optimization Workflow**: Tax-Scout → Atlas → Rebalance-Bot
-2. **Risk Management Workflow**: Risk-Shield → Macro Lens → Atlas
-3. **Portfolio Construction Workflow**: Screen Forge → Quill → Risk-Shield → Atlas
+**Current agent roster** (v0.1.16 baseline):
+- Portfolio Analysis agent
+- Research agent
+- Quill equity research agent
+- Screen Forge screening agent
+- Macro Lens strategist agent
 
-(Specific implementation details will be documented as features are completed)
+**Next steps**:
+- Investigate root cause of tool_use/tool_result pairing errors
+- Test v0.1.22 thoroughly before adding new features
+- Re-implement Atlas agent with proper fix once root cause identified
 
 ---
 
 ## Release Date
-TBD
+October 7, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.22/

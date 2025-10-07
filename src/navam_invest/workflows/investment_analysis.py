@@ -10,8 +10,8 @@ The workflow combines both perspectives to deliver a complete investment recomme
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import AIMessage, HumanMessage
-from langgraph.graph import END, START, StateGraph, add_messages
+from langchain_core.messages import AIMessage, HumanMessage, add_messages
+from langgraph.graph import END, START, StateGraph
 
 from navam_invest.config.settings import get_settings
 from navam_invest.tools import bind_api_keys_to_tools, get_tools_for_agent

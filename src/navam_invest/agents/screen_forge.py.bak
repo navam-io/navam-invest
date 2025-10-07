@@ -7,7 +7,7 @@ Focus on factor-based screening and weekly watchlist generation.
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage
+# SystemMessage removed - using llm.bind(system=...)
 from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -62,7 +62,7 @@ async def create_screen_forge_agent() -> StateGraph:
     # Define agent node with specialized screening prompt
     async def call_model(state: ScreenForgeState) -> dict:
         """Call the LLM with equity screening tools."""
-        system_msg = HumanMessage(
+        system_msg = SystemMessage(
             content="You are Screen Forge, an expert equity screener specializing in systematic stock discovery and idea generation. "
             "Your expertise includes:\n\n"
             "**Core Capabilities:**\n"
@@ -102,7 +102,11 @@ async def create_screen_forge_agent() -> StateGraph:
             "Be rigorous in your filtering and transparent about screening methodology."
         )
 
-        messages = [system_msg] + state["messages"]
+        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
+        messages = state["messages"]
+        if not messages or messages[0].type != "system":
+            messages = [system_msg] + messages
+
         response = await llm_with_tools.ainvoke(messages)
         return {"messages": [response]}
 

@@ -7,7 +7,7 @@ Focus on bottom-up stock analysis with comprehensive fundamental tools.
 from typing import Annotated, TypedDict
 
 from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage
+# SystemMessage removed - using llm.bind(system=...)
 from langgraph.graph import StateGraph, START, END, add_messages
 from langgraph.prebuilt import ToolNode
 
@@ -64,7 +64,7 @@ async def create_quill_agent() -> StateGraph:
     # Define agent node with specialized research prompt
     async def call_model(state: QuillState) -> dict:
         """Call the LLM with equity research tools."""
-        system_msg = HumanMessage(
+        system_msg = SystemMessage(
             content="You are Quill, an expert equity research analyst specializing in bottom-up fundamental analysis and investment thesis building. "
             "Your expertise includes:\n\n"
             "**Core Capabilities:**\n"
@@ -99,7 +99,11 @@ async def create_quill_agent() -> StateGraph:
             "Be rigorous, data-driven, and intellectually honest about both upside and downside scenarios."
         )
 
-        messages = [system_msg] + state["messages"]
+        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
+        messages = state["messages"]
+        if not messages or messages[0].type != "system":
+            messages = [system_msg] + messages
+
         response = await llm_with_tools.ainvoke(messages)
         return {"messages": [response]}
 
