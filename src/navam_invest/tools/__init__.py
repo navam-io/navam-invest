@@ -117,7 +117,7 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
     """Get tools filtered by category.
 
     Args:
-        category: One of 'market', 'fundamentals', 'macro', 'treasury', 'sec'
+        category: One of 'market', 'fundamentals', 'macro', 'treasury', 'sec', 'news', 'sentiment', 'files'
 
     Returns:
         List of tools in the specified category
@@ -167,6 +167,116 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
         return []
 
     return [TOOLS[name] for name in category_map[category] if name in TOOLS]
+
+
+def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
+    """Get recommended tools for a specific agent.
+
+    This function maps specialized agents to their optimal tool sets based on
+    the agent refactoring plan. It ensures each agent has focused, relevant tools
+    for their specialized tasks.
+
+    Args:
+        agent_name: One of 'quill', 'screen_forge', 'portfolio', 'research'
+
+    Returns:
+        List of tools recommended for the specified agent
+    """
+    agent_tool_map = {
+        # Quill (Equity Research): Deep fundamental analysis, thesis building, valuation
+        "quill": [
+            # Market data for current pricing
+            "get_stock_price",
+            "get_stock_overview",
+            # Fundamentals for analysis (excluding screening tool)
+            "get_company_fundamentals",
+            "get_financial_ratios",
+            "get_insider_trades",
+            "get_fundamentals_daily",
+            "get_fundamentals_statements",
+            "get_fundamentals_definitions",
+            "get_historical_fundamentals",
+            # SEC filings for deep-dive analysis
+            "search_company_by_ticker",
+            "get_company_filings",
+            "get_latest_10k",
+            "get_latest_10q",
+            "get_institutional_holdings",
+            # Company-specific news for thesis validation
+            "get_company_news",
+            "get_finnhub_company_news",
+        ],
+        # Screen Forge (Equity Screening): Systematic screening, idea generation
+        "screen_forge": [
+            # Market data for validation
+            "get_stock_price",
+            "get_stock_overview",
+            # Screening and fundamentals
+            "screen_stocks",
+            "get_company_fundamentals",
+            "get_financial_ratios",
+            # Sentiment for conviction signals
+            "get_company_news_sentiment",
+            "get_social_sentiment",
+            "get_insider_sentiment",
+            "get_recommendation_trends",
+        ],
+        # Portfolio (Generalist - Legacy): Broad portfolio analysis
+        "portfolio": [
+            # Market data
+            "get_stock_price",
+            "get_stock_overview",
+            # Fundamentals
+            "get_company_fundamentals",
+            "get_financial_ratios",
+            "get_insider_trades",
+            "screen_stocks",
+            "get_fundamentals_daily",
+            "get_fundamentals_statements",
+            "get_historical_fundamentals",
+            # Sentiment
+            "get_company_news_sentiment",
+            "get_social_sentiment",
+            "get_insider_sentiment",
+            "get_recommendation_trends",
+            "get_finnhub_company_news",
+            # SEC filings
+            "search_company_by_ticker",
+            "get_company_filings",
+            "get_latest_10k",
+            "get_latest_10q",
+            "get_institutional_holdings",
+            # News
+            "search_market_news",
+            "get_top_financial_headlines",
+            "get_company_news",
+            # Files
+            "read_local_file",
+            "list_local_files",
+        ],
+        # Research (Macro Analysis - Legacy): Top-down macro analysis
+        "research": [
+            # Macro indicators
+            "get_economic_indicator",
+            "get_key_macro_indicators",
+            # Treasury data
+            "get_treasury_yield_curve",
+            "get_treasury_rate",
+            "get_treasury_yield_spread",
+            "get_debt_to_gdp",
+            # Macro news
+            "search_market_news",
+            "get_top_financial_headlines",
+            # Files
+            "read_local_file",
+            "list_local_files",
+        ],
+    }
+
+    if agent_name not in agent_tool_map:
+        return []
+
+    return [TOOLS[name] for name in agent_tool_map[agent_name] if name in TOOLS]
 
 
 def _create_bound_wrapper(original_func, api_key: str):
@@ -324,6 +434,7 @@ __all__ = [
     "TOOLS",
     "get_all_tools",
     "get_tools_by_category",
+    "get_tools_for_agent",
     "bind_api_keys_to_tools",
     # Alpha Vantage
     "get_stock_price",

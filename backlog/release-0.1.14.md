@@ -51,6 +51,55 @@ Added specialized Screen Forge agent for systematic stock screening and investme
 - **Ranking system**: Multi-factor scoring to prioritize candidates
 - **Integration ready**: Works seamlessly with Quill agent for deep-dive analysis
 
+---
+
+### Tools Registry Enhancement - Agent-Specific Tool Mappings
+
+Enhanced tools registry with agent-specific tool mapping functionality to support specialized agents.
+
+**Implementation Details**:
+- **Modified**: `src/navam_invest/tools/__init__.py`
+- **New function**: `get_tools_for_agent(agent_name: str) -> List[BaseTool]`
+- **Purpose**: Map specialized agents to their optimal tool sets based on agent refactoring plan
+
+**Agent Tool Mappings**:
+
+1. **Quill (Equity Research)** - 16 tools:
+   - Market data: price, overview
+   - Fundamentals: financials, ratios, insider trades, historical data (5yr via Tiingo)
+   - SEC filings: 10-K, 10-Q, company filings, institutional holdings
+   - News: company-specific news for thesis validation
+
+2. **Screen Forge (Equity Screening)** - 9 tools:
+   - Market data: price, overview for validation
+   - Screening: stock screener, fundamentals, financial ratios
+   - Sentiment: Finnhub sentiment, social sentiment, insider sentiment, recommendations
+
+3. **Portfolio (Legacy Generalist)** - 24 tools:
+   - Comprehensive tool set across all categories
+   - Backward compatibility maintained
+
+4. **Research (Legacy Macro)** - 10 tools:
+   - Macro indicators: FRED economic data
+   - Treasury data: yield curve, rates, spreads
+   - Macro news and file reading
+
+**Benefits**:
+- **Focused agents**: Each specialized agent has curated tools for their domain
+- **Reduced tool sprawl**: Quill excludes screening tools, Screen Forge excludes SEC filings
+- **Clear separation**: Tool sets reflect agent specialization (bottom-up vs systematic screening)
+- **Future-ready**: Foundation for multi-agent workflows where agents share tool results
+- **Maintainability**: Centralized mapping makes it easy to adjust agent capabilities
+
+**Testing**:
+- Quill agent: ✅ 16 tools mapped correctly
+- Screen Forge agent: ✅ 9 tools mapped correctly
+- Portfolio agent: ✅ 24 tools (backward compatible)
+- Research agent: ✅ 10 tools
+- Full test suite: ✅ 48/48 tests PASSED
+
+**Phase 2A Status**: ✅ COMPLETE (All specialized agent tasks finished)
+
 ## Release Date
 TBD
 

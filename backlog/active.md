@@ -6,12 +6,12 @@
 
 ## Next Phase Items (from Agent Refactoring Plan)
 
-### Phase 2A: Specialized Agents (v0.1.13-0.1.14)
+### Phase 2A: Specialized Agents (v0.1.13-0.1.14) ✅ COMPLETE
 [x] Build Quill (Equity Research) agent - Deep fundamental analysis and thesis building → Completed in release-0.1.13.md
 [x] Build Screen Forge agent - Systematic stock screening and idea generation → Completed in release-0.1.14.md
 [x] Add agent selection in TUI: `/quill` command → Completed in release-0.1.13.md
 [x] Add agent selection in TUI: `/screen` command → Completed in release-0.1.14.md
-[ ] Update tools registry to map tools to specialized agents
+[x] Update tools registry to map tools to specialized agents → Completed in release-0.1.14.md
 
 ### Phase 2B: First Multi-Agent Workflow (v0.1.15)
 [ ] Implement Workflow 1: Comprehensive Investment Analysis (Quill → Macro Lens → Atlas)
