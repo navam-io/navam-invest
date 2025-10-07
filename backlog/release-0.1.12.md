@@ -1,7 +1,7 @@
 # Release 0.1.12
 
 ## Status
-IN DEVELOPMENT
+**Published: 2025-10-06**
 
 ## Features
 
@@ -145,7 +145,7 @@ Apple Inc. (AAPL) is currently trading at $150.25...
 **Documentation**: Granular progress streaming with real-time tool execution visibility
 
 ## Release Date
-TBD
+2025-10-06
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.12/
