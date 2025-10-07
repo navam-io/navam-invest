@@ -196,7 +196,11 @@ Provide clear, actionable recommendations:
 Always tie recommendations to investor goals, risk tolerance, and macro context."""
         )
 
-        messages = [system_msg] + state["messages"]
+        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
+        messages = state["messages"]
+        if not messages or messages[0].type != "system":
+            messages = [system_msg] + messages
+
         response = await llm_with_tools.ainvoke(messages)
         return {"messages": [response]}
 

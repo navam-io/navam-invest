@@ -1,39 +1,50 @@
 # Release 0.1.20
 
 ## Status
-IN DEVELOPMENT
+Published to PyPI on October 6, 2025
 
-## Features
+## Critical Bugfix Release
 
-### Phase 2C: Enhanced Multi-Agent Workflows
+This release fixes the root cause of the Anthropic API 400 error - system messages were being prepended on every agent call, breaking tool_use/tool_result message pairing.
 
-This release focuses on expanding multi-agent capabilities and building additional workflows.
+### System Message Prepending Fix
 
-**Planned Features**:
-- Extended Investment Analysis Workflow to include Atlas (Quill → Macro Lens → Atlas → Synthesis)
-- Additional multi-agent workflows (Tax Optimization, Portfolio Rebalancing, Risk Analysis)
-- Human-in-the-loop checkpoints for workflow approval/editing
-- Parallel agent execution for independent analyses
-- Workflow state persistence and resumption
-- Enhanced TUI workflow visualization
+**Issue**: System messages prepended on EVERY call to `call_model`, not just the first call
+- **Impact**: Anthropic API error 400 - `tool_use` blocks need corresponding `tool_result` in next message
+- **Root Cause**: Prepending SystemMessage on every call created invalid message sequences during tool execution
+- **Severity**: Critical - prevented all tool-calling workflows from functioning
 
-**Architecture Enhancements**:
-- Conditional routing in workflows (dynamic agent selection)
-- Agent feedback loops (iterative refinement)
-- Workflow templates for common analysis patterns
-- Cross-workflow state sharing
+**Problem Flow**:
+1. First call: `[SystemMsg, HumanMsg]` → AI makes tool_call
+2. ToolNode adds result: `[HumanMsg, AIMsg(tool_calls), ToolResultMsg]`
+3. Second call: Prepend AGAIN → `[SystemMsg, HumanMsg, AIMsg(tool_calls), ToolResultMsg]`
+4. Anthropic sees new SystemMsg breaking the tool_call/result pairing
 
-**Potential New Workflows**:
-1. **Tax Optimization Workflow**: Tax-Scout → Atlas → Rebalance-Bot
-2. **Risk Management Workflow**: Risk-Shield → Macro Lens → Atlas
-3. **Portfolio Construction Workflow**: Screen Forge → Quill → Risk-Shield → Atlas
+**Fix Applied** (All 6 agents):
+```python
+# Before (WRONG - prepends every time)
+messages = [system_msg] + state["messages"]
 
-(Specific implementation details will be documented as features are completed)
+# After (CORRECT - only on first call)
+messages = state["messages"]
+if not messages or messages[0].type != "system":
+    messages = [system_msg] + messages
+```
+
+**Files Fixed**:
+1. `src/navam_invest/agents/atlas.py`
+2. `src/navam_invest/agents/portfolio.py`
+3. `src/navam_invest/agents/research.py`
+4. `src/navam_invest/agents/quill.py`
+5. `src/navam_invest/agents/screen_forge.py`
+6. `src/navam_invest/agents/macro_lens.py`
+
+**Testing**: All 48 tests pass, tool-calling workflows now function correctly
 
 ---
 
 ## Release Date
-TBD
+October 6, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.20/

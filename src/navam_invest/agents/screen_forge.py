@@ -102,7 +102,11 @@ async def create_screen_forge_agent() -> StateGraph:
             "Be rigorous in your filtering and transparent about screening methodology."
         )
 
-        messages = [system_msg] + state["messages"]
+        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
+        messages = state["messages"]
+        if not messages or messages[0].type != "system":
+            messages = [system_msg] + messages
+
         response = await llm_with_tools.ainvoke(messages)
         return {"messages": [response]}
 

@@ -82,7 +82,11 @@ async def create_portfolio_agent() -> StateGraph:
             "including sentiment analysis (news sentiment, social media buzz, insider trading patterns, and analyst recommendations)."
         )
 
-        messages = [system_msg] + state["messages"]
+        # Only add system message on first call to avoid breaking tool_use/tool_result pairs
+        messages = state["messages"]
+        if not messages or messages[0].type != "system":
+            messages = [system_msg] + messages
+
         response = await llm_with_tools.ainvoke(messages)
         return {"messages": [response]}
 
