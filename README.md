@@ -21,16 +21,15 @@
 
 ---
 
-## 🆕 What's New in v0.1.11 (In Development)
+## 🆕 What's New in v0.1.12 (In Development)
 
-**Alternative Data & Sentiment Analysis** - Finnhub integration for institutional-grade insights:
+**Tiingo Integration & Real-Time Streaming** - Historical fundamentals and transparent AI execution:
 
-- ✨ **News Sentiment**: Company news scores, sector averages, bullish/bearish percentages
-- ✨ **Social Sentiment**: Reddit and Twitter mentions, positive/negative scores
-- ✨ **Insider Sentiment**: Monthly Share Purchase Ratio (MSPR), insider trading patterns
-- ✨ **Analyst Recommendations**: Ratings distribution (strong buy, buy, hold, sell, strong sell)
+- ✨ **Historical Fundamentals**: 5-year trend analysis, quarterly statements, CAGR calculations (Tiingo)
+- ✨ **Granular Progress Streaming**: Real-time visibility into agent reasoning and tool execution
+- ✨ **Enhanced Transparency**: See which APIs are called, what arguments are used, live tool status
 
-**Tool Count**: 18 → 23 tools (+28% growth) | **Full release notes**: [v0.1.11](backlog/release-0.1.11.md)
+**Tool Count**: 23 → 27 tools (+17% growth) | **Full release notes**: [v0.1.12](backlog/release-0.1.12.md)
 
 ---
 
@@ -59,9 +58,11 @@
 **Portfolio Analysis Agent**
 - Real-time stock quotes and metrics
 - Company fundamentals & financial ratios
-- **News & social sentiment analysis** 🆕
-- **Insider sentiment tracking (MSPR)** 🆕
-- **Analyst recommendation trends** 🆕
+- **5-year historical fundamentals** 🆕
+- **Quarterly statement tracking** 🆕
+- News & social sentiment analysis
+- Insider sentiment tracking (MSPR)
+- Analyst recommendation trends
 - SEC filings (10-K, 10-Q, 13F)
 - Multi-criteria stock screening
 - Local file reading (CSV, JSON, Excel)
@@ -81,13 +82,14 @@
 </tr>
 </table>
 
-### 📊 **Real API Integrations** (23 Tools Across 7 Data Sources)
+### 📊 **Real API Integrations** (27 Tools Across 8 Data Sources)
 
 | API | Tools | Purpose | Free Tier |
 |-----|-------|---------|-----------|
 | **Alpha Vantage** | 2 | Stock prices, company overviews, technical indicators | 25-500 calls/day |
 | **Financial Modeling Prep** | 4 | Financial statements, ratios, insider trades, screening | 250 calls/day |
-| **Finnhub** 🆕 | 5 | News sentiment, social sentiment, insider sentiment, analyst ratings | 60 calls/min |
+| **Tiingo** 🆕 | 4 | Historical fundamentals (5yr), quarterly statements, daily metrics | 50 symbols/hr |
+| **Finnhub** | 5 | News sentiment, social sentiment, insider sentiment, analyst ratings | 60 calls/min |
 | **FRED (St. Louis Fed)** | 2 | Economic indicators, macro data | Unlimited |
 | **U.S. Treasury** | 4 | Yield curves, treasury rates, debt metrics | Unlimited |
 | **SEC EDGAR** | 5 | Corporate filings (10-K, 10-Q, 13F) | 10 req/sec |
@@ -98,6 +100,7 @@
 
 - **Chat Interface**: Natural language interaction with AI agents
 - **Real-time Streaming**: Watch agents think and reason in real-time
+- **Granular Progress** 🆕: See which tools are called, with what arguments, and live execution status
 - **Markdown Rendering**: Beautiful formatted output with tables and lists
 - **Agent Switching**: Seamlessly switch between specialized agents (`/portfolio`, `/research`)
 - **Command Palette**: Quick access to common actions
@@ -154,6 +157,7 @@ pip install -e ".[dev]"
    # Optional (but recommended for full functionality)
    ALPHA_VANTAGE_API_KEY=your_key_here
    FMP_API_KEY=your_key_here
+   TIINGO_API_KEY=your_key_here
    FINNHUB_API_KEY=your_key_here
    FRED_API_KEY=your_key_here
    NEWSAPI_API_KEY=your_key_here
@@ -166,6 +170,7 @@ pip install -e ".[dev]"
    | **Anthropic** | [console.anthropic.com](https://console.anthropic.com/) | Required - Pay-as-you-go ($3-15/M tokens) |
    | **Alpha Vantage** | [alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key) | Free tier: 25 calls/day |
    | **FMP** | [financialmodelingprep.com/developer](https://financialmodelingprep.com/developer) | Free tier: 250 calls/day |
+   | **Tiingo** | [tiingo.com](https://www.tiingo.com/) | Free tier: 50 symbols/hr, 5yr history |
    | **Finnhub** | [finnhub.io/register](https://finnhub.io/register) | Free tier: 60 calls/min |
    | **FRED** | [fredaccount.stlouisfed.org/apikeys](https://fredaccount.stlouisfed.org/apikeys) | Free - Unlimited |
    | **NewsAPI** | [newsapi.org/register](https://newsapi.org/register) | Free tier: 100 calls/day |
@@ -231,7 +236,47 @@ Debt Ratio: 0.32
 </details>
 
 <details>
-<summary><b>🔍 Sentiment Analysis (NEW!)</b></summary>
+<summary><b>📊 Historical Fundamentals Analysis (NEW!)</b></summary>
+
+```
+You: Analyze AAPL's historical fundamentals over the past 5 years
+
+Portfolio Agent:
+  → Calling get_historical_fundamentals(symbol=AAPL, years=5)
+  ✓ get_historical_fundamentals completed
+
+**AAPL - 5-Year Fundamental Trends**
+
+**Revenue Growth:**
+2020: $274.5B → 2024: $383.9B
+CAGR: 8.7% (Steady growth)
+
+**Profitability Trends:**
+Net Margin: 21.2% → 25.3% (+4.1pp improvement)
+ROE: 73.7% → 147.4% (Exceptional capital efficiency)
+
+**Balance Sheet Strength:**
+Total Assets: $323.9B → $365.7B (+12.9%)
+Debt-to-Equity: 1.57 → 1.69 (Slight increase)
+
+**Free Cash Flow:**
+2020: $73.4B → 2024: $99.6B
+5-Year Total: $452.8B (Strong cash generation)
+
+**Valuation Trends:**
+P/E Ratio: 28.5 → 30.2 (Premium valuation maintained)
+P/B Ratio: 21.0 → 44.5 (Significant multiple expansion)
+
+**Investment Thesis:**
+Apple shows consistent revenue growth with improving profitability.
+ROE expansion indicates exceptional capital allocation. Strong FCF
+supports buybacks and dividends. Premium valuation reflects market
+confidence in services transition.
+```
+</details>
+
+<details>
+<summary><b>🔍 Sentiment Analysis</b></summary>
 
 ```
 You: What's the sentiment around TSLA?
@@ -433,7 +478,8 @@ navam-invest/
 │   ├── tools/               # 🔧 API integration tools (23 tools total)
 │   │   ├── alpha_vantage.py #    Stock price & fundamentals
 │   │   ├── fmp.py           #    Financial statements & ratios
-│   │   ├── finnhub.py       #    🆕 Sentiment & alternative data
+│   │   ├── tiingo.py        #    🆕 Historical fundamentals (5yr)
+│   │   ├── finnhub.py       #    Sentiment & alternative data
 │   │   ├── fred.py          #    Economic indicators & macro data
 │   │   ├── treasury.py      #    Yield curves & treasury data
 │   │   ├── sec_edgar.py     #    Corporate filings (10-K, 10-Q, 13F)
@@ -448,8 +494,10 @@ navam-invest/
 ├── tests/                   # ✅ Test suite (pytest + async)
 │   ├── test_config.py
 │   ├── test_tools.py
-│   ├── test_finnhub.py      # 🆕 Finnhub tests
-│   └── test_newsapi.py
+│   ├── test_tiingo.py       # 🆕 Tiingo tests (12 tests, 86% coverage)
+│   ├── test_finnhub.py      # Finnhub tests
+│   ├── test_newsapi.py
+│   └── test_file_reader.py
 ├── refer/                   # 📖 Reference documentation
 │   ├── langgraph/           #    LangGraph docs & examples
 │   └── specs/               #    Project specifications
@@ -509,10 +557,11 @@ User Query → Agent Reasoning → Tool Selection → Tool Execution → Respons
      └──────────────────── Streaming Updates ←──────────────────────────┘
 ```
 
-**Portfolio Analysis Agent (19 tools available):**
+**Portfolio Analysis Agent (23 tools available):**
 - **Market Data**: `get_stock_price`, `get_stock_overview` (Alpha Vantage)
 - **Fundamentals**: `get_company_fundamentals`, `get_financial_ratios`, `get_insider_trades`, `screen_stocks` (FMP)
-- **Sentiment** 🆕: `get_company_news_sentiment`, `get_social_sentiment`, `get_insider_sentiment`, `get_recommendation_trends`, `get_finnhub_company_news` (Finnhub)
+- **Historical Fundamentals** 🆕: `get_fundamentals_daily`, `get_fundamentals_statements`, `get_fundamentals_definitions`, `get_historical_fundamentals` (Tiingo)
+- **Sentiment**: `get_company_news_sentiment`, `get_social_sentiment`, `get_insider_sentiment`, `get_recommendation_trends`, `get_finnhub_company_news` (Finnhub)
 - **Filings**: `search_company_by_ticker`, `get_latest_10k`, `get_latest_10q`, `get_institutional_holdings`, `get_company_filings` (SEC)
 - **News**: `search_market_news`, `get_company_news`, `get_top_financial_headlines` (NewsAPI)
 - **Files**: `read_local_file`, `list_local_files` (Local)
@@ -553,7 +602,7 @@ pytest tests/test_finnhub.py -v
 pytest --cov=src/navam_invest --cov-report=term-missing
 ```
 
-**Current Coverage:** 36/36 tests passing ✅ (34% overall coverage)
+**Current Coverage:** 48/48 tests passing ✅ (43% overall coverage)
 
 ### Code Quality
 
@@ -618,22 +667,24 @@ See `CLAUDE.md` for comprehensive guide on adding new LangGraph agents and tools
 
 ## 📋 Roadmap
 
-### ✅ v0.1.11 (In Development)
-- [x] Finnhub integration (news sentiment, social sentiment, insider sentiment, analyst recommendations)
-- [x] API alternatives research and strategy
-- [x] Enhanced portfolio agent with sentiment analysis
-- [ ] Complete documentation updates
+### ✅ v0.1.12 (In Development)
+- [x] Tiingo integration (5-year historical fundamentals, quarterly statements, CAGR analysis)
+- [x] Granular progress streaming (real-time tool execution visibility)
+- [x] Enhanced TUI with transparent agent reasoning
+- [x] Agent refactoring plan and architecture design
 
-### 🚀 v0.1.12-0.1.15 (Next)
-- [ ] Tiingo integration (historical fundamentals, quarterly tracking)
-- [ ] Enhanced agent system prompts
-- [ ] Multi-agent workflow foundations
-- [ ] Custom screening engine (Phase 1)
+### 🚀 v0.1.13-0.1.15 (Next - Phase 2A)
+- [ ] Build Quill (Equity Research) agent - Deep fundamental analysis and thesis building
+- [ ] Build Screen Forge agent - Systematic stock screening and idea generation
+- [ ] Add agent selection in TUI: `/quill`, `/screen` commands
+- [ ] Update tools registry to map tools to specialized agents
 
-### v0.2.0 (Planned)
-- [ ] Custom hybrid stock screener (local computation + caching)
-- [ ] Additional specialized agents (Quill, Screen Forge, News Sentry, Macro Lens)
-- [ ] Multi-agent supervisor for coordinated analysis
+### v0.2.0 (Planned - Phase 2B & Phase 3)
+- [ ] Implement Workflow 1: Comprehensive Investment Analysis (Quill → Macro Lens → Atlas)
+- [ ] Add workflow command: `/analyze <SYMBOL>` for end-to-end analysis
+- [ ] Refactor Portfolio → Atlas (Investment Strategist)
+- [ ] Refactor Research → Macro Lens (Market Strategist)
+- [ ] Multi-agent supervisor for coordinated workflows
 - [ ] Portfolio optimization tools (PyPortfolioOpt integration)
 - [ ] Conversation persistence with LangGraph checkpointers
 - [ ] Enhanced TUI with portfolio display panels
@@ -671,6 +722,7 @@ Built with these amazing open-source projects:
 Data sources:
 - [Alpha Vantage](https://www.alphavantage.co/) - Stock market data
 - [Financial Modeling Prep](https://financialmodelingprep.com/) - Fundamentals & financials
+- [Tiingo](https://www.tiingo.com/) - Historical fundamentals & quarterly tracking
 - [Finnhub](https://finnhub.io/) - Alternative data & sentiment analysis
 - [FRED](https://fred.stlouisfed.org/) - Economic data from St. Louis Fed
 - [U.S. Treasury](https://fiscaldata.treasury.gov/) - Treasury yields & debt data
