@@ -1,7 +1,7 @@
 # Release 0.1.15
 
 ## Status
-IN DEVELOPMENT
+Published: October 6, 2025
 
 ## Features
 
@@ -86,7 +86,7 @@ This agent completes the specialized agent suite from Phase 2A, providing:
 ---
 
 ## Release Date
-TBD
+October 6, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.15/
