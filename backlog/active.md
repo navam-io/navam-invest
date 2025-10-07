@@ -15,8 +15,8 @@
 
 ### Phase 2B: First Multi-Agent Workflow (v0.1.15-0.1.16)
 [x] Build Macro Lens (Market Strategist) agent - Top-down macro analysis and regime identification → Completed in release-0.1.15.md
-[ ] Implement Workflow 1: Comprehensive Investment Analysis (Quill → Macro Lens → Atlas)
-[ ] Add workflow command: `/analyze <SYMBOL>` for end-to-end analysis
+[x] Implement Workflow 1: Comprehensive Investment Analysis (Quill → Macro Lens) → Completed in release-0.1.16.md
+[x] Add workflow command: `/analyze <SYMBOL>` for end-to-end analysis → Completed in release-0.1.16.md
 [ ] Refactor Portfolio → Atlas (Investment Strategist) if needed
 
 

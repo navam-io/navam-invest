@@ -14,6 +14,7 @@
 [Features](#-features) •
 [Quick Start](#-quick-start) •
 [Agents](#-specialized-ai-agents) •
+[Workflows](#-multi-agent-workflows-new) •
 [Examples](#-example-interactions) •
 [Documentation](#-documentation)
 
@@ -21,36 +22,103 @@
 
 ---
 
-## 🆕 What's New in v0.1.15
+## 🆕 What's New in v0.1.16
 
-**Macro Lens Market Strategist** - Top-down macroeconomic analysis and regime identification:
+**Multi-Agent Workflows** - Coordinated agent collaboration for comprehensive analysis:
 
-- ✨ **Macro Lens Agent**: Economic cycle regime identification with 4-phase framework (Early/Mid/Late Expansion, Contraction)
-- ✨ **Sector & Factor Guidance**: Macro-driven allocation recommendations aligned with economic conditions
-- ✨ **Yield Curve Analysis**: Recession signaling and interest rate trend interpretation
-- ✨ **Specialized Agent Suite Complete**: Quill (v0.1.13) + Screen Forge (v0.1.14) + Macro Lens (v0.1.15)
+- ✨ **Investment Analysis Workflow**: Sequential orchestration of Quill (fundamental) → Macro Lens (macro timing) → Synthesis
+- ✨ **`/analyze <SYMBOL>` Command**: One command delivers institutional-grade analysis combining bottom-up and top-down perspectives
+- ✨ **Shared State Architecture**: Agents reference each other's analysis for coherent recommendations
+- ✨ **Real-Time Multi-Agent Streaming**: Watch agents collaborate in real-time with transparent tool usage
+- ✨ **First Multi-Agent Workflow**: Foundation for future workflows (tax optimization, portfolio rebalancing, screening)
 
-**Agent Count**: 4 → **5 specialized agents** | **Ready for Multi-Agent Workflows** (Phase 2B)
+**Example**: `/analyze AAPL` → Quill analyzes fundamentals → Macro Lens validates timing → Synthesis delivers BUY/HOLD/SELL with confidence
 
-See [Release Notes](backlog/release-0.1.15.md) for details | Previous: [v0.1.14 - Screen Forge](backlog/release-0.1.14.md)
+See [Release Notes](backlog/release-0.1.16.md) for details | Previous: [v0.1.15 - Macro Lens](backlog/release-0.1.15.md)
 
 ---
 
 ## 📖 Overview
 
-`navam-invest` brings **institutional-grade portfolio intelligence** to individual retail investors. Built with [LangGraph](https://langchain-ai.github.io/langgraph/) and powered by [Anthropic's Claude](https://www.anthropic.com/claude), it provides **specialized AI agents** for equity research, systematic screening, macro analysis, portfolio management, and market research—all accessible through an interactive terminal interface.
+`navam-invest` brings **institutional-grade portfolio intelligence** to individual retail investors. Built with [LangGraph](https://langchain-ai.github.io/langgraph/) and powered by [Anthropic's Claude](https://www.anthropic.com/claude), it provides **specialized AI agents** that collaborate through **multi-agent workflows** for equity research, systematic screening, macro analysis, portfolio management, and market research—all accessible through an interactive terminal interface.
 
 ### Why Navam Invest?
 
-- **🎯 Specialized Agents**: Purpose-built agents for equity research, screening, macro strategy, portfolio analysis, and market research
+- **🎯 Multi-Agent Workflows**: Coordinated agent collaboration for comprehensive analysis (NEW in v0.1.16)
+- **🤖 Specialized Agents**: Purpose-built agents for equity research, screening, macro strategy, portfolio analysis, and market research
 - **🔒 Privacy-First**: Run locally with your own API keys—your data stays yours
 - **💡 Transparent**: Full audit trails and explainable AI reasoning with real-time streaming
 - **🆓 Free Data Sources**: Leverages high-quality public APIs (free tiers available)
-- **🔧 Extensible**: Modular architecture makes it easy to add new agents and data sources
+- **🔧 Extensible**: Modular architecture makes it easy to add new agents and workflows
 
 ---
 
 ## ✨ Features
+
+### 🔀 **Multi-Agent Workflows** (NEW in v0.1.16)
+
+Coordinated agent collaboration that combines specialized expertise for comprehensive analysis:
+
+<table>
+<tr>
+<td>
+
+#### **Investment Analysis Workflow**
+
+**Sequential Orchestration**: Quill → Macro Lens → Synthesis
+
+**How it works**:
+1. **Quill** performs bottom-up fundamental analysis
+   - Business overview & competitive position
+   - Financial health (5-year trends)
+   - Valuation (P/E, P/B, DCF fair value)
+   - Investment thesis with catalysts
+
+2. **Macro Lens** validates timing with top-down macro analysis
+   - Receives Quill's thesis via shared state
+   - Assesses current macro regime
+   - Evaluates sector positioning
+   - Validates entry point timing
+
+3. **Synthesis** combines both perspectives
+   - Overall rating: BUY/HOLD/SELL
+   - Confidence level: High/Medium/Low
+   - Key reasoning from both agents
+   - Risk warning & suggested action
+
+**Command**: `/analyze <SYMBOL>`
+
+**Example**:
+```
+/analyze AAPL
+
+Investment Analysis Workflow: Starting...
+📊 Quill analyzing fundamentals...
+  → get_company_fundamentals
+  → get_financial_ratios
+  → get_dcf_valuation
+🌍 Macro Lens validating timing...
+  → get_treasury_yield_curve
+  → get_key_macro_indicators
+🎯 Synthesizing recommendation...
+
+Final Recommendation:
+BUY - High Confidence
+Apple shows strong fundamentals (28% ROE,
+$100B FCF) with reasonable valuation (24x P/E
+vs 27x historical avg). Macro timing favorable
+with defensive positioning in late-cycle regime.
+```
+
+**Benefits**:
+- ✅ Combines fundamental + macro perspectives automatically
+- ✅ Agents reference each other's analysis (shared state)
+- ✅ Transparent multi-agent execution
+- ✅ Institutional-grade analysis in seconds
+
+</td>
+</tr>
+</table>
 
 ### 🤖 **Specialized AI Agents** (Powered by LangGraph)
 
@@ -70,6 +138,8 @@ See [Release Notes](backlog/release-0.1.15.md) for details | Previous: [v0.1.14 
 - Company-specific news validation
 - **16 specialized tools**
 
+**Command**: `/quill`
+
 **Use Case**: "Analyze AAPL and provide an investment thesis with fair value"
 
 </td>
@@ -86,6 +156,8 @@ See [Release Notes](backlog/release-0.1.15.md) for details | Previous: [v0.1.14 
 - Integration with Quill for deep-dives
 - **9 specialized tools**
 
+**Command**: `/screen`
+
 **Use Case**: "Screen for value stocks with P/E < 15 and market cap > $1B"
 
 </td>
@@ -93,7 +165,7 @@ See [Release Notes](backlog/release-0.1.15.md) for details | Previous: [v0.1.14 
 <tr>
 <td width="50%">
 
-#### **Macro Lens - Market Strategist** 🆕
+#### **Macro Lens - Market Strategist**
 *Top-down macro analysis & regime identification*
 
 - Economic cycle regime analysis (4 phases)
@@ -103,6 +175,8 @@ See [Release Notes](backlog/release-0.1.15.md) for details | Previous: [v0.1.14 
 - Inflation, growth, employment tracking
 - Fed policy and interest rate analysis
 - **10 specialized tools**
+
+**Command**: `/macro`
 
 **Use Case**: "What's the current macro regime and which sectors should I overweight?"
 
@@ -119,6 +193,8 @@ See [Release Notes](backlog/release-0.1.15.md) for details | Previous: [v0.1.14 
 - Multi-criteria stock screening
 - Local file reading (CSV, JSON, Excel)
 - **24 tools** (backward compatible)
+
+**Command**: `/portfolio`
 
 **Use Case**: "What's the current price and fundamentals of MSFT?"
 
@@ -137,6 +213,8 @@ See [Release Notes](backlog/release-0.1.15.md) for details | Previous: [v0.1.14 
 - Debt-to-GDP analysis
 - Market news & sentiment
 - **10 tools**
+
+**Command**: `/research`
 
 **Use Case**: "Show me the Treasury yield curve and economic indicators"
 
@@ -164,21 +242,24 @@ See [Release Notes](backlog/release-0.1.15.md) for details | Previous: [v0.1.14 
 
 - **Chat Interface**: Natural language interaction with specialized agents
 - **Real-time Streaming**: Watch agents think and reason live
-- **Granular Progress**: See which tools are called with what arguments
+- **Multi-Agent Progress**: See workflow transitions and agent collaboration
+- **Granular Tool Tracking**: Watch which tools are called with what arguments
 - **Markdown Rendering**: Beautiful formatted output with tables
 - **Agent Switching**: `/quill`, `/screen`, `/macro`, `/portfolio`, `/research`
+- **Workflow Commands**: `/analyze <SYMBOL>` for multi-agent analysis
 - **Command Palette**: Quick access to common actions
 - **File Reading**: Analyze local portfolio files
 
 ### 🏗️ **Built on Modern Tech**
 
 ```
-LangGraph (Agent Orchestration) → LangChain (Tools) → Anthropic Claude (Reasoning)
+LangGraph (Multi-Agent Orchestration) → LangChain (Tools) → Anthropic Claude (Reasoning)
      ↓
 Textual (Terminal UI) + Typer (CLI) + httpx (Async HTTP)
 ```
 
 **Architecture Highlights**:
+- **Multi-Agent Workflows**: Sequential orchestration with shared state (NEW)
 - **Specialized Agents**: Purpose-built agents with focused tool sets
 - **Tools Registry**: Agent-specific tool mappings for optimal performance
 - **ReAct Pattern**: Reasoning + Acting for transparent decision-making
@@ -255,18 +336,19 @@ pip install -e ".[dev]"
 navam invest
 ```
 
-This opens an interactive chat interface with 5 specialized AI agents.
+This opens an interactive chat interface with 5 specialized AI agents and multi-agent workflows.
 
 #### Quick Command Reference
 
-| Command | Agent | Description |
-|---------|-------|-------------|
+| Command | Agent/Workflow | Description |
+|---------|----------------|-------------|
+| `/analyze <SYMBOL>` 🆕 | Investment Analysis Workflow | Multi-agent fundamental + macro analysis |
 | `/quill` | Quill (Equity Research) | Deep fundamental analysis & thesis building |
 | `/screen` | Screen Forge | Systematic stock screening & idea generation |
-| `/macro` 🆕 | Macro Lens | Top-down macro analysis & regime identification |
+| `/macro` | Macro Lens | Top-down macro analysis & regime identification |
 | `/portfolio` | Portfolio Analysis | Comprehensive stock & portfolio tools |
 | `/research` | Market Research | Macroeconomic analysis & treasury data (legacy) |
-| `/examples` | - | Show example queries for current agent |
+| `/examples` | - | Show example queries for current agent/workflow |
 | `/help` | - | Show all commands |
 | `/clear` | - | Clear chat history |
 | `/quit` | - | Exit application |
@@ -275,7 +357,205 @@ This opens an interactive chat interface with 5 specialized AI agents.
 
 ## 💡 Example Interactions
 
-### Macro Lens - Market Strategist Agent 🆕
+### Multi-Agent Workflow: Investment Analysis 🆕
+
+<details>
+<summary><b>📊 Complete Investment Analysis (Fundamental + Macro)</b></summary>
+
+```
+You: /analyze MSFT
+
+Investment Analysis Workflow: Starting multi-agent analysis...
+
+📊 Quill analyzing fundamentals...
+  → get_company_fundamentals
+  → get_financial_ratios
+  → get_historical_fundamentals
+  → get_dcf_valuation
+  ✓ Fundamental analysis complete
+
+🌍 Macro Lens validating timing...
+  → get_key_macro_indicators
+  → get_treasury_yield_curve
+  → search_market_news
+  ✓ Macro validation complete
+
+🎯 Synthesizing recommendation...
+
+Final Recommendation:
+
+**Overall Rating: BUY - Medium Confidence**
+
+**Key Reasoning**:
+Microsoft demonstrates exceptional fundamental quality with 42% ROE,
+$87B annual free cash flow, and strong competitive moats in cloud
+(Azure) and enterprise software. Current valuation of 31x P/E is
+reasonable given 15% revenue growth and expanding margins. However,
+macro timing presents headwinds—we're in late expansion phase with
+inverted yield curve signaling recession risk within 12 months. Tech
+sector typically underperforms in early recession as enterprise IT
+spending contracts.
+
+**Suggested Action**:
+Consider accumulating MSFT on dips rather than full position immediately.
+Dollar-cost average over 3-6 months to capture potential volatility from
+macro headwinds. Microsoft's defensive characteristics (enterprise
+subscriptions, cloud infrastructure) should outperform cyclical tech
+peers in downturn.
+
+**Risk Warning**:
+Monitor enterprise cloud spending trends and Microsoft Azure growth rates.
+If Azure growth decelerates below 25% YoY, fundamental thesis weakens.
+Macro risk: Recession could compress P/E multiple to 24-26x (historical
+trough), implying 15-20% downside risk from current levels.
+
+**Data Sources**:
+- Fundamentals: Tiingo (5-year history), FMP (financial ratios)
+- Macro: FRED (GDP, CPI, unemployment), U.S. Treasury (yield curve)
+- Valuation: DCF model with 10% WACC, 3% terminal growth
+
+---
+
+**Quill's Fundamental Analysis** (Bottom-Up):
+
+**Business Quality: Excellent**
+- Market leader in cloud infrastructure (Azure: #2 globally, 23% market share)
+- Dominant enterprise software franchise (Office 365, Windows, LinkedIn)
+- Emerging AI leadership (OpenAI partnership, Copilot integration)
+- Exceptional competitive moats: switching costs, network effects, scale
+
+**Financial Health** (5-Year Trends):
+- Revenue Growth: 14% CAGR (FY19-FY24) → Consistent, accelerating
+- Operating Margin: 37% → 43% (600bps expansion) → World-class
+- Free Cash Flow: $52B → $87B (+68%) → Capital allocation strength
+- ROE: 38% → 42% → Best-in-class capital efficiency
+- Debt-to-Equity: 0.34 → Conservative, AA+ credit rating
+
+**Valuation Assessment**:
+- Current P/E: 31x (vs. 5-year avg: 28x) → Slight premium
+- P/FCF: 28x → Reasonable given quality and growth
+- DCF Fair Value: $425 (current: $410) → **3.7% upside**
+- Price-to-Sales: 12x → Premium to peers, justified by margins
+
+**Investment Thesis**:
+Microsoft is a **quality growth compounder** with secular tailwinds in
+cloud and AI. The business demonstrates pricing power, margin expansion,
+and capital-light growth. At current valuation, shares are fairly valued
+with modest upside to DCF fair value.
+
+**Bull Case** (Upside to $480, +17%):
+- Azure accelerates to 30%+ growth (AI workloads)
+- Copilot drives $10B+ incremental revenue by FY26
+- Operating margin expands to 45% (cloud scale economics)
+- Multiple re-rates to 35x on AI leadership
+
+**Bear Case** (Downside to $320, -22%):
+- Recession reduces enterprise IT spending
+- Azure growth decelerates to sub-20% (competitive pressure)
+- AI monetization disappoints (adoption lag)
+- Multiple compresses to 24x (historical trough)
+
+**Catalysts** (Next 12 months):
+- ✅ Q1 FY25 earnings (Oct 2024): Azure growth trajectory
+- ✅ Copilot adoption metrics (Dec 2024): AI revenue inflection
+- ✅ OpenAI GPT-5 release (2025): Technology leadership
+- ⚠️ Macro slowdown: Defensive cloud spending holds up better
+
+**Recommendation**: BUY on dips below $390 (26x P/E, 8% discount to fair value)
+
+---
+
+**Macro Lens's Timing Validation** (Top-Down):
+
+**Current Macro Regime: Late Expansion (Peak Phase)**
+
+**Supporting Macro Data**:
+- GDP Growth: 2.4% (Q3 2024) → Slowing trend
+- Unemployment: 3.9% → Near cycle lows
+- CPI Inflation: 3.2% YoY → Sticky above target
+- Fed Funds Rate: 5.25-5.50% → Restrictive territory
+- 10Y-2Y Yield Spread: **-0.54% (INVERTED)** → Recession warning
+- Inversion Duration: 16 months → In danger zone (12-18mo lead time)
+
+**Sector Positioning**:
+Technology sector in late expansion phase shows:
+- ❌ **Underperform in early recession** (cyclical earnings)
+- ⚠️ **Valuation vulnerability** (P/E compression risk)
+- ✅ **Microsoft = Defensive tech** (enterprise subscriptions, sticky revenue)
+
+**Timing Assessment**:
+
+**Macro Headwinds**:
+1. **Inverted Yield Curve**: 16 months into inversion suggests recession
+   risk elevated for H1 2025. Tech multiples typically compress 20-30%
+   in recession.
+2. **Late Cycle Dynamics**: Corporate IT spending growth decelerates in
+   late expansion as CFOs turn cautious.
+3. **Valuation Risk**: Tech sector trading at 27x P/E (vs. 15x S&P 500)
+   leaves room for multiple compression.
+
+**Macro Tailwinds**:
+1. **Defensive Characteristics**: Microsoft's enterprise subscription
+   model (90%+ recurring revenue) more resilient than cyclical tech.
+2. **Cloud Infrastructure**: Mission-critical workloads (Azure, Office 365)
+   see lower churn in recession vs. discretionary tech spending.
+3. **Fed Rate Cuts**: If Fed pivots in 2025, growth stocks benefit from
+   lower discount rates (duration play).
+
+**Recommendation**: ⚠️ **Proceed with Caution - Dollar-Cost Average**
+
+Fundamentals are excellent, but macro timing is challenging. Given inverted
+yield curve and late-cycle positioning, recommend building position gradually
+over 3-6 months rather than full commitment today. If recession materializes,
+expect 15-20% drawdown opportunity to add at better valuations.
+
+**Macro Risks to Monitor**:
+- Yield curve steepening (recession trigger within 3-6 months)
+- Enterprise software spending indicators (Salesforce, ServiceNow guidance)
+- Azure growth deceleration below 25% (cyclical headwind confirmation)
+- Credit spread widening (corporate stress)
+
+**Ideal Entry**: Wait for macro capitulation (10-15% market correction) or
+accumulate on any dip below $380 (24x P/E, 30% margin of safety vs. fair value).
+```
+</details>
+
+<details>
+<summary><b>🎯 Quick Analysis with Confidence Levels</b></summary>
+
+```
+You: /analyze NVDA
+
+Investment Analysis Workflow: Starting multi-agent analysis...
+📊 Quill analyzing fundamentals...
+🌍 Macro Lens validating timing...
+🎯 Synthesizing recommendation...
+
+Final Recommendation:
+
+**Overall Rating: HOLD - Low Confidence**
+
+**Key Reasoning**:
+NVIDIA shows exceptional fundamental strength (AI leadership, 100%+ revenue
+growth, 75% gross margins) but faces extreme valuation risk (65x P/E,
+40x FY25E) and unfavorable macro timing. Late-cycle regime with recession
+risk makes high-multiple growth stocks vulnerable to 30-50% drawdowns.
+Wait for better entry point.
+
+**Suggested Action**:
+Current holders: Trim position, take profits. New buyers: Wait for correction
+to $90-100 range (40-45x FY25E) before initiating. Consider stop-loss at $110
+(-15%) to protect against macro-driven selloff.
+
+**Risk Warning**:
+AI hype cycle could deflate quickly if enterprise AI spending disappoints.
+Recession would trigger P/E de-rating from 65x to 35-40x (historical growth
+stock trough), implying 40-50% downside risk. Monitor data center capex
+trends from hyperscalers (Microsoft, Google, Amazon).
+```
+</details>
+
+### Macro Lens - Market Strategist Agent
 
 <details>
 <summary><b>🌍 Economic Regime Analysis & Sector Guidance</b></summary>
@@ -346,151 +626,123 @@ suggesting recession risk elevated for H1 2025.
 4. **Consumer Weakness**: Excess savings depleted, student loan restart
 5. **Geopolitical Shocks**: Oil supply disruptions, trade tensions
 
-**Leading Indicators to Watch**:
-- PMI Manufacturing (recession if < 45 for 3 months)
-- Initial Jobless Claims (recession if > 350K sustained)
-- Yield Curve (recession risk when it steepens after inversion)
-- Credit Spreads (widening = stress)
-- Consumer Confidence (falling = spending slowdown ahead)
-
 **Investment Strategy Summary**:
 Position defensively with quality, low-volatility stocks in healthcare, utilities,
 and staples. Reduce cyclical and growth exposure. Build cash for opportunities
 when recession arrives. Consider long-duration bonds (10Y+ treasuries) as
 Fed cuts rates in 2025.
-
-**Data Sources**:
-- FRED (GDP, unemployment, inflation) - Latest release
-- U.S. Treasury (yield curve) - Real-time
-- Confidence: High (inverted curve is highly reliable signal)
-```
-</details>
-
-<details>
-<summary><b>📈 Yield Curve Analysis & Recession Signals</b></summary>
-
-```
-You: Analyze the yield curve. Is it signaling recession risk?
-
-Macro Lens (Market Strategist):
-  → Calling get_treasury_yield_curve()
-  ✓ get_treasury_yield_curve completed
-  → Calling get_treasury_yield_spread(maturity1=10Y, maturity2=2Y)
-  ✓ get_treasury_yield_spread completed
-
-**Yield Curve Analysis - Recession Signal Check**
-
-**Current Yield Curve** (2025-10-06):
-
-```
-Rate (%)
-5.5 |                    ┌──── 1M (5.42%)
-5.0 |                ┌───┘
-4.5 |            ┌───┘
-4.0 |        ┌───┘          ┌──── 30Y (4.42%)
-3.5 |    ┌───┘          ┌───┘
-    └────┴────┴────┴────┴────┴────
-         3M   6M   1Y   2Y  5Y  10Y
-```
-
-**Key Spreads**:
-- **10Y - 2Y**: **-0.54%** 🔴 INVERTED (Recession warning)
-- **10Y - 3M**: **-1.10%** 🔴 INVERTED (Strong recession signal)
-- **30Y - 10Y**: **+0.14%** 🟡 Slightly positive
-
-**Interpretation**:
-
-🔴 **RECESSION RISK: HIGH**
-
-The yield curve shows a classic **inversion pattern** where short-term rates
-(2-year: 4.82%) exceed long-term rates (10-year: 4.28%). This inversion has
-persisted for **16 months**, which is well into the danger zone.
-
-**Why This Matters**:
-1. **Historical Accuracy**: Yield curve inversions have preceded every recession
-   since 1970 with only one false signal (1998)
-2. **Lead Time**: Recession typically follows 12-18 months after inversion
-3. **Current Status**: We're at month 16 of inversion → recession likely H1 2025
-4. **Un-inversion Signal**: When curve steepens (uninverts), recession often
-   begins within 3-6 months
-
-**What the Curve Is Telling Us**:
-- **Short Rates (High)**: Fed policy is restrictive, fighting inflation
-- **Long Rates (Lower)**: Markets expect economic slowdown forcing Fed rate cuts
-- **Investor Behavior**: Flight to safety into long-duration bonds
-
-**Historical Context**:
-- **2006-2007**: Inverted 10 months before Great Recession
-- **2000**: Inverted 7 months before dot-com recession
-- **1989**: Inverted 15 months before 1990 recession
-- **Current**: Inverted 16 months and counting...
-
-**What to Watch Next**:
-1. **Steepening Event**: If 10Y-2Y spread returns to positive (uninverts),
-   recession clock starts ticking (3-6 months)
-2. **Long-End Selloff**: Rising 10Y yields = inflation concerns dominate
-3. **Fed Pivot**: First rate cut often coincides with curve steepening
-
-**Investment Implications**:
-- ✅ **Defensive Positioning**: Quality stocks, low volatility sectors
-- ✅ **Duration Play**: Long-duration bonds (10Y+) benefit from Fed cuts
-- ✅ **Cash Buildup**: Dry powder for buying opportunities in recession
-- ❌ **Avoid Cyclicals**: Tech, discretionary, financials vulnerable
-- ❌ **Credit Caution**: High-yield bonds face default risk
-
-**Bottom Line**: The inverted yield curve is one of the most reliable recession
-indicators. At 16 months of inversion, we're well past the typical lead time.
-Maintain defensive positioning and prepare for potential recession in 2025.
 ```
 </details>
 
 ### Quill - Equity Research Agent
 
 <details>
-<summary><b>📊 Investment Thesis & Valuation</b></summary>
+<summary><b>📈 Investment Thesis with DCF Valuation</b></summary>
 
 ```
 You: /quill
 You: Analyze AAPL and provide an investment thesis with fair value
 
 Quill (Equity Research):
-  → Calling get_stock_price(symbol=AAPL)
-  ✓ get_stock_price completed
   → Calling get_company_fundamentals(symbol=AAPL)
   ✓ get_company_fundamentals completed
+  → Calling get_financial_ratios(symbol=AAPL)
+  ✓ get_financial_ratios completed
   → Calling get_historical_fundamentals(symbol=AAPL, years=5)
   ✓ get_historical_fundamentals completed
+  → Calling get_dcf_valuation(symbol=AAPL)
+  ✓ get_dcf_valuation completed
 
-**AAPL - Investment Thesis**
+**Investment Thesis: Apple Inc. (AAPL)**
 
-**Recommendation**: BUY
-**Fair Value Range**: $185 - $205 (Current: $178)
+**Business Overview**:
+Apple is the world's most valuable technology company ($3.5T market cap),
+operating a vertically integrated ecosystem spanning hardware (iPhone, Mac,
+iPad), services (App Store, iCloud, Apple Music), and wearables (Apple Watch,
+AirPods). The company's competitive moats include brand loyalty, ecosystem
+lock-in, and premium positioning.
+
+**Financial Health** (5-Year Analysis):
+
+**Revenue Trends**:
+- FY19: $260B → FY24: $383B (8% CAGR)
+- iPhone: 52% of revenue (stable), Services: 22% (growing 16% YoY)
+- Geographic: Americas 42%, Greater China 19%, Europe 24%
+
+**Profitability**:
+- Gross Margin: 38% → 46% (800bps expansion) - Industry-leading
+- Operating Margin: 24% → 30% - Best-in-class for hardware
+- Net Margin: 21% → 26% - Exceptional cash generation
+- ROE: 49% → 147% (buybacks amplifying returns)
+
+**Cash Flow**:
+- Operating Cash Flow: $69B → $118B (+71%)
+- Free Cash Flow: $58B → $100B - Massive capital return capacity
+- FCF Margin: 22% → 26% - Among highest in mega-cap tech
+
+**Balance Sheet**:
+- Net Cash: $62B (vs. $137B gross cash, $75B debt)
+- Debt-to-Equity: 1.8 → Manageable, used for buybacks
+- Current Ratio: 0.88 → Efficient working capital management
+
+**Valuation Assessment**:
+
+**Current Metrics**:
+- Price: $227 (as of analysis)
+- P/E Ratio: 36x (TTM), 30x (FY25E)
+- P/FCF: 27x - Premium valuation
+- EV/EBITDA: 26x
+- PEG Ratio: 3.0 (high for 10% growth)
+
+**DCF Fair Value Calculation**:
+- WACC: 9.5% (equity: 8%, debt: 3%, tax: 15%)
+- Terminal Growth: 3% (GDP-like perpetuity)
+- 5-Year FCF Forecast: $100B → $130B (5% CAGR)
+- **Intrinsic Value: $210 per share**
+- **Current Price: $227 → 8% overvalued**
 
 **Investment Thesis**:
-Apple demonstrates exceptional business quality with a durable competitive moat
-in hardware/software integration. The services transition is accelerating with
-28% annual growth, improving margins and reducing cyclicality. 5-year revenue
-CAGR of 8.7% with expanding net margins (21% → 25%) shows pricing power.
 
-**Key Catalysts**:
-1. Vision Pro spatial computing platform opening new TAM
-2. Services growth (Apple One, advertising) driving margin expansion
-3. India manufacturing diversification reducing supply chain risk
+**Bull Case** (Price Target: $260, +15%):
+- Services revenue inflection (Apple Vision Pro, subscriptions)
+- iPhone upgrade supercycle (AI features, 5-year replacement)
+- Gross margin expansion to 48% (services mix shift)
+- $110B+ annual buybacks (6% yield at current price)
+- Multiple sustains at 32-35x on quality premium
 
-**Key Risks**:
-1. iPhone dependency (52% of revenue) creates cyclical exposure
-2. Regulatory pressure on App Store (EU DMA compliance)
-3. Premium valuation (P/E 30x) limits margin of safety
+**Base Case** (Fair Value: $210, -7.5%):
+- iPhone growth slows to 2-3% (market saturation)
+- Services grow 12-15% (Apple One bundles)
+- Margins stable at 45-46% (mix shift offsets inflation)
+- FCF grows 6% annually (buybacks continue)
+- P/E de-rates to 28x (normalized growth stock multiple)
 
-**Valuation**:
-- DCF (10% WACC, 3% terminal growth): $195
-- P/E multiple (25x normalized earnings): $185
-- Fair value: $190 (7% upside from current)
+**Bear Case** (Downside: $180, -21%):
+- iPhone replacement cycle extends to 4+ years (saturation)
+- China regulatory/competitive risks (Huawei resurgence)
+- Services growth decelerates to sub-10% (market maturity)
+- Margin compression from product mix shift to India (lower ASP)
+- P/E compresses to 24x (market de-rating of mega-cap tech)
 
-**Financial Metrics**:
-- ROE: 147% (exceptional capital efficiency)
-- Free Cash Flow: $100B annually (supports $15B dividends + buybacks)
-- Debt/Equity: 1.69 (manageable with strong cash generation)
+**Key Catalysts** (Next 12 months):
+- ✅ iPhone 16 cycle with AI features (Sep 2024)
+- ✅ Vision Pro international launch (2025)
+- ✅ India manufacturing scale-up (supply chain diversification)
+- ⚠️ China economic slowdown (18% of revenue at risk)
+- ⚠️ DOJ antitrust case (App Store at risk)
+
+**Recommendation**: **HOLD**
+
+Apple is a world-class business with exceptional cash generation and capital
+allocation, but current valuation (36x P/E, 8% premium to DCF fair value)
+offers limited margin of safety. Recommend accumulating on dips to $200-210
+range (28-30x P/E). Current holders: Trim on rallies above $240.
+
+**Confidence**: Medium (85% of companies analyzed)
+
+**Data Sources**:
+- Fundamentals: Tiingo (5-year history), FMP (ratios)
+- Valuation: Custom DCF model, consensus estimates
 ```
 </details>
 
@@ -501,345 +753,277 @@ CAGR of 8.7% with expanding net margins (21% → 25%) shows pricing power.
 
 ```
 You: /screen
-You: Screen for value stocks: P/E under 15, P/B under 2, market cap over $1B
+You: Screen for value stocks with P/E under 15, P/B under 2, and market cap over $1B
 
 Screen Forge (Equity Screening):
-  → Calling screen_stocks(peRatioLowerThan=15, pbRatioLowerThan=2...)
+  → Calling screen_stocks(pe_ratio_max=15, price_to_book_max=2, market_cap_min=1000000000)
   ✓ screen_stocks completed
-  → Calling get_financial_ratios(symbol=BAC)
+  → Calling get_financial_ratios (batch for top 10 matches)
   ✓ get_financial_ratios completed
 
-**Stock Screening Results - Value Screen**
+**Value Stock Screening Results**
 
-**Methodology**: Value stocks with P/E < 15, P/B < 2, Market Cap > $1B
-**Candidates Found**: 12 stocks | **Top 5 Shown**
+**Criteria**:
+- P/E Ratio: < 15x (vs. S&P 500: 22x)
+- Price-to-Book: < 2x (vs. S&P 500: 4.5x)
+- Market Cap: > $1B (mid-cap+)
 
-**1. BAC - Bank of America Corp**
-   Price: $34.50 | Market Cap: $271.2B
-   P/E: 11.2 | P/B: 1.1 | ROE: 9.8%
-   **Standout**: Trading below book value with solid profitability
+**Matches Found**: 47 stocks
 
-**2. WFC - Wells Fargo & Company**
-   Price: $48.20 | Market Cap: $168.5B
-   P/E: 10.5 | P/B: 1.3 | ROE: 12.4%
-   **Standout**: Highest ROE in banking peers, P/E at 5-year low
+**Top 10 Ranked by Quality Score** (ROE × FCF Yield):
 
-**3. VZ - Verizon Communications**
-   Price: $41.30 | Market Cap: $173.4B
-   P/E: 8.9 | P/B: 1.8 | Dividend Yield: 6.2%
-   **Standout**: Defensive telecom with strong dividend yield
+| Rank | Ticker | Company | P/E | P/B | Mkt Cap | ROE | FCF Yield | Quality Score |
+|------|--------|---------|-----|-----|---------|-----|-----------|---------------|
+| 1 | **BAC** | Bank of America | 11.2 | 1.1 | $285B | 9.8% | 8.2% | 80.4 |
+| 2 | **WFC** | Wells Fargo | 10.5 | 1.3 | $182B | 11.2% | 7.1% | 79.5 |
+| 3 | **INTC** | Intel | 13.8 | 1.4 | $165B | 8.9% | 6.8% | 60.5 |
+| 4 | **F** | Ford Motor | 6.2 | 0.9 | $52B | 15.3% | 9.4% | 143.8 |
+| 5 | **GM** | General Motors | 5.8 | 1.0 | $51B | 18.2% | 11.2% | 203.8 |
+| 6 | **T** | AT&T | 8.9 | 1.5 | $135B | 7.2% | 8.9% | 64.1 |
+| 7 | **VZ** | Verizon | 9.1 | 1.8 | $182B | 6.8% | 7.5% | 51.0 |
+| 8 | **PFE** | Pfizer | 11.4 | 1.6 | $163B | 5.4% | 6.2% | 33.5 |
+| 9 | **CVX** | Chevron | 12.5 | 1.7 | $295B | 13.8% | 5.8% | 80.0 |
+| 10 | **XOM** | Exxon Mobil | 13.2 | 1.9 | $445B | 16.4% | 6.1% | 100.0 |
 
-**4. PFE - Pfizer Inc**
-   Price: $28.70 | Market Cap: $161.8B
-   P/E: 9.4 | P/B: 1.5 | Net Margin: 18.3%
-   **Standout**: Beaten down pharma with strong pipeline
+**Sector Breakdown**:
+- Financials: 15 stocks (banks, insurance)
+- Energy: 8 stocks (oil & gas)
+- Industrials: 9 stocks (manufacturing)
+- Utilities: 7 stocks (power, telecom)
+- Consumer: 5 stocks (retail, autos)
+- Technology: 3 stocks (semiconductors, legacy tech)
 
-**5. CVX - Chevron Corporation**
-   Price: $156.80 | Market Cap: $289.3B
-   P/E: 10.8 | P/B: 1.7 | FCF Yield: 8.1%
-   **Standout**: Energy major with exceptional free cash flow
+**Key Observations**:
 
-**Next Steps**:
-→ Deep dive with Quill on top 3 picks (BAC, WFC, VZ)
-→ Consider sector diversification (3 financials, 1 telecom, 1 pharma, 1 energy)
-→ Validate thesis with macro environment (interest rate sensitivity for financials)
+1. **Value Concentration in Cyclicals**:
+   - Banks (BAC, WFC): Trading below book value, elevated credit risk priced in
+   - Autos (F, GM): Highest quality scores but cyclical earnings risk
+   - Energy (CVX, XOM): High FCF yield, commodity price exposure
 
-**Screening Limitations**:
-- Excludes companies with negative earnings
-- Does not account for cyclical earnings adjustments
-- Static snapshot; fundamentals may change
+2. **Valuation Drivers**:
+   - Financial sector: Credit cycle concerns, recession fears
+   - Energy: Oil price volatility, energy transition uncertainty
+   - Telecom: Mature markets, high debt loads
+
+3. **Risk Factors**:
+   - ⚠️ **Cyclical Exposure**: 34 of 47 stocks (72%) are cyclical sectors
+   - ⚠️ **Value Trap Risk**: Low multiples may reflect structural headwinds
+   - ⚠️ **Recession Timing**: Value stocks typically lag in late expansion
+
+**Recommended Next Steps**:
+
+1. **Deep Dive Candidates** (for Quill analysis):
+   - **GM**: Highest quality score, EV transition optionality
+   - **BAC**: Strong deposit franchise, Fed rate cut beneficiary
+   - **CVX**: Energy discipline, $75B buyback, 4% dividend yield
+
+2. **Sentiment Check** (Finnhub validation):
+   - Run `get_social_sentiment` for top 5 candidates
+   - Validate with `get_recommendation_trends` (analyst consensus)
+
+3. **Portfolio Construction**:
+   - Diversify across 8-10 stocks (avoid sector concentration)
+   - Favor quality within value (ROE > 12%, FCF Yield > 6%)
+   - Monitor macro regime (value outperforms in early recession)
+
+**Use with Quill**:
+Type `/quill` then "Analyze GM and provide investment thesis" for deep-dive
+fundamental analysis on top candidate.
 ```
 </details>
 
-### Portfolio Analysis Examples
+---
 
-<details>
-<summary><b>📈 Stock Fundamentals & Ratios</b></summary>
+## 🏗️ Architecture
 
-```
-You: /portfolio
-You: Show me MSFT's financial ratios
-
-Portfolio Analyst:
-**MSFT - Financial Ratios**
-
-**Profitability:**
-Gross Margin: 0.68
-Operating Margin: 0.42
-Net Margin: 0.36
-ROE: 0.43
-ROA: 0.19
-
-**Liquidity:**
-Current Ratio: 1.31
-Quick Ratio: 1.27
-
-**Leverage:**
-Debt/Equity: 0.39
-Interest Coverage: 28.5x
-
-**Valuation:**
-P/E Ratio: 34.2
-P/B Ratio: 12.8
-EV/EBITDA: 22.1
-```
-</details>
-
-<details>
-<summary><b>📰 Sentiment Analysis</b></summary>
+### Multi-Agent Workflow System
 
 ```
-You: What's the sentiment around NVDA?
-
-Portfolio Analyst:
-**NVDA - Sentiment Analysis**
-
-**News Sentiment** (Finnhub):
-Company Score: 0.82 (Very Bullish)
-Sector Average: 0.58
-Articles (7 days): 67 | Buzz: 2.1x
-
-**Social Sentiment**:
-Reddit: 4,500 mentions | Score: 0.73 (Positive)
-Twitter: 12,300 mentions | Score: 0.68 (Positive)
-
-**Insider Sentiment**:
-MSPR: 0.45 (Strong net buying)
-Recent Insider Buys: 3 executives ($2.1M)
-
-**Analyst Recommendations**:
-Strong Buy: 25 | Buy: 8 | Hold: 2 | Sell: 0
-Consensus: 🟢 Very Bullish (AI accelerator dominance)
+User Command: /analyze AAPL
+    ↓
+┌─────────────────────────────────────────────────────────┐
+│  Investment Analysis Workflow (LangGraph StateGraph)    │
+│                                                          │
+│  Shared State:                                          │
+│    - messages: [user query, agent responses]           │
+│    - symbol: "AAPL"                                     │
+│    - quill_analysis: (populated by Quill)              │
+│    - macro_context: (populated by Macro Lens)          │
+└─────────────────────────────────────────────────────────┘
+    ↓
+┌──────────────┐
+│  Node 1:     │   Bottom-Up Fundamental Analysis
+│  Quill Agent │ → 16 tools (FMP, Tiingo, SEC, Finnhub)
+└──────────────┘   Results stored in quill_analysis
+    ↓
+┌──────────────────┐
+│  Node 2:         │   Top-Down Macro Validation
+│  Macro Lens      │ → 10 tools (FRED, Treasury, NewsAPI)
+└──────────────────┘   Reads quill_analysis from shared state
+    ↓
+┌──────────────────┐
+│  Node 3:         │   Combines Both Perspectives
+│  Synthesize      │ → Overall rating: BUY/HOLD/SELL
+└──────────────────┘   Confidence: High/Medium/Low
+    ↓
+Final Recommendation (Markdown formatted)
 ```
-</details>
 
-### Market Research Examples
+### Agent Architecture
 
-<details>
-<summary><b>📊 Macro Indicators & Yield Curve</b></summary>
+Each specialized agent is built with:
+- **LangGraph ReAct Pattern**: Reasoning → Tool Selection → Action → Observation loop
+- **Focused Tool Set**: Only tools relevant to agent's specialty (prevents tool overload)
+- **Streaming**: Real-time progress updates to TUI
+- **Type Safety**: Pydantic models for all tool inputs/outputs
 
+### Tools Registry
+
+```python
+agent_tool_map = {
+    "quill": [
+        # Fundamentals (8 tools)
+        "get_company_fundamentals", "get_financial_ratios",
+        "get_historical_fundamentals", "get_dcf_valuation",
+        # Filings (3 tools)
+        "get_sec_filings", "get_latest_10k", "get_latest_10q",
+        # Sentiment (5 tools)
+        "get_insider_sentiment", "get_recommendation_trends",
+        "search_company_news", "get_company_news", "get_social_sentiment"
+    ],  # 16 tools
+
+    "macro_lens": [
+        # Macro indicators (2 tools)
+        "get_economic_indicator", "get_key_macro_indicators",
+        # Treasury (4 tools)
+        "get_treasury_yield_curve", "get_treasury_rate",
+        "get_treasury_yield_spread", "get_debt_to_gdp",
+        # News (2 tools)
+        "search_market_news", "get_top_financial_headlines",
+        # Files (2 tools)
+        "read_local_file", "list_local_files"
+    ],  # 10 tools
+
+    "screen_forge": [
+        # Screening (4 tools)
+        "screen_stocks", "get_company_fundamentals",
+        "get_financial_ratios", "batch_financial_ratios",
+        # Sentiment validation (5 tools)
+        "get_social_sentiment", "get_recommendation_trends",
+        "get_insider_sentiment", "get_company_news_sentiment",
+        "search_company_news"
+    ],  # 9 tools
+}
 ```
-You: /research
-You: Show me key economic indicators and the yield curve
-
-Market Researcher:
-**Key Macroeconomic Indicators**
-
-**GDP Growth (Real):** 2.4% (Q3 2024)
-**Unemployment Rate:** 3.9% (October 2024)
-**CPI Inflation:** 3.2% (YoY, October 2024)
-**Fed Funds Rate:** 5.25-5.50% (Current)
-
-**U.S. Treasury Yield Curve** (2025-10-06)
-
-1 Month:   5.42%  |  1 Year:    5.15%
-3 Month:   5.38%  |  2 Year:    4.82%
-6 Month:   5.32%  |  5 Year:    4.35%
-                  | 10 Year:    4.28%
-                  | 30 Year:    4.42%
-
-**2Y-10Y Spread:** -0.54% (Inverted)
-**Curve Shape:** 🔴 Inverted (Recession signal)
-
-**Economic Regime:** Late Cycle Expansion
-**Investment Implications:** Defensive positioning, monitor credit spreads
-```
-</details>
 
 ---
 
 ## 📚 Documentation
 
-### Agent Tool Mappings
+### Project Resources
 
-Each specialized agent has curated tools for optimal performance:
+- **[Backlog](backlog/active.md)**: Current development roadmap
+- **[Release Notes](backlog/)**: Detailed changelog for each version
+- **[Architecture Specs](refer/specs/)**: Technical design documents
+- **[LangGraph Guide](refer/langgraph/)**: Multi-agent patterns & best practices
 
-| Agent | Tool Count | Categories | Focus |
-|-------|------------|------------|-------|
-| **Quill** | 16 | Market, Fundamentals, SEC, News | Deep fundamental analysis, thesis building |
-| **Screen Forge** | 9 | Market, Fundamentals, Sentiment | Systematic screening, idea generation |
-| **Macro Lens** 🆕 | 10 | Macro, Treasury, News, Files | Top-down regime analysis, sector guidance |
-| **Portfolio** | 24 | All categories | Comprehensive backward compatibility |
-| **Research** | 10 | Macro, Treasury, News | Top-down economic analysis (legacy) |
+### API Reference
 
-### Project Structure
+- **[Anthropic Claude](https://docs.anthropic.com/)**: AI reasoning engine
+- **[LangGraph](https://langchain-ai.github.io/langgraph/)**: Agent orchestration framework
+- **[Alpha Vantage](https://www.alphavantage.co/documentation/)**: Stock market data
+- **[FMP](https://site.financialmodelingprep.com/developer/docs)**: Financial statements & screening
+- **[Tiingo](https://www.tiingo.com/documentation/)**: Historical fundamentals
+- **[Finnhub](https://finnhub.io/docs/api)**: Alternative data & sentiment
+- **[FRED](https://fred.stlouisfed.org/docs/api/fred/)**: Economic indicators
+- **[SEC EDGAR](https://www.sec.gov/edgar/sec-api-documentation)**: Corporate filings
 
-```
-navam-invest/
-├── src/navam_invest/
-│   ├── agents/                 # 🤖 LangGraph specialized agents
-│   │   ├── quill.py           #    Equity research analyst
-│   │   ├── screen_forge.py    #    Systematic screener
-│   │   ├── macro_lens.py      #    🆕 Market strategist
-│   │   ├── portfolio.py       #    Portfolio analysis (legacy)
-│   │   └── research.py        #    Market research (legacy)
-│   ├── tools/                  # 🔧 API integration (27 tools)
-│   │   ├── __init__.py        #    Tools registry with agent mappings
-│   │   ├── alpha_vantage.py   #    Stock prices & overviews
-│   │   ├── fmp.py             #    Fundamentals & screening
-│   │   ├── tiingo.py          #    Historical fundamentals
-│   │   ├── finnhub.py         #    Sentiment & alternative data
-│   │   ├── fred.py            #    Economic indicators
-│   │   ├── treasury.py        #    Yield curves & treasury data
-│   │   ├── sec_edgar.py       #    Corporate filings
-│   │   ├── newsapi.py         #    Market news
-│   │   └── file_reader.py     #    Local file reading
-│   ├── tui/                    # 💬 Textual terminal UI
-│   │   └── app.py             #    Chat interface with streaming
-│   ├── config/                 # ⚙️ Configuration
-│   │   └── settings.py        #    Pydantic settings with .env
-│   └── cli.py                  # 🖥️ Typer CLI entry point
-├── tests/                      # ✅ Test suite (48 tests, 38% coverage)
-├── backlog/                    # 📋 Development roadmap
-│   ├── active.md              #    Current tasks
-│   └── release-*.md           #    Release notes
-└── pyproject.toml             # 📦 Package configuration
+### Development
+
+#### Running Tests
+
+```bash
+pytest                    # Run all tests
+pytest -v                # Verbose output
+pytest tests/test_*.py   # Specific test file
 ```
 
-### Technology Stack
+#### Code Quality
 
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **AI & Agents** | LangGraph 0.2+, LangChain Core 0.3+, Anthropic Claude Sonnet 4.5 | Agent orchestration, tool framework, AI reasoning |
-| **User Interface** | Textual 1.0+, Typer 0.15+, Rich 13+ | Terminal UI, CLI framework, markdown rendering |
-| **Data & HTTP** | httpx 0.28+, Pydantic 2.0+, python-dotenv | Async HTTP, data validation, config management |
+```bash
+black src/ tests/        # Format code
+ruff check src/ tests/   # Lint code
+mypy src/                # Type check
+```
+
+#### Building from Source
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Build package
+python -m build
+
+# Check distribution
+twine check dist/*
+```
 
 ---
 
-## 🛠️ Development
+## 🗺️ Roadmap
 
-### Setup Development Environment
+### Current Release: v0.1.16
+- ✅ Multi-agent workflows (Investment Analysis)
+- ✅ `/analyze` command for comprehensive analysis
+- ✅ Shared state architecture for agent collaboration
 
-```bash
-git clone https://github.com/navam-io/navam-invest.git
-cd navam-invest
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -e ".[dev]"
-```
+### Next: v0.1.17-0.1.20
+- [ ] Additional workflows (Tax Optimization, Portfolio Rebalancing)
+- [ ] Atlas agent (Investment Strategist) for strategic allocation
+- [ ] Human-in-the-loop checkpoints for workflow approval
+- [ ] Parallel agent execution for independent analyses
 
-### Running Tests
-
-```bash
-# All tests with coverage
-pytest
-
-# Specific test file
-pytest tests/test_finnhub.py -v
-
-# With coverage report
-pytest --cov=src/navam_invest --cov-report=term-missing
-```
-
-**Current Status**: ✅ 48/48 tests passing (38% coverage)
-
-### Code Quality
-
-```bash
-# Format code
-black src/ tests/
-
-# Lint
-ruff check src/ tests/
-
-# Type check
-mypy src/
-
-# All quality checks
-black src/ tests/ && ruff check src/ tests/ && mypy src/
-```
+### Future: v0.2.0+
+- [ ] Portfolio tracking & performance attribution
+- [ ] Backtesting engine for investment strategies
+- [ ] Risk management workflows (VaR, stress testing)
+- [ ] Web UI (in addition to TUI)
+- [ ] Cloud deployment options
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Here's how:
+Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-1. **🐛 Report Bugs**: [Open an issue](https://github.com/navam-io/navam-invest/issues)
-2. **💡 Suggest Features**: [Start a discussion](https://github.com/navam-io/navam-invest/discussions)
-3. **📝 Improve Docs**: Submit PR for documentation
-4. **🔧 Submit Code**: Fork, branch, PR
-
-### Development Workflow
-
-```bash
-# 1. Create feature branch
-git checkout -b feature/your-feature
-
-# 2. Make changes and test
-pytest && black src/ tests/
-
-# 3. Commit and push
-git commit -m "feat: add your feature"
-git push origin feature/your-feature
-
-# 4. Open Pull Request
-```
-
-See `CLAUDE.md` for comprehensive agent development guide.
-
----
-
-## 📋 Roadmap
-
-### ✅ v0.1.15 (Current)
-- [x] Macro Lens agent - Top-down macro analysis and regime identification
-- [x] Economic cycle framework - 4-phase regime analysis
-- [x] Yield curve analysis - Recession signaling capability
-- [x] Specialized agent suite complete - Ready for multi-agent workflows
-
-### 🚀 v0.1.16 (Next - Phase 2B)
-- [ ] Multi-agent workflows - Comprehensive investment analysis (Quill → Macro Lens → Atlas)
-- [ ] `/analyze <SYMBOL>` command - End-to-end analysis workflow
-- [ ] Refactor Portfolio → Atlas (Investment Strategist)
-
-### v0.2.0 (Planned)
-- [ ] Multi-agent supervisor for coordinated workflows
-- [ ] Tax-loss harvesting agent
-- [ ] Portfolio optimization (PyPortfolioOpt)
-- [ ] Conversation persistence (LangGraph checkpointers)
-- [ ] Enhanced TUI with portfolio panels
-
-### Future
-- [ ] Web UI (Streamlit or FastAPI)
-- [ ] LangGraph Cloud deployment
-- [ ] Broker integrations (Alpaca, IBKR)
+**Ways to Contribute**:
+- 🐛 Report bugs via [GitHub Issues](https://github.com/navam-io/navam-invest/issues)
+- 💡 Suggest features or improvements
+- 📝 Improve documentation
+- 🔧 Submit pull requests
 
 ---
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
 ## 🙏 Acknowledgments
 
-**Built with**:
-- [LangGraph](https://github.com/langchain-ai/langgraph) - Agent orchestration
-- [Anthropic Claude](https://www.anthropic.com/) - AI reasoning
-- [Textual](https://github.com/Textualize/textual) - Terminal UI
-
-**Data sources**:
-- [Alpha Vantage](https://www.alphavantage.co/), [FMP](https://financialmodelingprep.com/), [Tiingo](https://www.tiingo.com/)
-- [Finnhub](https://finnhub.io/), [FRED](https://fred.stlouisfed.org/), [U.S. Treasury](https://fiscaldata.treasury.gov/)
-- [SEC EDGAR](https://www.sec.gov/edgar), [NewsAPI](https://newsapi.org/)
-
----
-
-## 🔗 Links
-
-- **PyPI**: [pypi.org/project/navam-invest](https://pypi.org/project/navam-invest/)
-- **GitHub**: [github.com/navam-io/navam-invest](https://github.com/navam-io/navam-invest)
-- **Issues**: [Report bugs](https://github.com/navam-io/navam-invest/issues)
-- **Discussions**: [Join conversation](https://github.com/navam-io/navam-invest/discussions)
+- **[Anthropic](https://www.anthropic.com/)** - Claude AI reasoning engine
+- **[LangChain](https://www.langchain.com/)** - Agent framework ecosystem
+- **[Textual](https://textual.textualize.io/)** - Modern terminal UI framework
+- **Data Providers** - Alpha Vantage, FMP, Tiingo, Finnhub, FRED, SEC, NewsAPI
 
 ---
 
 <div align="center">
 
-**⭐ Star this project if you find it useful!**
+**Built with ❤️ for retail investors**
 
-Made with ❤️ by the Navam team
+[⬆ Back to Top](#-navam-invest)
 
 </div>

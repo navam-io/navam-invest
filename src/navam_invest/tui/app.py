@@ -15,6 +15,7 @@ from navam_invest.agents.research import create_research_agent
 from navam_invest.agents.quill import create_quill_agent
 from navam_invest.agents.screen_forge import create_screen_forge_agent
 from navam_invest.agents.macro_lens import create_macro_lens_agent
+from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 
 # Example prompts for each agent
@@ -73,6 +74,13 @@ MACRO_LENS_EXAMPLES = [
     "Should I be defensive or cyclical given the economic cycle phase?",
 ]
 
+WORKFLOW_EXAMPLES = [
+    "/analyze AAPL - Complete investment analysis (fundamental + macro)",
+    "/analyze MSFT - Should I invest? Get both bottom-up and top-down view",
+    "/analyze NVDA - Multi-agent analysis combining Quill and Macro Lens",
+    "/analyze GOOGL - Comprehensive thesis with macro timing validation",
+]
+
 
 class ChatUI(App):
     """Navam Invest chat interface."""
@@ -110,6 +118,7 @@ class ChatUI(App):
         self.quill_agent: Optional[object] = None
         self.screen_forge_agent: Optional[object] = None
         self.macro_lens_agent: Optional[object] = None
+        self.investment_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
 
@@ -139,7 +148,8 @@ class ChatUI(App):
                 "- `/research` - Switch to market research agent\n"
                 "- `/quill` - Switch to Quill equity research agent\n"
                 "- `/screen` - Switch to Screen Forge screening agent\n"
-                "- `/macro` - Switch to Macro Lens market strategist 🆕\n"
+                "- `/macro` - Switch to Macro Lens market strategist\n"
+                "- `/analyze <SYMBOL>` - Multi-agent investment analysis 🆕\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
                 "- `/quit` - Exit the application\n"
@@ -158,8 +168,10 @@ class ChatUI(App):
             self.quill_agent = await create_quill_agent()
             self.screen_forge_agent = await create_screen_forge_agent()
             self.macro_lens_agent = await create_macro_lens_agent()
+            self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
             chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens)[/green]")
+            chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
             # Show helpful setup instructions for missing API keys
@@ -294,7 +306,74 @@ class ChatUI(App):
 
     async def _handle_command(self, command: str, chat_log: RichLog) -> None:
         """Handle slash commands."""
-        if command == "/help":
+        if command.startswith("/analyze"):
+            # Extract symbol from command
+            parts = command.split()
+            if len(parts) != 2:
+                chat_log.write(
+                    Markdown(
+                        "\\n**Usage**: `/analyze <SYMBOL>`\\n\\n"
+                        "Example: `/analyze AAPL`\\n"
+                    )
+                )
+                return
+
+            symbol = parts[1].upper()
+            chat_log.write(f"\\n[bold cyan]You:[/bold cyan] Analyze {symbol}\\n")
+            chat_log.write(f"[bold green]Investment Analysis Workflow:[/bold green] Starting multi-agent analysis...\\n")
+
+            try:
+                # Run the workflow
+                tool_calls_shown = set()
+                async for event in self.investment_workflow.astream(
+                    {
+                        "messages": [HumanMessage(content=f"Analyze {symbol}")],
+                        "symbol": symbol,
+                        "quill_analysis": "",
+                        "macro_context": "",
+                    },
+                    stream_mode=["values", "updates"]
+                ):
+                    # Parse the event tuple
+                    if isinstance(event, tuple) and len(event) == 2:
+                        event_type, event_data = event
+
+                        # Handle node updates
+                        if event_type == "updates":
+                            for node_name, node_output in event_data.items():
+                                # Show which agent is working
+                                if node_name == "quill":
+                                    chat_log.write("[dim]  📊 Quill analyzing fundamentals...[/dim]\\n")
+                                elif node_name == "macro_lens":
+                                    chat_log.write("[dim]  🌍 Macro Lens validating timing...[/dim]\\n")
+                                elif node_name == "synthesize":
+                                    chat_log.write("[dim]  🎯 Synthesizing recommendation...[/dim]\\n")
+
+                                # Show tool calls
+                                if "messages" in node_output:
+                                    for msg in node_output["messages"]:
+                                        if hasattr(msg, "tool_calls") and msg.tool_calls:
+                                            for tool_call in msg.tool_calls:
+                                                call_id = tool_call.get("id", "")
+                                                if call_id not in tool_calls_shown:
+                                                    tool_calls_shown.add(call_id)
+                                                    tool_name = tool_call.get("name", "unknown")
+                                                    chat_log.write(f"[dim]    → {tool_name}[/dim]\\n")
+
+                        # Handle final values
+                        elif event_type == "values":
+                            if "messages" in event_data and event_data["messages"]:
+                                last_msg = event_data["messages"][-1]
+                                if hasattr(last_msg, "content") and last_msg.content:
+                                    # Show final recommendation
+                                    if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+                                        chat_log.write("\\n[bold green]Final Recommendation:[/bold green]\\n")
+                                        chat_log.write(Markdown(last_msg.content))
+
+            except Exception as e:
+                chat_log.write(f"\\n[red]Error running workflow: {str(e)}[/red]")
+
+        elif command == "/help":
             chat_log.write(
                 Markdown(
                     "\n**Available Commands:**\n"
@@ -303,6 +382,7 @@ class ChatUI(App):
                     "- `/quill` - Switch to Quill equity research agent\n"
                     "- `/screen` - Switch to Screen Forge screening agent\n"
                     "- `/macro` - Switch to Macro Lens market strategist\n"
+                    "- `/analyze <SYMBOL>` - Multi-agent investment analysis 🆕\n"
                     "- `/examples` - Show example prompts for current agent\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"
@@ -350,10 +430,15 @@ class ChatUI(App):
 
             examples_text = "\n".join(f"{i+1}. {ex}" for i, ex in enumerate(selected_examples))
 
+            # Add workflow examples
+            workflow_text = "\n".join(f"{i+1}. {ex}" for i, ex in enumerate(WORKFLOW_EXAMPLES))
+
             chat_log.write(
                 Markdown(
                     f"\n**Example prompts for {agent_name} agent:**\n\n"
                     f"{examples_text}\n\n"
+                    f"**Multi-Agent Workflows:**\n\n"
+                    f"{workflow_text}\n\n"
                     f"💡 Try copying one of these or ask your own question!\n"
                 )
             )
