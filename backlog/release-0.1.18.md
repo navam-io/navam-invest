@@ -1,39 +1,36 @@
 # Release 0.1.18
 
 ## Status
-IN DEVELOPMENT
+Published to PyPI on October 6, 2025
 
-## Features
+## Bugfix Release
 
-### Phase 2C: Enhanced Multi-Agent Workflows
+This is a hotfix release addressing a critical import error in v0.1.17.
 
-This release focuses on expanding multi-agent capabilities and building additional workflows.
+### Critical Fix
 
-**Planned Features**:
-- Extended Investment Analysis Workflow to include Atlas (Quill → Macro Lens → Atlas → Synthesis)
-- Additional multi-agent workflows (Tax Optimization, Portfolio Rebalancing, Risk Analysis)
-- Human-in-the-loop checkpoints for workflow approval/editing
-- Parallel agent execution for independent analyses
-- Workflow state persistence and resumption
-- Enhanced TUI workflow visualization
+**Import Error Resolution** (`src/navam_invest/workflows/investment_analysis.py`)
+- **Issue**: `add_messages` incorrectly imported from `langchain_core.messages`
+- **Fix**: Changed import to `langgraph.graph.add_messages` (consistent with all agent files)
+- **Impact**: Resolves `ImportError` that prevented package from running after installation
+- **Root Cause**: Inconsistent import statement in workflow file vs agent files
 
-**Architecture Enhancements**:
-- Conditional routing in workflows (dynamic agent selection)
-- Agent feedback loops (iterative refinement)
-- Workflow templates for common analysis patterns
-- Cross-workflow state sharing
+**Changes**:
+```python
+# Before (incorrect)
+from langchain_core.messages import AIMessage, HumanMessage, add_messages
 
-**Potential New Workflows**:
-1. **Tax Optimization Workflow**: Tax-Scout → Atlas → Rebalance-Bot
-2. **Risk Management Workflow**: Risk-Shield → Macro Lens → Atlas
-3. **Portfolio Construction Workflow**: Screen Forge → Quill → Risk-Shield → Atlas
+# After (correct)
+from langchain_core.messages import AIMessage, HumanMessage
+from langgraph.graph import END, START, StateGraph, add_messages
+```
 
-(Specific implementation details will be documented as features are completed)
+**Testing**: All 48 tests pass with the corrected import
 
 ---
 
 ## Release Date
-TBD
+October 6, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.18/
