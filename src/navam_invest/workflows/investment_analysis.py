@@ -12,6 +12,7 @@ from typing import Annotated, TypedDict
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.graph import END, START, StateGraph, add_messages
+from langgraph.prebuilt import ToolNode
 
 from navam_invest.config.settings import get_settings
 from navam_invest.tools import bind_api_keys_to_tools, get_tools_for_agent
@@ -71,17 +72,12 @@ async def create_investment_analysis_workflow() -> StateGraph:
         newsapi_key=settings.newsapi_api_key or "",
     )
 
-    # Create agent-specific LLMs with tools
-    quill_llm = llm.bind_tools(quill_tools_with_keys)
-    macro_llm = llm.bind_tools(macro_tools_with_keys)
-
     # Agent 1: Quill - Fundamental Analysis
     async def quill_agent(state: InvestmentAnalysisState) -> dict:
         """Quill performs bottom-up fundamental analysis."""
         symbol = state["symbol"]
 
-        system_msg = HumanMessage(
-            content=f"""You are Quill, an expert equity research analyst. Analyze {symbol} and provide a comprehensive investment thesis.
+        system_prompt = f"""You are Quill, an expert equity research analyst. Analyze {symbol} and provide a comprehensive investment thesis.
 
 Your analysis should include:
 1. **Business Overview**: What does the company do? Competitive position?
@@ -93,10 +89,11 @@ Your analysis should include:
 Focus on **fundamental quality** and **long-term value**. Use all available tools to gather data.
 
 Format your response as a concise investment thesis (3-4 paragraphs) that will be combined with macro analysis."""
-        )
 
-        messages = [system_msg] + state["messages"]
-        response = await quill_llm.ainvoke(messages)
+        # Bind tools and system prompt to LLM
+        quill_llm = llm.bind_tools(quill_tools_with_keys).bind(system=system_prompt)
+
+        response = await quill_llm.ainvoke(state["messages"])
 
         # Store Quill's analysis in state for Macro Lens to reference
         analysis_text = response.content if hasattr(response, "content") else str(response)
@@ -112,8 +109,7 @@ Format your response as a concise investment thesis (3-4 paragraphs) that will b
         symbol = state["symbol"]
         quill_analysis = state.get("quill_analysis", "")
 
-        system_msg = HumanMessage(
-            content=f"""You are Macro Lens, an expert market strategist. You've received a fundamental analysis of {symbol} from Quill (equity research).
+        system_prompt = f"""You are Macro Lens, an expert market strategist. You've received a fundamental analysis of {symbol} from Quill (equity research).
 
 **Quill's Analysis**:
 {quill_analysis}
@@ -130,10 +126,11 @@ Provide a **macro validation** (2-3 paragraphs) that either:
 - ❌ **Contradicts thesis**: "Macro headwinds make this risky because..."
 
 Use treasury yield curve, economic indicators, and current regime analysis."""
-        )
 
-        messages = [system_msg] + state["messages"]
-        response = await macro_llm.ainvoke(messages)
+        # Bind tools and system prompt to LLM
+        macro_llm = llm.bind_tools(macro_tools_with_keys).bind(system=system_prompt)
+
+        response = await macro_llm.ainvoke(state["messages"])
 
         macro_text = response.content if hasattr(response, "content") else str(response)
 
@@ -173,15 +170,48 @@ Keep it concise (4-5 sentences total)."""
     # Build the sequential workflow graph
     workflow = StateGraph(InvestmentAnalysisState)
 
-    # Add nodes
+    # Add agent nodes
     workflow.add_node("quill", quill_agent)
     workflow.add_node("macro_lens", macro_lens_agent)
     workflow.add_node("synthesize", synthesize_recommendation)
 
-    # Define the sequence: START → Quill → Macro Lens → Synthesize → END
+    # Add tool execution nodes
+    workflow.add_node("quill_tools", ToolNode(quill_tools_with_keys))
+    workflow.add_node("macro_tools", ToolNode(macro_tools_with_keys))
+
+    # Helper functions to check if tools were called
+    def quill_should_continue(state: InvestmentAnalysisState) -> str:
+        """Check if Quill made tool calls."""
+        messages = state["messages"]
+        last_message = messages[-1]
+        if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+            return "quill_tools"
+        return "macro_lens"
+
+    def macro_should_continue(state: InvestmentAnalysisState) -> str:
+        """Check if Macro Lens made tool calls."""
+        messages = state["messages"]
+        last_message = messages[-1]
+        if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+            return "macro_tools"
+        return "synthesize"
+
+    # Define the workflow with tool execution loops
     workflow.add_edge(START, "quill")
-    workflow.add_edge("quill", "macro_lens")
-    workflow.add_edge("macro_lens", "synthesize")
+    workflow.add_conditional_edges(
+        "quill",
+        quill_should_continue,
+        {"quill_tools": "quill_tools", "macro_lens": "macro_lens"}
+    )
+    workflow.add_edge("quill_tools", "quill")  # Loop back to quill after tool execution
+
+    workflow.add_conditional_edges(
+        "macro_lens",
+        macro_should_continue,
+        {"macro_tools": "macro_tools", "synthesize": "synthesize"}
+    )
+    workflow.add_edge("macro_tools", "macro_lens")  # Loop back to macro_lens after tool execution
+
     workflow.add_edge("synthesize", END)
 
     return workflow.compile()
