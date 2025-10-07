@@ -12,6 +12,7 @@ from textual.widgets import Footer, Header, Input, RichLog
 
 from navam_invest.agents.portfolio import create_portfolio_agent
 from navam_invest.agents.research import create_research_agent
+from navam_invest.agents.quill import create_quill_agent
 from navam_invest.config.settings import ConfigurationError
 
 # Example prompts for each agent
@@ -35,6 +36,17 @@ RESEARCH_EXAMPLES = [
     "How has inflation (CPI) trended over the past year?",
     "What's the current federal funds rate?",
     "Is the yield curve inverted? What does that signal?",
+]
+
+QUILL_EXAMPLES = [
+    "Analyze AAPL and provide an investment thesis with fair value",
+    "What's your investment recommendation for TSLA? Include catalysts and risks",
+    "Deep dive on MSFT: business quality, financials, and valuation",
+    "Build an investment case for GOOGL with DCF-based fair value",
+    "Analyze NVDA's 5-year fundamental trends and provide a thesis",
+    "What does the latest 10-K reveal about AMZN's business model?",
+    "Compare META and SNAP: which is the better investment and why?",
+    "Thesis on NFLX: analyze subscriber growth, margins, and competition",
 ]
 
 
@@ -71,6 +83,7 @@ class ChatUI(App):
         super().__init__()
         self.portfolio_agent: Optional[object] = None
         self.research_agent: Optional[object] = None
+        self.quill_agent: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
 
@@ -98,6 +111,7 @@ class ChatUI(App):
                 "**Commands:**\n"
                 "- `/portfolio` - Switch to portfolio analysis agent\n"
                 "- `/research` - Switch to market research agent\n"
+                "- `/quill` - Switch to Quill equity research agent 🆕\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
                 "- `/quit` - Exit the application\n"
@@ -113,8 +127,9 @@ class ChatUI(App):
         try:
             self.portfolio_agent = await create_portfolio_agent()
             self.research_agent = await create_research_agent()
+            self.quill_agent = await create_quill_agent()
             self.agents_initialized = True
-            chat_log.write("[green]✓ Agents initialized successfully[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
             # Show helpful setup instructions for missing API keys
@@ -167,14 +182,19 @@ class ChatUI(App):
 
         # Get agent response
         try:
-            agent = (
-                self.portfolio_agent
-                if self.current_agent == "portfolio"
-                else self.research_agent
-            )
-            agent_name = (
-                "Portfolio Analyst" if self.current_agent == "portfolio" else "Market Researcher"
-            )
+            # Select agent based on current mode
+            if self.current_agent == "portfolio":
+                agent = self.portfolio_agent
+                agent_name = "Portfolio Analyst"
+            elif self.current_agent == "research":
+                agent = self.research_agent
+                agent_name = "Market Researcher"
+            elif self.current_agent == "quill":
+                agent = self.quill_agent
+                agent_name = "Quill (Equity Research)"
+            else:
+                agent = self.portfolio_agent
+                agent_name = "Portfolio Analyst"
 
             if not agent:
                 chat_log.write("[red]Error: Agent not initialized[/red]")
@@ -244,6 +264,7 @@ class ChatUI(App):
                     "\n**Available Commands:**\n"
                     "- `/portfolio` - Switch to portfolio analysis agent\n"
                     "- `/research` - Switch to market research agent\n"
+                    "- `/quill` - Switch to Quill equity research agent\n"
                     "- `/examples` - Show example prompts for current agent\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"
@@ -256,16 +277,23 @@ class ChatUI(App):
         elif command == "/research":
             self.current_agent = "research"
             chat_log.write("\n[green]✓ Switched to Market Research agent[/green]\n")
+        elif command == "/quill":
+            self.current_agent = "quill"
+            chat_log.write("\n[green]✓ Switched to Quill (Equity Research) agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
-            examples = (
-                PORTFOLIO_EXAMPLES
-                if self.current_agent == "portfolio"
-                else RESEARCH_EXAMPLES
-            )
-            agent_name = (
-                "Portfolio Analysis" if self.current_agent == "portfolio" else "Market Research"
-            )
+            if self.current_agent == "portfolio":
+                examples = PORTFOLIO_EXAMPLES
+                agent_name = "Portfolio Analysis"
+            elif self.current_agent == "research":
+                examples = RESEARCH_EXAMPLES
+                agent_name = "Market Research"
+            elif self.current_agent == "quill":
+                examples = QUILL_EXAMPLES
+                agent_name = "Quill (Equity Research)"
+            else:
+                examples = PORTFOLIO_EXAMPLES
+                agent_name = "Portfolio Analysis"
 
             # Randomly select 4 examples to show
             selected_examples = random.sample(examples, min(4, len(examples)))
