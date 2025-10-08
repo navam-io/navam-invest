@@ -301,6 +301,7 @@ positioning. Dollar-cost average on dips below $210.
 - **Workflow Commands**: `/analyze <SYMBOL>` for multi-agent analysis
 - **Command Palette**: Quick access to common actions
 - **File Reading**: Analyze local portfolio files
+- **📄 Auto-Save Reports**: All agent reports automatically saved to `reports/` directory with timestamps
 
 ### 🏗️ **Built on Modern Tech**
 
@@ -410,6 +411,35 @@ This opens an interactive chat interface with 7 specialized AI agents and multi-
 | `/examples` | Show example prompts for current agent |
 | `/clear` | Clear chat history |
 | `/quit` | Exit the application |
+
+#### 📄 Automatic Report Saving
+
+**All agent-generated reports are automatically saved** to the `reports/` directory in your working folder:
+
+- **📊 Investment Analysis** (`/analyze`): Complete multi-section reports with Quill fundamentals, Macro Lens validation, and final recommendation
+- **🔍 Agent Responses**: All substantial agent responses (>200 chars) automatically saved as markdown files
+- **📁 Organized Naming**: Reports use descriptive names with timestamps: `{symbol}_{report_type}_{timestamp}.md`
+- **💾 Full Context**: Reports include metadata (date, symbol, query) and formatted markdown content
+
+**Example**: After `/analyze AAPL`, you'll see:
+```
+📄 Report saved to: /path/to/working-dir/reports/AAPL_analysis_20251008_143022.md
+```
+
+**Report Structure** for `/analyze`:
+- Investment Analysis Report header with metadata
+- Fundamental Analysis (Quill) section
+- Macro Validation (Macro Lens) section
+- Final Recommendation section
+
+**Supported Report Types**:
+- `analysis` - Multi-agent investment analysis workflow
+- `equity_research` - Quill equity research reports
+- `portfolio` - Portfolio analysis reports
+- `research` - Market research and macro analysis
+- `screening` - Stock screening results
+- `macro_analysis` - Macro regime analysis
+- `earnings` - Earnings surprise analysis
 
 #### Agent Selection Commands
 

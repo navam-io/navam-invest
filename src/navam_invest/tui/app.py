@@ -19,7 +19,7 @@ from navam_invest.agents.macro_lens import create_macro_lens_agent
 from navam_invest.agents.earnings_whisperer import create_earnings_whisperer_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
-from navam_invest.utils import check_all_apis
+from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
 
 # Example prompts for each agent
 PORTFOLIO_EXAMPLES = [
@@ -244,24 +244,31 @@ class ChatUI(App):
             if self.current_agent == "portfolio":
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
+                report_type = "portfolio"
             elif self.current_agent == "research":
                 agent = self.research_agent
                 agent_name = "Market Researcher"
+                report_type = "research"
             elif self.current_agent == "quill":
                 agent = self.quill_agent
                 agent_name = "Quill (Equity Research)"
+                report_type = "equity_research"
             elif self.current_agent == "screen":
                 agent = self.screen_forge_agent
                 agent_name = "Screen Forge (Equity Screening)"
+                report_type = "screening"
             elif self.current_agent == "macro":
                 agent = self.macro_lens_agent
                 agent_name = "Macro Lens (Market Strategist)"
+                report_type = "macro_analysis"
             elif self.current_agent == "earnings":
                 agent = self.earnings_whisperer_agent
                 agent_name = "Earnings Whisperer"
+                report_type = "earnings"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
+                report_type = "portfolio"
 
             if not agent:
                 chat_log.write("[red]Error: Agent not initialized[/red]")
@@ -270,6 +277,7 @@ class ChatUI(App):
             chat_log.write(f"[bold green]{agent_name}:[/bold green] ")
 
             # Stream response with detailed progress
+            agent_response = ""
             tool_calls_shown = set()
             async for event in agent.astream(
                 {"messages": [HumanMessage(content=text)]},
@@ -318,7 +326,28 @@ class ChatUI(App):
                             if hasattr(last_msg, "content") and last_msg.content:
                                 # Show final response only
                                 if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
-                                    chat_log.write(Markdown(last_msg.content))
+                                    agent_response = last_msg.content
+                                    chat_log.write(Markdown(agent_response))
+
+            # Save agent response as report if it's substantial (>200 chars)
+            if agent_response and len(agent_response) > 200:
+                try:
+                    # Extract context from user message (e.g., stock symbols)
+                    import re
+                    symbols = re.findall(r'\b[A-Z]{2,5}\b', text.upper())
+
+                    context = {"query": text[:50]}
+                    if symbols:
+                        context["symbol"] = symbols[0]
+
+                    report_path = save_agent_report(
+                        content=agent_response,
+                        report_type=report_type,
+                        context=context,
+                    )
+                    chat_log.write(f"\n[dim]📄 Report saved to: {report_path}[/dim]\n")
+                except Exception as save_error:
+                    chat_log.write(f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n")
 
         except Exception as e:
             chat_log.write(f"\n[red]Error: {str(e)}[/red]")
@@ -342,6 +371,11 @@ class ChatUI(App):
             chat_log.write(f"[bold green]Investment Analysis Workflow:[/bold green] Starting multi-agent analysis...\n")
 
             try:
+                # Track analysis sections for report saving
+                quill_analysis = ""
+                macro_context = ""
+                final_recommendation = ""
+
                 # Run the workflow
                 tool_calls_shown = set()
                 async for event in self.investment_workflow.astream(
@@ -381,13 +415,32 @@ class ChatUI(App):
 
                         # Handle final values
                         elif event_type == "values":
+                            # Capture state data for report
+                            if "quill_analysis" in event_data:
+                                quill_analysis = event_data["quill_analysis"]
+                            if "macro_context" in event_data:
+                                macro_context = event_data["macro_context"]
+
                             if "messages" in event_data and event_data["messages"]:
                                 last_msg = event_data["messages"][-1]
                                 if hasattr(last_msg, "content") and last_msg.content:
                                     # Show final recommendation
                                     if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+                                        final_recommendation = last_msg.content
                                         chat_log.write("\n[bold green]Final Recommendation:[/bold green]\n")
-                                        chat_log.write(Markdown(last_msg.content))
+                                        chat_log.write(Markdown(final_recommendation))
+
+                # Save the complete report
+                try:
+                    report_path = save_investment_report(
+                        symbol=symbol,
+                        final_recommendation=final_recommendation,
+                        quill_analysis=quill_analysis,
+                        macro_context=macro_context,
+                    )
+                    chat_log.write(f"\n[dim]📄 Report saved to: {report_path}[/dim]\n")
+                except Exception as save_error:
+                    chat_log.write(f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n")
 
             except Exception as e:
                 chat_log.write(f"\n[red]Error running workflow: {str(e)}[/red]")
