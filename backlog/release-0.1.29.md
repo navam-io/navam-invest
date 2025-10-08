@@ -1,7 +1,7 @@
 # Release 0.1.29
 
 ## Status
-IN DEVELOPMENT
+Published to PyPI on 2025-10-08
 
 ## Features
 
@@ -80,7 +80,7 @@ Based on v0.1.28 foundation:
 ---
 
 ## Release Date
-TBD
+2025-10-08
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.29/
