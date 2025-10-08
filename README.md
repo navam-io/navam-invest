@@ -369,7 +369,14 @@ pip install -e ".[dev]"
    # No keys needed for Yahoo Finance, SEC EDGAR, U.S. Treasury!
    ```
 
-3. **Get API Keys** (all have free tiers):
+3. **Verify API Keys** (use `/api` command in chat to check status):
+   ```bash
+   navam invest
+   > /api
+   # Shows status table with ✅ working / ❌ failed / ⚪ not configured
+   ```
+
+4. **Get API Keys** (all have free tiers):
 
    | Service | Link | Free Tier | Required? |
    |---------|------|-----------|-----------|
@@ -382,7 +389,7 @@ pip install -e ".[dev]"
    | **Tiingo** | [tiingo.com](https://www.tiingo.com/) | 50 symbols/hr, 5yr history | Optional |
    | **Finnhub** | [finnhub.io/register](https://finnhub.io/register) | 60 calls/min | Optional |
    | **FRED** | [fredaccount.stlouisfed.org/apikeys](https://fredaccount.stlouisfed.org/apikeys) | Unlimited | Optional |
-   | **NewsAPI** | [newsapi.org/register](https://newsapi.org/register) | 100 calls/day | Optional |
+   | **NewsAPI.org** | [newsapi.org/register](https://newsapi.org/register) | 1,000 calls/day | Optional |
 
 ### Usage
 
@@ -394,7 +401,17 @@ navam invest
 
 This opens an interactive chat interface with 7 specialized AI agents and multi-agent workflows.
 
-#### Quick Command Reference
+#### Slash Commands
+
+| Command | Description |
+|---------|-------------|
+| `/api` | Check API connectivity and status of all data providers |
+| `/help` | Show all available commands |
+| `/examples` | Show example prompts for current agent |
+| `/clear` | Clear chat history |
+| `/quit` | Exit the application |
+
+#### Agent Selection Commands
 
 | Command | Agent/Workflow | Description |
 |---------|----------------|-------------|

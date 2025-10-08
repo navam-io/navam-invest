@@ -1,18 +1,25 @@
 # Active Backlog
 
-## Current Development Cycle (v0.1.27)
+## Current Development Cycle (v0.1.28)
 
 ### Next Priority Features
 
 Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integration (v0.1.26), the following specialized agents and workflows are priorities:
 
-#### High Priority Agents (Phase 3A - v0.1.27-0.1.29)
+#### High Priority Features (Phase 3A - v0.1.27-0.1.29)
 
 - [x] **Earnings Whisperer Agent** - Earnings analysis and post-earnings drift opportunities → Completed in release-0.1.27.md
   - Leverages Yahoo Finance earnings tools (`get_earnings_history`, `get_earnings_calendar`)
   - Tracks earnings surprises and analyst estimate revisions
   - Identifies post-earnings drift patterns
   - TUI command: `/earnings`
+
+- [x] **`/api` Command - Self-Service API Status Checker** → Completed in release-0.1.28.md
+  - Interactive API connectivity testing in chat interface
+  - Real-time validation of all 10 data providers
+  - Rich table formatting with color-coded status
+  - Troubleshooting tips and error diagnosis
+  - Documentation clarifying NewsAPI.org vs NewsAPI.ai
 
 - [ ] **News Sentry Agent** - Real-time event detection and material event monitoring
   - Leverages SEC 8-K filings (`get_latest_8k`)
@@ -52,6 +59,11 @@ Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integratio
   - Integration with rebalancing logic
 
 #### Infrastructure Enhancements
+
+- [x] **API Status Checking** → Completed in release-0.1.28.md
+  - Self-service API validation via `/api` command
+  - Real-time connectivity testing
+  - User-friendly error diagnostics
 
 - [ ] **API Caching Layer** (DuckDB)
   - Cache Yahoo Finance, EDGAR, and other API results

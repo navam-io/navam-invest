@@ -6,6 +6,7 @@ from typing import Optional
 
 from langchain_core.messages import HumanMessage
 from rich.markdown import Markdown
+from rich.table import Table
 from textual.app import App, ComposeResult
 from textual.containers import Container, Vertical
 from textual.widgets import Footer, Header, Input, RichLog
@@ -18,6 +19,7 @@ from navam_invest.agents.macro_lens import create_macro_lens_agent
 from navam_invest.agents.earnings_whisperer import create_earnings_whisperer_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
+from navam_invest.utils import check_all_apis
 
 # Example prompts for each agent
 PORTFOLIO_EXAMPLES = [
@@ -390,6 +392,66 @@ class ChatUI(App):
             except Exception as e:
                 chat_log.write(f"\\n[red]Error running workflow: {str(e)}[/red]")
 
+        elif command == "/api":
+            chat_log.write("\\n[bold cyan]Checking API Status...[/bold cyan]\\n")
+            chat_log.write("[dim]Testing connectivity to all configured APIs...\\n\\n[/dim]")
+
+            try:
+                # Run API checks
+                results = await check_all_apis()
+
+                # Create Rich table
+                table = Table(
+                    title="API Status Report",
+                    show_header=True,
+                    header_style="bold magenta",
+                    show_lines=True,
+                )
+                table.add_column("API Provider", style="cyan", width=18)
+                table.add_column("Status", width=18)
+                table.add_column("Details", style="dim", width=40)
+
+                # Add rows
+                for result in results:
+                    # Color code status
+                    status = result["status"]
+                    if "✅" in status:
+                        status_styled = f"[green]{status}[/green]"
+                    elif "❌" in status:
+                        status_styled = f"[red]{status}[/red]"
+                    elif "⚠️" in status:
+                        status_styled = f"[yellow]{status}[/yellow]"
+                    else:
+                        status_styled = f"[dim]{status}[/dim]"
+
+                    table.add_row(
+                        result["api"],
+                        status_styled,
+                        result["details"]
+                    )
+
+                # Display table
+                chat_log.write(table)
+
+                # Add summary
+                working = sum(1 for r in results if "✅" in r["status"])
+                failed = sum(1 for r in results if "❌" in r["status"])
+                not_configured = sum(1 for r in results if "⚪" in r["status"])
+
+                chat_log.write(
+                    Markdown(
+                        f"\\n**Summary:** {working} working • {failed} failed • {not_configured} not configured\\n\\n"
+                        f"💡 **Tips:**\\n"
+                        f"- Failed APIs: Check your `.env` file for correct API keys\\n"
+                        f"- Not configured: Optional - get free keys to unlock more features\\n"
+                        f"- Rate limited: Wait a few minutes and try again\\n\\n"
+                        f"Run `python scripts/validate_newsapi_key.py` to validate NewsAPI.org specifically.\\n"
+                    )
+                )
+
+            except Exception as e:
+                chat_log.write(f"\\n[red]Error checking APIs: {str(e)}[/red]")
+
         elif command == "/help":
             chat_log.write(
                 Markdown(
@@ -401,6 +463,7 @@ class ChatUI(App):
                     "- `/macro` - Switch to Macro Lens market strategist\n"
                     "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                     "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
+                    "- `/api` - Check API connectivity and status\n"
                     "- `/examples` - Show example prompts for current agent\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"

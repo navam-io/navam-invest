@@ -1,4 +1,9 @@
-"""NewsAPI.org tools for market news and sentiment analysis."""
+"""NewsAPI.org tools for market news and sentiment analysis.
+
+IMPORTANT: This uses NewsAPI.org (https://newsapi.org), NOT NewsAPI.ai
+Get your free API key at: https://newsapi.org/register
+Free tier: 1,000 requests/day
+"""
 
 from typing import Any, Dict, Optional
 
@@ -39,7 +44,8 @@ async def search_market_news(
     """Search for market news articles related to stocks, companies, or financial topics.
 
     This tool searches through millions of articles from financial news sources.
-    Note: Free tier has 100 requests/day limit and 24-hour article delay.
+    Uses NewsAPI.org (NOT NewsAPI.ai). Get your key at: https://newsapi.org/register
+    Note: Free tier has 1,000 requests/day limit and 24-hour article delay.
 
     Args:
         query: Search query (e.g., 'Tesla earnings', 'Federal Reserve', 'AAPL stock')
@@ -110,7 +116,8 @@ async def get_top_financial_headlines(
     """Get top financial and business headlines from major news sources.
 
     This tool retrieves current top headlines for financial news.
-    Note: Free tier has 100 requests/day limit and 24-hour article delay.
+    Uses NewsAPI.org (NOT NewsAPI.ai). Get your key at: https://newsapi.org/register
+    Note: Free tier has 1,000 requests/day limit and 24-hour article delay.
 
     Args:
         api_key: NewsAPI.org API key
@@ -174,7 +181,8 @@ async def get_company_news(company_name: str, api_key: str, limit: int = 5) -> s
 
     This tool searches for news mentioning a specific company name.
     Useful for tracking company-specific events, announcements, and market sentiment.
-    Note: Free tier has 100 requests/day limit and 24-hour article delay.
+    Uses NewsAPI.org (NOT NewsAPI.ai). Get your key at: https://newsapi.org/register
+    Note: Free tier has 1,000 requests/day limit and 24-hour article delay.
 
     Args:
         company_name: Company name to search for (e.g., 'Apple', 'Tesla', 'Microsoft')
