@@ -21,24 +21,24 @@
 
 ---
 
-## 🆕 What's New in v0.1.26
+## 🆕 What's New in v0.1.27
 
-**Yahoo Finance + Enhanced SEC EDGAR Integration** - Institutional-grade data at zero cost:
+**Earnings Whisperer Agent** - Specialized earnings analysis and trading opportunities:
 
-- ✨ **Yahoo Finance Integration**: 11 new tools for real-time quotes, earnings analysis, analyst ratings, institutional holders (FREE, no API key)
-- ✨ **Enhanced SEC EDGAR**: 4 new tools for 8-K material events, XBRL company facts, insider transactions (Form 4), flexible filing search
-- ✨ **Quill Agent Enhanced**: 22 → 36 tools (+64% capabilities) - Now includes earnings trends, analyst sentiment, ownership tracking
-- ✨ **Zero Cost Expansion**: All new tools free & unlimited ($2,400-$10,800/year savings vs. paid alternatives)
-- ✨ **Full Backward Compatibility**: Existing agents and workflows unchanged
+- ✨ **New Agent**: Earnings Whisperer for earnings surprise analysis, post-earnings drift detection, and momentum tracking
+- ✨ **14 Specialized Tools**: Earnings data (Yahoo), market analysis, analyst coverage, SEC 8-K filings, news
+- ✨ **5-Step Framework**: History analysis, drift detection, analyst tracking, calendar monitoring, catalyst integration
+- ✨ **TUI Command**: `/earnings` to switch to Earnings Whisperer agent
+- ✨ **Pattern Recognition**: Consistent beaters, accelerating beats, drift opportunities, quality issues
 
-**New Capabilities**:
-- **Earnings Analysis**: Historical EPS surprises, upcoming earnings calendar, analyst estimates
-- **Analyst Coverage**: Consensus ratings, price targets, recent upgrades/downgrades
-- **Material Events**: 8-K filings for M&A, earnings, management changes, bankruptcy
-- **Ownership Intelligence**: Institutional holders, Form 4 insider transactions, 13F filings
-- **Market Indices**: S&P 500, Dow Jones, Nasdaq, Russell 2000, VIX (for macro analysis)
+**Analysis Capabilities**:
+- **Earnings Momentum**: Identify stocks with 3+ consecutive quarters beating estimates
+- **Post-Earnings Drift**: Detect underreaction opportunities (1-3 days after earnings)
+- **Analyst Revisions**: Track estimate changes and rating upgrades post-earnings
+- **Earnings Quality**: Flag revenue misses vs. EPS beats, non-recurring items
+- **Trading Signals**: BUY (drift play), HOLD (wait), SELL (negative momentum)
 
-See [Integration Docs](backlog/edgar-yahoo-integration.md) for details | Previous: [v0.1.25](backlog/release-0.1.25.md)
+**Previous Release**: [v0.1.26](backlog/release-0.1.26.md) - Yahoo Finance + Enhanced SEC EDGAR Integration
 
 ---
 
@@ -49,11 +49,11 @@ See [Integration Docs](backlog/edgar-yahoo-integration.md) for details | Previou
 ### Why Navam Invest?
 
 - **🎯 Multi-Agent Workflows**: Coordinated agent collaboration for comprehensive analysis
-- **🤖 Specialized Agents**: 6 purpose-built agents (Quill, Screen Forge, Macro Lens, Atlas, Portfolio, Research)
+- **🤖 Specialized Agents**: 7 purpose-built agents (Quill, Earnings Whisperer, Screen Forge, Macro Lens, Atlas, Portfolio, Research)
 - **📊 Institutional Data**: Yahoo Finance + Enhanced EDGAR + 8 premium APIs (all free tiers)
 - **🔒 Privacy-First**: Run locally with your own API keys—your data stays yours
 - **💡 Transparent**: Full audit trails and explainable AI reasoning with real-time streaming
-- **🆓 Zero Additional Cost**: New Yahoo Finance + EDGAR tools require no API keys
+- **🆓 Zero Additional Cost**: Yahoo Finance + EDGAR tools require no API keys
 - **🔧 Extensible**: Modular architecture makes it easy to add new agents and workflows
 
 ---
@@ -117,6 +117,26 @@ See [Integration Docs](backlog/edgar-yahoo-integration.md) for details | Previou
 </td>
 </tr>
 <tr>
+<td width="50%">
+
+#### **Earnings Whisperer - Earnings Analyst** ⭐ *NEW v0.1.27*
+*Earnings surprise analysis & post-earnings drift*
+
+**Core Capabilities**:
+- Historical earnings surprise tracking (4-8 quarters)
+- Post-earnings drift detection (1-3 day momentum)
+- Analyst estimate revision monitoring
+- Earnings quality assessment (revenue vs. EPS beats)
+- Upcoming earnings calendar with probability scoring
+- Earnings momentum patterns (consistent beaters)
+- Trading signals (BUY/HOLD/SELL on earnings)
+- **14 specialized tools**
+
+**Command**: `/earnings`
+
+**Use Case**: "Analyze NVDA earnings history - is there a post-earnings drift opportunity?"
+
+</td>
 <td width="50%">
 
 #### **Macro Lens - Market Strategist**
@@ -372,7 +392,7 @@ pip install -e ".[dev]"
 navam invest
 ```
 
-This opens an interactive chat interface with 6 specialized AI agents and multi-agent workflows.
+This opens an interactive chat interface with 7 specialized AI agents and multi-agent workflows.
 
 #### Quick Command Reference
 
@@ -380,6 +400,7 @@ This opens an interactive chat interface with 6 specialized AI agents and multi-
 |---------|----------------|-------------|
 | `/analyze <SYMBOL>` | Investment Analysis Workflow | Multi-agent fundamental + macro analysis |
 | `/quill` | Quill (Equity Research) | Deep fundamental analysis & thesis building ⭐ *36 tools* |
+| `/earnings` | Earnings Whisperer | Earnings surprise analysis & post-earnings drift ⭐ *NEW v0.1.27* |
 | `/screen` | Screen Forge | Systematic stock screening & idea generation |
 | `/macro` | Macro Lens | Top-down macro analysis & regime identification |
 | `/atlas` | Atlas (Investment Strategist) | Strategic asset allocation & IPS development |
@@ -702,14 +723,19 @@ twine check dist/*
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.26
+### Current Release: v0.1.27
+- ✅ Earnings Whisperer agent (earnings surprise analysis, post-earnings drift)
+- ✅ 14 specialized earnings tools (Yahoo Finance + SEC + Finnhub)
+- ✅ 5-step earnings analysis framework
+- ✅ Pattern recognition (consistent beaters, drift opportunities)
+
+### Recent: v0.1.26
 - ✅ Yahoo Finance integration (11 tools, FREE)
 - ✅ Enhanced SEC EDGAR (4 new tools: 8-K, company facts, insider transactions)
 - ✅ Quill agent enhanced with earnings & analyst coverage
 - ✅ Zero cost expansion ($2.4K-$10.8K/year savings)
 
-### Next: v0.1.27-0.1.30
-- [ ] Earnings Whisperer agent (leverages Yahoo earnings tools)
+### Next: v0.1.28-0.1.30
 - [ ] News Sentry agent (leverages 8-K material events)
 - [ ] Options analysis tools for Hedge Smith agent (Yahoo options chain)
 - [ ] Enhanced multi-agent workflows (parallel execution)
