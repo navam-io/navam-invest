@@ -283,6 +283,28 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             # Dividends
             "get_dividends",
         ],
+        # Earnings Whisperer (Earnings Analysis): Earnings surprises, post-earnings drift, momentum
+        "earnings_whisperer": [
+            # Earnings data (Yahoo Finance)
+            "get_earnings_history",
+            "get_earnings_calendar",
+            # Market data for drift analysis
+            "get_quote",
+            "get_historical_data",
+            "get_stock_price",
+            # Analyst coverage for estimate revisions
+            "get_analyst_recommendations",
+            "get_recommendation_trends",
+            # SEC filings for earnings releases
+            "get_latest_8k",
+            "search_filings_by_form",
+            # News for earnings context
+            "get_company_news",
+            "get_finnhub_company_news",
+            # Fundamentals for earnings quality checks
+            "get_financials",
+            "get_financial_ratios",
+        ],
         # Screen Forge (Equity Screening): Systematic screening, idea generation
         "screen_forge": [
             # Market data for validation (Yahoo Finance + Alpha Vantage)

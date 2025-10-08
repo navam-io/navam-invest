@@ -8,7 +8,7 @@ Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integratio
 
 #### High Priority Agents (Phase 3A - v0.1.27-0.1.29)
 
-- [ ] **Earnings Whisperer Agent** - Earnings analysis and post-earnings drift opportunities
+- [x] **Earnings Whisperer Agent** - Earnings analysis and post-earnings drift opportunities → Completed in release-0.1.27.md
   - Leverages Yahoo Finance earnings tools (`get_earnings_history`, `get_earnings_calendar`)
   - Tracks earnings surprises and analyst estimate revisions
   - Identifies post-earnings drift patterns

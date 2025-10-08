@@ -15,6 +15,7 @@ from navam_invest.agents.research import create_research_agent
 from navam_invest.agents.quill import create_quill_agent
 from navam_invest.agents.screen_forge import create_screen_forge_agent
 from navam_invest.agents.macro_lens import create_macro_lens_agent
+from navam_invest.agents.earnings_whisperer import create_earnings_whisperer_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 
@@ -72,6 +73,17 @@ MACRO_LENS_EXAMPLES = [
     "Identify top 3 macro risks to monitor over the next 6 months",
     "How do current GDP, unemployment, and inflation compare to historical norms?",
     "Should I be defensive or cyclical given the economic cycle phase?",
+]
+
+EARNINGS_WHISPERER_EXAMPLES = [
+    "Analyze AAPL earnings history - are they consistent beaters?",
+    "What's TSLA's earnings surprise trend over the last 4 quarters?",
+    "Is there a post-earnings drift opportunity in NVDA after recent earnings?",
+    "When is MSFT's next earnings date? What are analyst estimates?",
+    "Show me GOOGL's earnings quality - revenue vs EPS beats",
+    "Track analyst estimate revisions for AMZN post-earnings",
+    "Find stocks with 3+ consecutive quarters beating estimates",
+    "Analyze META's earnings momentum and recommend a trade",
 ]
 
 WORKFLOW_EXAMPLES = [
@@ -149,6 +161,7 @@ class ChatUI(App):
                 "- `/quill` - Switch to Quill equity research agent\n"
                 "- `/screen` - Switch to Screen Forge screening agent\n"
                 "- `/macro` - Switch to Macro Lens market strategist\n"
+                "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
@@ -168,9 +181,10 @@ class ChatUI(App):
             self.quill_agent = await create_quill_agent()
             self.screen_forge_agent = await create_screen_forge_agent()
             self.macro_lens_agent = await create_macro_lens_agent()
+            self.earnings_whisperer_agent = await create_earnings_whisperer_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens)[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer)[/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -240,6 +254,9 @@ class ChatUI(App):
             elif self.current_agent == "macro":
                 agent = self.macro_lens_agent
                 agent_name = "Macro Lens (Market Strategist)"
+            elif self.current_agent == "earnings":
+                agent = self.earnings_whisperer_agent
+                agent_name = "Earnings Whisperer"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -382,6 +399,7 @@ class ChatUI(App):
                     "- `/quill` - Switch to Quill equity research agent\n"
                     "- `/screen` - Switch to Screen Forge screening agent\n"
                     "- `/macro` - Switch to Macro Lens market strategist\n"
+                    "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                     "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                     "- `/examples` - Show example prompts for current agent\n"
                     "- `/clear` - Clear chat history\n"
@@ -404,6 +422,9 @@ class ChatUI(App):
         elif command == "/macro":
             self.current_agent = "macro"
             chat_log.write("\n[green]✓ Switched to Macro Lens (Market Strategist) agent[/green]\n")
+        elif command == "/earnings":
+            self.current_agent = "earnings"
+            chat_log.write("\n[green]✓ Switched to Earnings Whisperer agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -421,6 +442,9 @@ class ChatUI(App):
             elif self.current_agent == "macro":
                 examples = MACRO_LENS_EXAMPLES
                 agent_name = "Macro Lens (Market Strategist)"
+            elif self.current_agent == "earnings":
+                examples = EARNINGS_WHISPERER_EXAMPLES
+                agent_name = "Earnings Whisperer"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"
