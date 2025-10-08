@@ -30,6 +30,7 @@ async def create_research_agent() -> StateGraph:
         model=settings.anthropic_model,
         api_key=settings.anthropic_api_key,
         temperature=settings.temperature,
+        max_tokens=8192,  # Ensure full responses without truncation
     )
 
     # Get all research-relevant tools (macro + treasury + news + files)

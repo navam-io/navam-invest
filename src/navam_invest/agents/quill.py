@@ -40,6 +40,7 @@ async def create_quill_agent() -> StateGraph:
         model=settings.anthropic_model,
         api_key=settings.anthropic_api_key,
         temperature=settings.temperature,
+        max_tokens=8192,  # Ensure full responses without truncation
     )
 
     # Get Quill-specific tools (comprehensive equity research toolkit)

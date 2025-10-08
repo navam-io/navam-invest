@@ -162,21 +162,25 @@
       "bases:Create new base": false
     }
   },
-  "active": "57dd7d8089d4b857",
+  "active": "0478eab2742cd08b",
   "lastOpenFiles": [
-    "backlog/release-0.1.29.md",
-    "backlog/release-0.1.29.md.tmp.76328.1759928143628",
-    "dist/navam_invest-0.1.28-py3-none-any.whl",
-    "dist/navam_invest-0.1.28.tar.gz",
+    "backlog/release-0.1.32.md",
+    "dist/navam_invest-0.1.31-py3-none-any.whl",
+    "dist/navam_invest-0.1.31.tar.gz",
     "dist",
-    "backlog/active.md.tmp.76328.1759928040724",
+    "src/navam_invest/tui/app.py.tmp.96729.1759934246790",
+    "src/navam_invest/agents/earnings_whisperer.py.tmp.96729.1759934085824",
+    "pyproject.toml.tmp.76328.1759932012095",
+    "backlog/release-0.1.31.md",
+    "backlog/release-0.1.31.md.tmp.76328.1759932002373",
+    "dist/navam_invest-0.1.30-py3-none-any.whl",
+    "dist/navam_invest-0.1.30.tar.gz",
+    "README.md.tmp.76328.1759930884483",
+    "backlog/release-0.1.30.md",
+    "RELEASE_v0.1.28_SUMMARY.md",
+    "backlog/release-0.1.29.md",
     "API_COMMAND_IMPLEMENTATION.md",
     "refer/specs/api-status-command.md",
-    "src/navam_invest/workflows/__pycache__/__init__.cpython-313.pyc",
-    "src/navam_invest/utils/__pycache__/api_checker.cpython-313.pyc",
-    "src/navam_invest/utils/__pycache__/__init__.cpython-313.pyc",
-    "src/navam_invest/utils/__pycache__",
-    "scripts/test_api_command.py",
     "refer/specs/newsapi-comparison.md",
     "NEWSAPI_DOCUMENTATION_UPDATES.md",
     "refer/specs/newsapi-clarification.md",
@@ -195,10 +199,6 @@
     "backlog/release-0.1.18.md",
     "backlog/release-0.1.17.md",
     "backlog/release-0.1.16.md",
-    "backlog/release-0.1.15.md",
-    "backlog/release-0.1.14.md",
-    "backlog/release-0.1.13.md",
-    "backlog/agent-refactoring-plan.md",
-    "backlog/release-0.1.12.md"
+    "backlog/release-0.1.15.md"
   ]
 }

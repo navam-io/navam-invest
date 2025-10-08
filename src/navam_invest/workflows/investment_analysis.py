@@ -50,6 +50,7 @@ async def create_investment_analysis_workflow() -> StateGraph:
         model=settings.anthropic_model,
         api_key=settings.anthropic_api_key,
         temperature=settings.temperature,
+        max_tokens=8192,  # Ensure full responses without truncation
     )
 
     # Get tools for each agent

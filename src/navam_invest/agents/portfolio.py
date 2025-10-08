@@ -30,6 +30,7 @@ async def create_portfolio_agent() -> StateGraph:
         model=settings.anthropic_model,
         api_key=settings.anthropic_api_key,
         temperature=settings.temperature,
+        max_tokens=8192,  # Ensure full responses without truncation
     )
 
     # Get all portfolio-relevant tools (market + fundamentals + sentiment + SEC + news + files)

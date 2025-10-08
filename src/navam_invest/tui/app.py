@@ -151,6 +151,9 @@ class ChatUI(App):
 
     async def on_mount(self) -> None:
         """Initialize agents when app mounts."""
+        # Set initial status
+        self.sub_title = "Initializing agents..."
+
         chat_log = self.query_one("#chat-log", RichLog)
         chat_log.write(
             Markdown(
@@ -186,6 +189,7 @@ class ChatUI(App):
             self.earnings_whisperer_agent = await create_earnings_whisperer_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
+            self.sub_title = f"Agent: {self.current_agent.title()} | Ready"
             chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer)[/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
@@ -224,22 +228,29 @@ class ChatUI(App):
         if not self.agents_initialized:
             return
 
-        # Clear input
+        # Get input widget and chat log
         input_widget = self.query_one("#user-input", Input)
-        input_widget.value = ""
-
         chat_log = self.query_one("#chat-log", RichLog)
 
-        # Handle commands
-        if text.startswith("/"):
-            await self._handle_command(text, chat_log)
-            return
+        # Clear input and disable during processing
+        input_widget.value = ""
+        input_widget.disabled = True
+        original_placeholder = input_widget.placeholder
+        input_widget.placeholder = "⏳ Processing your request..."
 
-        # Display user message
-        chat_log.write(f"\n[bold cyan]You:[/bold cyan] {text}\n")
+        # Update footer status
+        self.sub_title = "Processing..."
 
-        # Get agent response
         try:
+            # Handle commands
+            if text.startswith("/"):
+                await self._handle_command(text, chat_log)
+                return
+
+            # Display user message
+            chat_log.write(f"\n[bold cyan]You:[/bold cyan] {text}\n")
+
+            # Get agent response
             # Select agent based on current mode
             if self.current_agent == "portfolio":
                 agent = self.portfolio_agent
@@ -351,6 +362,26 @@ class ChatUI(App):
 
         except Exception as e:
             chat_log.write(f"\n[red]Error: {str(e)}[/red]")
+
+        finally:
+            # Always re-enable input and restore placeholder
+            input_widget.disabled = False
+            input_widget.placeholder = original_placeholder
+
+            # Update status to Ready with proper agent name
+            agent_display_names = {
+                "portfolio": "Portfolio",
+                "research": "Research",
+                "quill": "Quill",
+                "screen": "Screen Forge",
+                "macro": "Macro Lens",
+                "earnings": "Earnings Whisperer"
+            }
+            agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
+            self.sub_title = f"Agent: {agent_name} | Ready"
+
+            # Focus back on input for next query
+            input_widget.focus()
 
     async def _handle_command(self, command: str, chat_log: RichLog) -> None:
         """Handle slash commands."""
@@ -525,21 +556,27 @@ class ChatUI(App):
             )
         elif command == "/portfolio":
             self.current_agent = "portfolio"
+            self.sub_title = "Agent: Portfolio | Ready"
             chat_log.write("\n[green]✓ Switched to Portfolio Analysis agent[/green]\n")
         elif command == "/research":
             self.current_agent = "research"
+            self.sub_title = "Agent: Research | Ready"
             chat_log.write("\n[green]✓ Switched to Market Research agent[/green]\n")
         elif command == "/quill":
             self.current_agent = "quill"
+            self.sub_title = "Agent: Quill | Ready"
             chat_log.write("\n[green]✓ Switched to Quill (Equity Research) agent[/green]\n")
         elif command == "/screen":
             self.current_agent = "screen"
+            self.sub_title = "Agent: Screen Forge | Ready"
             chat_log.write("\n[green]✓ Switched to Screen Forge (Equity Screening) agent[/green]\n")
         elif command == "/macro":
             self.current_agent = "macro"
+            self.sub_title = "Agent: Macro Lens | Ready"
             chat_log.write("\n[green]✓ Switched to Macro Lens (Market Strategist) agent[/green]\n")
         elif command == "/earnings":
             self.current_agent = "earnings"
+            self.sub_title = "Agent: Earnings Whisperer | Ready"
             chat_log.write("\n[green]✓ Switched to Earnings Whisperer agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
