@@ -331,15 +331,15 @@ class ChatUI(App):
             if len(parts) != 2:
                 chat_log.write(
                     Markdown(
-                        "\\n**Usage**: `/analyze <SYMBOL>`\\n\\n"
-                        "Example: `/analyze AAPL`\\n"
+                        "\n**Usage**: `/analyze <SYMBOL>`\n\n"
+                        "Example: `/analyze AAPL`\n"
                     )
                 )
                 return
 
             symbol = parts[1].upper()
-            chat_log.write(f"\\n[bold cyan]You:[/bold cyan] Analyze {symbol}\\n")
-            chat_log.write(f"[bold green]Investment Analysis Workflow:[/bold green] Starting multi-agent analysis...\\n")
+            chat_log.write(f"\n[bold cyan]You:[/bold cyan] Analyze {symbol}\n")
+            chat_log.write(f"[bold green]Investment Analysis Workflow:[/bold green] Starting multi-agent analysis...\n")
 
             try:
                 # Run the workflow
@@ -362,11 +362,11 @@ class ChatUI(App):
                             for node_name, node_output in event_data.items():
                                 # Show which agent is working
                                 if node_name == "quill":
-                                    chat_log.write("[dim]  📊 Quill analyzing fundamentals...[/dim]\\n")
+                                    chat_log.write("[dim]  📊 Quill analyzing fundamentals...[/dim]\n")
                                 elif node_name == "macro_lens":
-                                    chat_log.write("[dim]  🌍 Macro Lens validating timing...[/dim]\\n")
+                                    chat_log.write("[dim]  🌍 Macro Lens validating timing...[/dim]\n")
                                 elif node_name == "synthesize":
-                                    chat_log.write("[dim]  🎯 Synthesizing recommendation...[/dim]\\n")
+                                    chat_log.write("[dim]  🎯 Synthesizing recommendation...[/dim]\n")
 
                                 # Show tool calls
                                 if "messages" in node_output:
@@ -377,7 +377,7 @@ class ChatUI(App):
                                                 if call_id not in tool_calls_shown:
                                                     tool_calls_shown.add(call_id)
                                                     tool_name = tool_call.get("name", "unknown")
-                                                    chat_log.write(f"[dim]    → {tool_name}[/dim]\\n")
+                                                    chat_log.write(f"[dim]    → {tool_name}[/dim]\n")
 
                         # Handle final values
                         elif event_type == "values":
@@ -386,15 +386,15 @@ class ChatUI(App):
                                 if hasattr(last_msg, "content") and last_msg.content:
                                     # Show final recommendation
                                     if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
-                                        chat_log.write("\\n[bold green]Final Recommendation:[/bold green]\\n")
+                                        chat_log.write("\n[bold green]Final Recommendation:[/bold green]\n")
                                         chat_log.write(Markdown(last_msg.content))
 
             except Exception as e:
-                chat_log.write(f"\\n[red]Error running workflow: {str(e)}[/red]")
+                chat_log.write(f"\n[red]Error running workflow: {str(e)}[/red]")
 
         elif command == "/api":
-            chat_log.write("\\n[bold cyan]Checking API Status...[/bold cyan]\\n")
-            chat_log.write("[dim]Testing connectivity to all configured APIs...\\n\\n[/dim]")
+            chat_log.write("\n[bold cyan]Checking API Status...[/bold cyan]\n")
+            chat_log.write("[dim]Testing connectivity to all configured APIs...\n\n[/dim]")
 
             try:
                 # Run API checks
@@ -440,17 +440,17 @@ class ChatUI(App):
 
                 chat_log.write(
                     Markdown(
-                        f"\\n**Summary:** {working} working • {failed} failed • {not_configured} not configured\\n\\n"
-                        f"💡 **Tips:**\\n"
-                        f"- Failed APIs: Check your `.env` file for correct API keys\\n"
-                        f"- Not configured: Optional - get free keys to unlock more features\\n"
-                        f"- Rate limited: Wait a few minutes and try again\\n\\n"
-                        f"Run `python scripts/validate_newsapi_key.py` to validate NewsAPI.org specifically.\\n"
+                        f"\n**Summary:** {working} working • {failed} failed • {not_configured} not configured\n\n"
+                        f"💡 **Tips:**\n"
+                        f"- Failed APIs: Check your `.env` file for correct API keys\n"
+                        f"- Not configured: Optional - get free keys to unlock more features\n"
+                        f"- Rate limited: Wait a few minutes and try again\n\n"
+                        f"Run `python scripts/validate_newsapi_key.py` to validate NewsAPI.org specifically.\n"
                     )
                 )
 
             except Exception as e:
-                chat_log.write(f"\\n[red]Error checking APIs: {str(e)}[/red]")
+                chat_log.write(f"\n[red]Error checking APIs: {str(e)}[/red]")
 
         elif command == "/help":
             chat_log.write(
