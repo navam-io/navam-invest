@@ -1,38 +1,75 @@
 # Active Backlog
 
-[x] When using agents and tools stream granular progress within chat response area including which agent is active, which API is called, which tool is used, what arguments is the tool processing, etc. → Completed in release-0.1.12.md
+## Current Development Cycle (v0.1.27)
 
-[x] Reflect on refer/specs/agents-tools.md and refer/specs/multi-agents.md to decide 1. how to refactor current agents and tools, and 2. build next set of agents, tools, and multi-agent workflow. You can also split this backlog item into multiple open items accordingly. → Analysis complete, see `backlog/agent-refactoring-plan.md` for detailed recommendations
+### Next Priority Features
 
-## Next Phase Items (from Agent Refactoring Plan)
+Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integration (v0.1.26), the following specialized agents and workflows are priorities:
 
-### Phase 2A: Specialized Agents (v0.1.13-0.1.14) ✅ COMPLETE
-[x] Build Quill (Equity Research) agent - Deep fundamental analysis and thesis building → Completed in release-0.1.13.md
-[x] Build Screen Forge agent - Systematic stock screening and idea generation → Completed in release-0.1.14.md
-[x] Add agent selection in TUI: `/quill` command → Completed in release-0.1.13.md
-[x] Add agent selection in TUI: `/screen` command → Completed in release-0.1.14.md
-[x] Update tools registry to map tools to specialized agents → Completed in release-0.1.14.md
+#### High Priority Agents (Phase 3A - v0.1.27-0.1.29)
 
-### Phase 2B: First Multi-Agent Workflow (v0.1.15-0.1.16) ✅ COMPLETE
-[x] Build Macro Lens (Market Strategist) agent - Top-down macro analysis and regime identification → Completed in release-0.1.15.md
-[x] Implement Workflow 1: Comprehensive Investment Analysis (Quill → Macro Lens) → Completed in release-0.1.16.md
-[x] Add workflow command: `/analyze <SYMBOL>` for end-to-end analysis → Completed in release-0.1.16.md
-[x] Build Atlas (Investment Strategist) agent - Strategic asset allocation and portfolio construction → Completed in release-0.1.17.md
+- [ ] **Earnings Whisperer Agent** - Earnings analysis and post-earnings drift opportunities
+  - Leverages Yahoo Finance earnings tools (`get_earnings_history`, `get_earnings_calendar`)
+  - Tracks earnings surprises and analyst estimate revisions
+  - Identifies post-earnings drift patterns
+  - TUI command: `/earnings`
 
+- [ ] **News Sentry Agent** - Real-time event detection and material event monitoring
+  - Leverages SEC 8-K filings (`get_latest_8k`)
+  - Filters market-moving news and SEC filings
+  - Material event categorization (earnings, M&A, management changes)
+  - TUI command: `/news`
 
-## Completed Items
+#### Medium Priority Agents (Phase 3B - v0.1.30-0.1.32)
+
+- [ ] **Risk Shield Manager** - Portfolio risk management and exposure monitoring
+  - Drawdown analysis and limit breach detection
+  - VAR calculations and scenario testing
+  - Risk mitigation strategies
+
+- [ ] **Tax Scout** - Tax optimization and loss harvesting
+  - Tax-loss harvesting opportunities
+  - Wash-sale rule compliance
+  - Year-end tax planning
+
+- [ ] **Hedge Smith** - Options strategies for portfolio protection
+  - Leverages Yahoo Finance options chain (`get_options_chain`)
+  - Protective collar strategies
+  - Covered call yield enhancement
+
+#### Future Multi-Agent Workflows (Phase 3C)
+
+- [ ] **Workflow 2**: Systematic Idea Generation (Screen Forge → Quill → Atlas → Notionist)
+  - Weekly pipeline of investment ideas
+  - Automated screening, research, allocation, and cataloging
+
+- [ ] **Workflow 3**: Extended Investment Analysis (Quill → Macro Lens → Atlas)
+  - Add Atlas to existing /analyze workflow
+  - Complete bottom-up → top-down → allocation pipeline
+
+- [ ] **Workflow 4**: Tax-Efficient Rebalancing
+  - Automated tax-loss harvesting workflow
+  - Integration with rebalancing logic
+
+#### Infrastructure Enhancements
+
+- [ ] **API Caching Layer** (DuckDB)
+  - Cache Yahoo Finance, EDGAR, and other API results
+  - Reduce redundant API calls
+  - Improve response times
+
+- [ ] **Enhanced TUI Features**
+  - Agent selection menu
+  - Active agent in header/status bar
+  - Workflow progress visualization
+
+- [ ] **State Persistence**
+  - PostgreSQL checkpointer for LangGraph workflows
+  - Multi-session conversation continuity
+  - Portfolio state tracking
+
+## Completed Features
 
 All completed features have been moved to their respective release files:
-- `release-0.1.0.md` - Initial package scaffold, CLAUDE.md enhancement, and minimal first release with LangGraph/Anthropic API/TUI/agents
-- `release-0.1.1.md` - PyPI publication
-- `release-0.1.2.md` - Configuration error handling patch
-- `release-0.1.3.md` - CLI command improvement (navam invest)
-- `release-0.1.4.md` - Product vision & architecture documentation
-- `release-0.1.5.md` - Tier 1 API tools expansion (FMP, Treasury, SEC EDGAR) + Agent-tool integration (17 tools, 100% utilization)
-- `release-0.1.6.md` - Secure API key management
-- `release-0.1.7.md` - TUI command enhancements (/quit, /clear, /examples)
-- `release-0.1.8.md` - FMP screener enhancements and bug fixes
-- `release-0.1.9.md` - Local file reading capability
-- `release-0.1.10.md` - NewsAPI.org integration for market news and sentiment
-- `release-0.1.11.md` - Multi-agent architecture specs, API alternatives research, Finnhub integration
-- `release-0.1.12.md` - Tiingo integration for historical fundamentals (IN DEVELOPMENT)
+- `release-0.1.0.md` through `release-0.1.26.md` - See individual release notes
+- Latest: `release-0.1.26.md` - Yahoo Finance integration, enhanced EDGAR tools, Quill/Screen Forge/Macro Lens enhancements
