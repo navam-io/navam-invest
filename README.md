@@ -287,7 +287,8 @@ positioning. Dollar-cost average on dips below $210.
 | **NewsAPI.org** | 3 | Market news, headlines | 1,000 calls/day | |
 | **Anthropic Claude** | - | AI reasoning (Sonnet 4.5) | Pay-as-you-go | |
 
-**Total Free Data**: 7 out of 9 sources require no API key! (Yahoo Finance, SEC, Treasury)
+**Total Free Data**: 3 out of 9 sources require no API key! (Yahoo Finance, SEC, Treasury)
+**Optional APIs**: 5 premium data sources for enhanced coverage (all have free tiers)
 
 ### 💬 **Interactive Terminal UI**
 
