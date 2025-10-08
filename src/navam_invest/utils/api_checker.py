@@ -86,31 +86,6 @@ async def check_newsapi(api_key: str) -> Dict[str, Any]:
         return {"status": "❌ Failed", "details": str(e)[:50]}
 
 
-async def check_fmp(api_key: str) -> Dict[str, Any]:
-    """Test Financial Modeling Prep API."""
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(
-                "https://financialmodelingprep.com/api/v3/quote/AAPL",
-                params={"apikey": api_key},
-                timeout=10.0,
-            )
-            if response.status_code == 200:
-                data = response.json()
-                if isinstance(data, list) and len(data) > 0:
-                    return {"status": "✅ Working", "details": "Successfully fetched quote"}
-                elif isinstance(data, dict) and "Error Message" in data:
-                    return {"status": "❌ Failed", "details": "Access denied or invalid key"}
-                else:
-                    return {"status": "❌ Failed", "details": "Invalid response"}
-            elif response.status_code == 403:
-                return {"status": "❌ Failed", "details": "Access denied - check plan"}
-            else:
-                return {"status": "❌ Failed", "details": f"HTTP {response.status_code}"}
-    except Exception as e:
-        return {"status": "❌ Failed", "details": str(e)[:50]}
-
-
 async def check_finnhub(api_key: str) -> Dict[str, Any]:
     """Test Finnhub API."""
     try:
@@ -208,17 +183,6 @@ async def check_all_apis() -> List[Dict[str, str]]:
             "api": "NewsAPI.org",
             "status": "⚪ Not Configured",
             "details": "Optional - News (1,000/day free)",
-        })
-
-    # FMP (optional)
-    if settings.fmp_api_key:
-        result = await check_fmp(settings.fmp_api_key)
-        results.append({"api": "FMP", **result})
-    else:
-        results.append({
-            "api": "FMP",
-            "status": "⚪ Not Configured",
-            "details": "Optional - Fundamentals (250/day free)",
         })
 
     # Finnhub (optional)

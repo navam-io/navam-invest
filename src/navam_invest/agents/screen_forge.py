@@ -53,7 +53,6 @@ async def create_screen_forge_agent() -> StateGraph:
     tools_with_keys = bind_api_keys_to_tools(
         tools,
         alpha_vantage_key=settings.alpha_vantage_api_key or "",
-        fmp_key=settings.fmp_api_key or "",
         finnhub_key=settings.finnhub_api_key or "",
     )
 

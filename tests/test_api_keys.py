@@ -19,13 +19,6 @@ from navam_invest.tools.alpha_vantage import get_stock_price, get_stock_overview
 # FRED tools
 from navam_invest.tools.fred import get_economic_indicator, get_key_macro_indicators
 
-# FMP tools
-from navam_invest.tools.fmp import (
-    get_company_fundamentals,
-    get_financial_ratios,
-    screen_stocks,
-)
-
 # Finnhub tools
 from navam_invest.tools.finnhub import (
     get_company_news_sentiment,
@@ -80,7 +73,6 @@ class TestEnvironmentVariables:
         keys = {
             "ALPHA_VANTAGE_API_KEY": settings.alpha_vantage_api_key,
             "FRED_API_KEY": settings.fred_api_key,
-            "FMP_API_KEY": settings.fmp_api_key,
             "FINNHUB_API_KEY": settings.finnhub_api_key,
             "NEWSAPI_API_KEY": settings.newsapi_api_key,
             "TIINGO_API_KEY": settings.tiingo_api_key,
@@ -210,25 +202,6 @@ class TestNewsAPI:
             )
         elif "error" in result.lower() and "429" not in result:
             pytest.fail(f"NewsAPI error: {result}")
-
-
-class TestFMPAPI:
-    """Test Financial Modeling Prep API integration."""
-
-    @pytest.mark.asyncio
-    async def test_get_company_fundamentals(self):
-        """Test fetching company fundamentals."""
-        settings = get_settings()
-        if not settings.fmp_api_key:
-            pytest.skip("FMP_API_KEY not set")
-
-        result = await get_company_fundamentals.ainvoke(
-            {"symbol": "AAPL", "api_key": settings.fmp_api_key}
-        )
-        print(f"\n=== FMP Company Fundamentals ===\n{result}")
-
-        assert result is not None
-        assert "AAPL" in result or "error" in result.lower()
 
 
 class TestFinnhubAPI:

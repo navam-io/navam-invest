@@ -21,14 +21,6 @@ from navam_invest.tools.newsapi import (
     search_market_news,
 )
 
-# Financial Modeling Prep tools
-from navam_invest.tools.fmp import (
-    get_company_fundamentals,
-    get_financial_ratios,
-    get_insider_trades,
-    screen_stocks,
-)
-
 # Finnhub tools
 from navam_invest.tools.finnhub import (
     get_company_news_sentiment,
@@ -90,11 +82,6 @@ TOOLS: Dict[str, BaseTool] = {
     # File Reading (Local Data)
     "read_local_file": read_local_file,
     "list_local_files": list_local_files,
-    # Fundamentals (FMP)
-    "get_company_fundamentals": get_company_fundamentals,
-    "get_financial_ratios": get_financial_ratios,
-    "get_insider_trades": get_insider_trades,
-    "screen_stocks": screen_stocks,
     # Alternative Data & Sentiment (Finnhub)
     "get_company_news_sentiment": get_company_news_sentiment,
     "get_social_sentiment": get_social_sentiment,
@@ -167,10 +154,6 @@ def get_tools_by_category(category: str) -> List[BaseTool]:
         ],
         "files": ["read_local_file", "list_local_files"],
         "fundamentals": [
-            "get_company_fundamentals",
-            "get_financial_ratios",
-            "get_insider_trades",
-            "screen_stocks",
             "get_fundamentals_daily",
             "get_fundamentals_statements",
             "get_fundamentals_definitions",
@@ -249,11 +232,8 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_stock_price",
             "get_stock_overview",
             "get_historical_data",
-            # Fundamentals (Yahoo Finance + FMP + Tiingo)
+            # Fundamentals (Yahoo Finance + Tiingo)
             "get_financials",
-            "get_company_fundamentals",
-            "get_financial_ratios",
-            "get_insider_trades",
             "get_fundamentals_daily",
             "get_fundamentals_statements",
             "get_fundamentals_definitions",
@@ -301,9 +281,9 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             # News for earnings context
             "get_company_news",
             "get_finnhub_company_news",
-            # Fundamentals for earnings quality checks
+            # Fundamentals for earnings quality checks (Yahoo Finance)
             "get_financials",
-            "get_financial_ratios",
+            "get_company_info",
         ],
         # Screen Forge (Equity Screening): Systematic screening, idea generation
         "screen_forge": [
@@ -312,11 +292,9 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_stock_price",
             "get_stock_overview",
             "get_historical_data",
-            # Screening and fundamentals
-            "screen_stocks",
-            "get_company_fundamentals",
-            "get_financial_ratios",
+            # Fundamentals (Yahoo Finance)
             "get_financials",
+            "get_company_info",
             # Sentiment for conviction signals
             "get_company_news_sentiment",
             "get_social_sentiment",
@@ -356,9 +334,9 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_treasury_rate",
             "get_treasury_yield_spread",
             "get_debt_to_gdp",
-            # Fundamentals for equity allocation insights
-            "get_company_fundamentals",
-            "get_financial_ratios",
+            # Fundamentals for equity allocation insights (Yahoo Finance)
+            "get_financials",
+            "get_company_info",
             # Market news for allocation context
             "search_market_news",
             "get_top_financial_headlines",
@@ -371,11 +349,9 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             # Market data
             "get_stock_price",
             "get_stock_overview",
-            # Fundamentals
-            "get_company_fundamentals",
-            "get_financial_ratios",
-            "get_insider_trades",
-            "screen_stocks",
+            # Fundamentals (Yahoo Finance + Tiingo)
+            "get_financials",
+            "get_company_info",
             "get_fundamentals_daily",
             "get_fundamentals_statements",
             "get_historical_fundamentals",
@@ -439,7 +415,6 @@ def _create_bound_wrapper(original_func, api_key: str):
 def bind_api_keys_to_tools(
     tools: List[BaseTool],
     alpha_vantage_key: str = "",
-    fmp_key: str = "",
     finnhub_key: str = "",
     tiingo_key: str = "",
     fred_key: str = "",
@@ -453,7 +428,6 @@ def bind_api_keys_to_tools(
     Args:
         tools: List of tools to bind API keys to
         alpha_vantage_key: Alpha Vantage API key
-        fmp_key: Financial Modeling Prep API key
         finnhub_key: Finnhub API key
         tiingo_key: Tiingo API key
         fred_key: FRED API key
@@ -482,24 +456,6 @@ def bind_api_keys_to_tools(
                 bound_tools.append(bound_tool)
             else:
                 bound_tools.append(tool)  # Keep original if no key
-
-        # FMP tools
-        elif tool_name in [
-            "get_company_fundamentals",
-            "get_financial_ratios",
-            "get_insider_trades",
-            "screen_stocks",
-        ]:
-            if fmp_key and callable_func:
-                bound_func = _create_bound_wrapper(callable_func, fmp_key)
-                bound_tool = StructuredTool.from_function(
-                    coroutine=bound_func,
-                    name=tool.name,
-                    description=tool.description,
-                )
-                bound_tools.append(bound_tool)
-            else:
-                bound_tools.append(tool)
 
         # Finnhub tools
         elif tool_name in [
@@ -587,11 +543,6 @@ __all__ = [
     # File Reading
     "read_local_file",
     "list_local_files",
-    # FMP
-    "get_company_fundamentals",
-    "get_financial_ratios",
-    "get_insider_trades",
-    "screen_stocks",
     # Finnhub
     "get_company_news_sentiment",
     "get_social_sentiment",

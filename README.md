@@ -273,22 +273,21 @@ support) but late-cycle macro timing suggests cautious
 positioning. Dollar-cost average on dips below $210.
 ```
 
-### 📊 **Data Sources** (36 Tools Across 10+ APIs)
+### 📊 **Data Sources** (32 Tools Across 9 APIs)
 
 | Data Source | Tools | Purpose | Cost | New in v0.1.26 |
 |-------------|-------|---------|------|----------------|
 | **Yahoo Finance** 🆕 | 11 | Real-time quotes, earnings, analyst ratings, ownership | **FREE** | ✅ |
 | **SEC EDGAR** 🔄 | 9 | Corporate filings (10-K, 10-Q, 8-K), XBRL, insider transactions | **FREE** | ✅ 4 new |
-| **Financial Modeling Prep** | 4 | Financial statements, ratios, screening | 250 calls/day | |
 | **Tiingo** | 4 | Historical fundamentals (5yr), quarterly data | 50 symbols/hr | |
 | **Finnhub** | 5 | News/social/insider sentiment, analyst ratings | 60 calls/min | |
 | **Alpha Vantage** | 2 | Stock prices, company overviews | 25-500 calls/day | |
 | **FRED (St. Louis Fed)** | 2 | Economic indicators, macro data | Unlimited | |
 | **U.S. Treasury** | 4 | Yield curves, treasury rates | Unlimited | |
-| **NewsAPI.org** | 3 | Market news, headlines | 100 calls/day | |
+| **NewsAPI.org** | 3 | Market news, headlines | 1,000 calls/day | |
 | **Anthropic Claude** | - | AI reasoning (Sonnet 4.5) | Pay-as-you-go | |
 
-**Total Free Data**: 7 out of 10 sources require no API key! (Yahoo Finance, SEC, Treasury)
+**Total Free Data**: 7 out of 9 sources require no API key! (Yahoo Finance, SEC, Treasury)
 
 ### 💬 **Interactive Terminal UI**
 
@@ -361,7 +360,6 @@ pip install -e ".[dev]"
 
    # Optional (but recommended for full functionality)
    ALPHA_VANTAGE_API_KEY=your_key_here
-   FMP_API_KEY=your_key_here
    TIINGO_API_KEY=your_key_here
    FINNHUB_API_KEY=your_key_here
    FRED_API_KEY=your_key_here
@@ -386,7 +384,6 @@ pip install -e ".[dev]"
    | **SEC EDGAR** | - | Unlimited, no key needed | ✅ Built-in |
    | **U.S. Treasury** | - | Unlimited, no key needed | ✅ Built-in |
    | **Alpha Vantage** | [alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key) | 25 calls/day | Optional |
-   | **FMP** | [financialmodelingprep.com/developer](https://financialmodelingprep.com/developer) | 250 calls/day | Optional |
    | **Tiingo** | [tiingo.com](https://www.tiingo.com/) | 50 symbols/hr, 5yr history | Optional |
    | **Finnhub** | [finnhub.io/register](https://finnhub.io/register) | 60 calls/min | Optional |
    | **FRED** | [fredaccount.stlouisfed.org/apikeys](https://fredaccount.stlouisfed.org/apikeys) | Unlimited | Optional |
@@ -624,7 +621,7 @@ Macro risk: Recession could compress P/E multiple to 24-26x (historical
 trough), implying 15-20% downside risk from current levels.
 
 **Data Sources**:
-- Fundamentals: Yahoo Finance (earnings, analysts, quotes), FMP (ratios)
+- Fundamentals: Yahoo Finance (earnings, analysts, quotes, financials), Tiingo (historical)
 - Macro: FRED (GDP, CPI, unemployment), U.S. Treasury (yield curve)
 - Market: Yahoo Finance (indices), NewsAPI (sentiment)
 ```
@@ -729,7 +726,6 @@ deep-dive analysis on top value candidate.
 - **[LangGraph](https://langchain-ai.github.io/langgraph/)**: Agent orchestration framework
 - **[Yahoo Finance (yfinance)](https://github.com/ranaroussi/yfinance)**: Free market data library 🆕
 - **[Alpha Vantage](https://www.alphavantage.co/documentation/)**: Stock market data
-- **[FMP](https://site.financialmodelingprep.com/developer/docs)**: Financial statements & screening
 - **[Tiingo](https://www.tiingo.com/documentation/)**: Historical fundamentals
 - **[Finnhub](https://finnhub.io/docs/api)**: Alternative data & sentiment
 - **[FRED](https://fred.stlouisfed.org/docs/api/fred/)**: Economic indicators
@@ -821,7 +817,7 @@ This project is licensed under the MIT License - see [LICENSE](LICENSE) file for
 - **[LangChain](https://www.langchain.com/)** - Agent framework ecosystem
 - **[Textual](https://textual.textualize.io/)** - Modern terminal UI framework
 - **[yfinance](https://github.com/ranaroussi/yfinance)** - Free Yahoo Finance API wrapper 🆕
-- **Data Providers** - Yahoo Finance, SEC, Treasury, Alpha Vantage, FMP, Tiingo, Finnhub, FRED, NewsAPI
+- **Data Providers** - Yahoo Finance, SEC, Treasury, Alpha Vantage, Tiingo, Finnhub, FRED, NewsAPI
 
 ---
 

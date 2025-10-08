@@ -60,7 +60,6 @@ async def create_investment_analysis_workflow() -> StateGraph:
     quill_tools_with_keys = bind_api_keys_to_tools(
         quill_tools,
         alpha_vantage_key=settings.alpha_vantage_api_key or "",
-        fmp_key=settings.fmp_api_key or "",
         finnhub_key=settings.finnhub_api_key or "",
         tiingo_key=settings.tiingo_api_key or "",
         newsapi_key=settings.newsapi_api_key or "",

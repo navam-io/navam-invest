@@ -49,7 +49,6 @@ async def create_earnings_whisperer_agent() -> StateGraph:
     tools_with_keys = bind_api_keys_to_tools(
         tools,
         alpha_vantage_key=settings.alpha_vantage_api_key or "",
-        fmp_key=settings.fmp_api_key or "",
         newsapi_key=settings.newsapi_api_key or "",
     )
 
