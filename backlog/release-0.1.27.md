@@ -1,7 +1,7 @@
 # Release 0.1.27
 
 ## Status
-COMPLETE - Ready for PyPI publication
+✅ **PUBLISHED** - October 07, 2025
 
 ## Features
 
@@ -67,7 +67,15 @@ Added specialized Earnings Whisperer agent for earnings surprise analysis, post-
 ---
 
 ## Release Date
-TBD
+October 07, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.27/
+
+## Installation
+
+```bash
+pip install navam-invest==0.1.27
+# or
+pip install --upgrade navam-invest
+```
