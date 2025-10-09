@@ -164,6 +164,10 @@
   },
   "active": "0478eab2742cd08b",
   "lastOpenFiles": [
+    "pyproject.toml.tmp.22041.1760019661446",
+    "backlog/release-0.1.34.md",
+    "dist/navam_invest-0.1.33-py3-none-any.whl",
+    "dist/navam_invest-0.1.33.tar.gz",
     "src/navam_invest/tui/app.py.tmp.22041.1760019162242",
     "src/navam_invest/tui/app.py.tmp.22041.1760019161683",
     "src/navam_invest/tui/app.py.tmp.22041.1760019161410",
@@ -173,8 +177,6 @@
     "tests/test_risk_shield.py",
     "src/navam_invest/agents/risk_shield.py",
     "backlog/release-0.1.33.md",
-    "dist/navam_invest-0.1.32-py3-none-any.whl",
-    "dist/navam_invest-0.1.32.tar.gz",
     "docs/CLAUDE_MD_UPDATES.md",
     "docs/REORGANIZATION_SUMMARY.md",
     "DOCUMENTATION_REORGANIZATION.md",
@@ -190,7 +192,6 @@
     "docs/development/newsapi-updates.md",
     "docs/development/api-status-report.md",
     "docs/development/api-command-implementation.md",
-    "docs/development",
     "backlog/release-0.1.32.md",
     "backlog/release-0.1.31.md",
     "backlog/release-0.1.30.md",
@@ -198,7 +199,6 @@
     "backlog/release-0.1.29.md",
     "API_COMMAND_IMPLEMENTATION.md",
     "refer/specs/api-status-command.md",
-    "refer/specs/newsapi-comparison.md",
-    "NEWSAPI_DOCUMENTATION_UPDATES.md"
+    "refer/specs/newsapi-comparison.md"
   ]
 }
