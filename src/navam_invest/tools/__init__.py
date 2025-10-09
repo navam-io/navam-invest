@@ -285,6 +285,28 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_financials",
             "get_company_info",
         ],
+        # News Sentry (Event Monitoring): Real-time event detection, material events, insider trading
+        "news_sentry": [
+            # Material events (8-K filings)
+            "get_latest_8k",
+            "search_filings_by_form",
+            "search_company_by_ticker",
+            # Insider trading activity (Form 4)
+            "get_insider_transactions",
+            # Breaking news monitoring
+            "search_market_news",
+            "get_top_financial_headlines",
+            "get_company_news",
+            "get_finnhub_company_news",
+            # Sentiment analysis
+            "get_company_news_sentiment",
+            # Analyst rating changes
+            "get_analyst_recommendations",
+            "get_recommendation_trends",
+            # Market data for event-driven price action
+            "get_quote",
+            "get_historical_data",
+        ],
         # Screen Forge (Equity Screening): Systematic screening, idea generation
         "screen_forge": [
             # Market data for validation (Yahoo Finance + Alpha Vantage)

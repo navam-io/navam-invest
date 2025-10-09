@@ -656,13 +656,21 @@ Input: [Ask about stocks or economic indicators...] (cursor auto-focused)
 
 ## 📚 Documentation
 
-### Official Resources
+### User Documentation
+
+- 🚀 **[Getting Started](docs/user-guide/getting-started.md)** - Installation, setup, and first queries
+- ❓ **[FAQ](docs/faq.md)** - Comprehensive Q&A covering all features
+- 🤖 **[Agents Guide](docs/user-guide/agents.md)** - Complete agent reference
+- 🔀 **[Multi-Agent Workflows](docs/user-guide/multi-agent-workflows.md)** - Agent collaboration patterns
+- 🛠️ **[API Tools](docs/user-guide/api-tools.md)** - Data sources and tool capabilities
+
+### Developer Resources
 
 - **[GitHub Repository](https://github.com/navam-io/navam-invest)** - Source code, issues, PRs
 - **[PyPI Package](https://pypi.org/project/navam-invest/)** - Latest releases
 - **[Release Notes](backlog/)** - Detailed changelog for each version
-- **[Integration Guide](backlog/edgar-yahoo-integration.md)** - Yahoo Finance + EDGAR integration
-- **[Architecture Specs](refer/specs/)** - Technical design documents
+- **[Architecture](docs/architecture/about.md)** - System design and technical overview
+- **[Development Docs](docs/development/)** - Implementation notes
 - **[LangGraph Guide](refer/langgraph/)** - Multi-agent patterns & best practices
 
 ### API Documentation

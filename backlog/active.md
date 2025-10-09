@@ -21,10 +21,12 @@ Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integratio
   - Troubleshooting tips and error diagnosis
   - Documentation clarifying NewsAPI.org vs NewsAPI.ai
 
-- [ ] **News Sentry Agent** - Real-time event detection and material event monitoring
-  - Leverages SEC 8-K filings (`get_latest_8k`)
-  - Filters market-moving news and SEC filings
-  - Material event categorization (earnings, M&A, management changes)
+- [x] **News Sentry Agent** - Real-time event detection and material event monitoring → Completed in release-0.1.32.md
+  - Leverages SEC 8-K filings (`get_latest_8k`), Form 4 insider trades (`get_insider_transactions`)
+  - Filters market-moving news and SEC filings with event prioritization (CRITICAL/HIGH/MEDIUM/LOW)
+  - Material event categorization (earnings, M&A, management changes, bankruptcy)
+  - Breaking news with sentiment analysis and insider trading alerts
+  - Analyst rating change tracking with actionability scoring (1-10 scale)
   - TUI command: `/news`
 
 #### Medium Priority Agents (Phase 3B - v0.1.30-0.1.32)

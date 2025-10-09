@@ -17,6 +17,7 @@ from navam_invest.agents.quill import create_quill_agent
 from navam_invest.agents.screen_forge import create_screen_forge_agent
 from navam_invest.agents.macro_lens import create_macro_lens_agent
 from navam_invest.agents.earnings_whisperer import create_earnings_whisperer_agent
+from navam_invest.agents.news_sentry import create_news_sentry_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
@@ -88,6 +89,17 @@ EARNINGS_WHISPERER_EXAMPLES = [
     "Analyze META's earnings momentum and recommend a trade",
 ]
 
+NEWS_SENTRY_EXAMPLES = [
+    "What material events (8-K filings) happened at TSLA in the last 30 days?",
+    "Show me recent insider trading activity (Form 4) for AAPL",
+    "Are there any breaking news events for NVDA that I should know about?",
+    "Track analyst rating changes for MSFT over the past week",
+    "Monitor GOOGL for material corporate events - any M&A, management changes?",
+    "Alert me to any critical events for META - bankruptcy, CEO changes, etc.",
+    "What's the sentiment around recent AMZN news?",
+    "Check for insider buying clusters in tech stocks",
+]
+
 WORKFLOW_EXAMPLES = [
     "/analyze AAPL - Complete investment analysis (fundamental + macro)",
     "/analyze MSFT - Should I invest? Get both bottom-up and top-down view",
@@ -132,6 +144,8 @@ class ChatUI(App):
         self.quill_agent: Optional[object] = None
         self.screen_forge_agent: Optional[object] = None
         self.macro_lens_agent: Optional[object] = None
+        self.earnings_whisperer_agent: Optional[object] = None
+        self.news_sentry_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
@@ -167,6 +181,7 @@ class ChatUI(App):
                 "- `/screen` - Switch to Screen Forge screening agent\n"
                 "- `/macro` - Switch to Macro Lens market strategist\n"
                 "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
+                "- `/news` - Switch to News Sentry event monitoring agent\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
@@ -187,10 +202,11 @@ class ChatUI(App):
             self.screen_forge_agent = await create_screen_forge_agent()
             self.macro_lens_agent = await create_macro_lens_agent()
             self.earnings_whisperer_agent = await create_earnings_whisperer_agent()
+            self.news_sentry_agent = await create_news_sentry_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
             self.sub_title = f"Agent: {self.current_agent.title()} | Ready"
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer)[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry)[/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -276,6 +292,10 @@ class ChatUI(App):
                 agent = self.earnings_whisperer_agent
                 agent_name = "Earnings Whisperer"
                 report_type = "earnings"
+            elif self.current_agent == "news":
+                agent = self.news_sentry_agent
+                agent_name = "News Sentry"
+                report_type = "news_monitoring"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -375,7 +395,8 @@ class ChatUI(App):
                 "quill": "Quill",
                 "screen": "Screen Forge",
                 "macro": "Macro Lens",
-                "earnings": "Earnings Whisperer"
+                "earnings": "Earnings Whisperer",
+                "news": "News Sentry"
             }
             agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
             self.sub_title = f"Agent: {agent_name} | Ready"
@@ -546,6 +567,7 @@ class ChatUI(App):
                     "- `/screen` - Switch to Screen Forge screening agent\n"
                     "- `/macro` - Switch to Macro Lens market strategist\n"
                     "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
+                    "- `/news` - Switch to News Sentry event monitoring agent\n"
                     "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                     "- `/api` - Check API connectivity and status\n"
                     "- `/examples` - Show example prompts for current agent\n"
@@ -578,6 +600,10 @@ class ChatUI(App):
             self.current_agent = "earnings"
             self.sub_title = "Agent: Earnings Whisperer | Ready"
             chat_log.write("\n[green]✓ Switched to Earnings Whisperer agent[/green]\n")
+        elif command == "/news":
+            self.current_agent = "news"
+            self.sub_title = "Agent: News Sentry | Ready"
+            chat_log.write("\n[green]✓ Switched to News Sentry (Event Monitoring) agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -598,6 +624,9 @@ class ChatUI(App):
             elif self.current_agent == "earnings":
                 examples = EARNINGS_WHISPERER_EXAMPLES
                 agent_name = "Earnings Whisperer"
+            elif self.current_agent == "news":
+                examples = NEWS_SENTRY_EXAMPLES
+                agent_name = "News Sentry (Event Monitoring)"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"

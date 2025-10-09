@@ -5,16 +5,29 @@ IN DEVELOPMENT
 
 ## Features
 
+### ✅ Completed Features
+
+**News Sentry Agent** - Real-time event detection and material event monitoring
+- **Material Event Detection**: Monitors SEC 8-K filings for earnings, M&A, management changes, bankruptcy
+- **Breaking News Monitoring**: Real-time news with sentiment analysis and market impact assessment
+- **Insider Trading Alerts**: Tracks Form 4 filings (officer/director/10%+ shareholder transactions)
+- **Analyst Action Tracking**: Monitors recommendation changes, upgrades/downgrades, price target revisions
+- **Event Categorization**: Classifies events as CRITICAL, HIGH, MEDIUM, LOW priority
+- **Actionability Ranking**: Scores events on 1-10 scale for trading/investment relevance
+- **TUI Integration**: `/news` command to activate News Sentry agent
+- **Example Prompts**: Pre-configured event monitoring examples in TUI
+- **Comprehensive Testing**: Unit tests for agent initialization and tool registration
+- **Tools Integration**: Leverages existing 8-K, Form 4, news, and analyst tools
+
+**Implementation Details**:
+- File: `src/navam_invest/agents/news_sentry.py`
+- Agent Type: LangGraph-based stateful agent
+- Tools: 13 specialized tools (8-K filings, Form 4, NewsAPI, Finnhub, analyst data)
+- Test Coverage: `tests/test_news_sentry.py`
+
 ### 🚧 Planned Features
 
 Based on v0.1.31 foundation (enhanced TUI UX, full response delivery):
-
-**High Priority**:
-- **News Sentry** agent (real-time event detection and material event monitoring)
-  - 8-K filing alerts for material events
-  - Breaking news monitoring with sentiment analysis
-  - Insider trading activity detection
-  - Analyst rating changes tracking
 
 - **Enhanced Multi-Agent Workflows**
   - Extend `/analyze` workflow with additional agents (News Sentry, Risk Shield)
