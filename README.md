@@ -2,550 +2,514 @@
 
 # 🧠 Navam Invest
 
-**AI-Powered Investment Advisory for Retail Investors**
+**AI-Powered Investment Intelligence for Retail Investors**
 
 [![PyPI version](https://badge.fury.io/py/navam-invest.svg)](https://badge.fury.io/py/navam-invest)
 [![Python Version](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Downloads](https://static.pepy.tech/badge/navam-invest)](https://pepy.tech/project/navam-invest)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-[Features](#-features) •
+Institutional-grade portfolio intelligence powered by specialized AI agents
+Built on [LangGraph](https://langchain-ai.github.io/langgraph/) • Powered by [Anthropic Claude](https://www.anthropic.com/claude)
+
 [Quick Start](#-quick-start) •
+[Features](#-key-features) •
 [AI Agents](#-specialized-ai-agents) •
-[Examples](#-example-workflows) •
 [Documentation](#-documentation) •
-[Roadmap](#-roadmap)
+[Examples](#-example-workflows)
 
 </div>
 
 ---
 
-## 📖 Overview
+## 🎯 What is Navam Invest?
 
-**Navam Invest** brings **institutional-grade portfolio intelligence** to individual retail investors managing $50K-$1M portfolios. Built on [LangGraph](https://langchain-ai.github.io/langgraph/) and powered by [Anthropic's Claude](https://www.anthropic.com/claude), it replaces traditional wealth management fees (1% AUM) with a team of **specialized AI agents** that collaborate through **multi-agent workflows** for equity research, systematic screening, macro analysis, earnings tracking, and portfolio management—all accessible through an interactive terminal interface.
+**Replace $1,000-$10,000/year wealth management fees with AI agents that research, analyze, and explain investment decisions in plain English.**
 
-### Why Navam Invest?
+Navam Invest is an **open-source AI investment advisory platform** designed for retail investors managing $50K-$1M portfolios. Instead of paying 1% AUM fees, you get a **team of 7 specialized AI agents** that collaborate through multi-agent workflows—all running locally with your API keys, using free public data.
+
+### Why Choose Navam Invest?
 
 <table>
 <tr>
-<td width="33%" align="center">
+<td width="50%">
 
-**🤖 Multi-Agent Intelligence**
-
-7 specialized AI agents orchestrated by LangGraph for coordinated analysis
-
-</td>
-<td width="33%" align="center">
-
-**📊 Institutional Data**
-
-Yahoo Finance + SEC EDGAR + 7 premium APIs (all free tiers)
+**🏦 Institutional Intelligence, Retail Access**
+- 7 specialized AI agents (equity research, earnings analysis, macro strategy)
+- Multi-agent workflows that combine bottom-up + top-down analysis
+- Same frameworks used by professional analysts
 
 </td>
-<td width="33%" align="center">
+<td width="50%">
 
-**🔒 Privacy-First**
-
-Runs locally with your API keys—your data stays yours
+**💰 Zero Lock-In, Maximum Value**
+- Core features work with 100% free APIs (Yahoo Finance + SEC EDGAR)
+- No subscriptions, no recurring fees
+- Your data stays yours—runs completely locally
 
 </td>
 </tr>
 <tr>
-<td width="33%" align="center">
+<td width="50%">
 
-**💡 Explainable AI**
-
-Full audit trails and transparent reasoning with real-time streaming
-
-</td>
-<td width="33%" align="center">
-
-**🆓 Zero Lock-In**
-
-Yahoo Finance + EDGAR require no API keys, core tools always free
+**🔍 Transparent & Explainable**
+- Watch AI agents reason in real-time
+- Full audit trails of tool calls and data sources
+- Educational explanations, not black-box recommendations
 
 </td>
-<td width="33%" align="center">
+<td width="50%">
 
-**🔧 Extensible**
-
-Modular architecture for custom agents and workflows
+**⚡ Production-Ready Today**
+- Interactive terminal UI (TUI) with real-time streaming
+- 32 tools across 9 APIs (3 require zero setup)
+- Auto-save reports, multi-agent orchestration
 
 </td>
 </tr>
 </table>
-
-### Architecture at a Glance
-
-```mermaid
-graph LR
-    A[You] -->|Natural Language| B[Textual TUI]
-    B --> C{LangGraph Orchestrator}
-    C --> D[Quill<br/>Equity Research]
-    C --> E[Earnings Whisperer<br/>Earnings Analysis]
-    C --> F[Screen Forge<br/>Stock Screening]
-    C --> G[Macro Lens<br/>Market Strategist]
-    C --> H[Atlas<br/>Asset Allocation]
-    D --> I[Yahoo Finance]
-    D --> J[SEC EDGAR]
-    D --> K[Tiingo]
-    E --> I
-    F --> I
-    F --> L[Finnhub]
-    G --> M[FRED]
-    G --> N[U.S. Treasury]
-    style C fill:#f9f,stroke:#333,stroke-width:4px
-    style I fill:#9f9,stroke:#333,stroke-width:2px
-    style J fill:#9f9,stroke:#333,stroke-width:2px
-```
-
-**Stack**: LangGraph (orchestration) → LangChain (tools) → Claude (reasoning) → Textual (TUI) → yfinance/httpx (data)
 
 ---
 
-## ✨ Features
+## ✨ Key Features
 
-### 🤖 Specialized AI Agents
+### 🤖 7 Specialized AI Agents
 
-> **Each agent is purpose-built with 10-36 specialized tools and expert system prompts**
+Each agent is purpose-built with curated tools and expert system prompts:
 
-<details open>
-<summary><h4>⭐ Quill - Equity Research Analyst</h4></summary>
-
-**Deep fundamental analysis & investment thesis building**
-
-**Core Capabilities**:
-- 📊 **Valuation Models**: DCF, comparable company analysis, P/E/P/B/P/S ratios
-- 📈 **Financial Analysis**: 5-year trends (revenue, margins, ROIC, FCF, debt ratios)
-- 💰 **Earnings Tracking**: Historical earnings, analyst estimates, surprise analysis
-- 🎯 **Analyst Coverage**: Consensus ratings, price targets, upgrades/downgrades
-- 🏢 **Ownership Tracking**: Institutional holders, insider transactions (Form 4)
-- 📋 **SEC Filings**: 10-K, 10-Q, 8-K material events, XBRL structured data
-- 💵 **Dividends**: Yield, payout ratios, dividend history, sustainability
-- 📰 **News Validation**: Company-specific news with sentiment analysis
-
-**Tools**: 36 specialized tools across Yahoo Finance, SEC EDGAR, Tiingo, Finnhub, NewsAPI
-
-**Command**: `/quill`
-
-**Example Query**:
-> "Analyze AAPL with focus on recent earnings trends, institutional ownership, and material events from 8-K filings"
-
-</details>
-
-<details>
-<summary><h4>📊 Earnings Whisperer - Earnings Specialist</h4></summary>
-
-**Earnings surprise analysis & post-earnings drift detection**
-
-**Core Capabilities**:
-- 🎯 **Historical Analysis**: 4-8 quarter earnings surprise tracking
-- 📈 **Drift Detection**: 1-3 day post-earnings momentum patterns
-- 🔄 **Analyst Revisions**: Estimate changes and rating updates post-earnings
-- ✅ **Quality Assessment**: Revenue vs. EPS beats, non-recurring items
-- 📅 **Calendar Monitoring**: Upcoming earnings with probability scoring
-- 🏆 **Pattern Recognition**: Consistent beaters, accelerating beats, quality issues
-- 💹 **Trading Signals**: BUY (drift play), HOLD (wait), SELL (negative momentum)
-
-**Tools**: 14 specialized tools across Yahoo Finance, SEC, Finnhub
-
-**Command**: `/earnings`
-
-**Example Query**:
-> "Analyze NVDA earnings history - is there a post-earnings drift opportunity?"
-
-</details>
-
-<details>
-<summary><h4>🔍 Screen Forge - Equity Screener</h4></summary>
-
-**Systematic stock discovery & idea generation**
-
-**Core Capabilities**:
-- 📐 **Multi-Factor Screening**: Value, growth, quality, momentum factors
-- 🎯 **Systematic Discovery**: Weekly watchlist generation with factor-based ranking
-- 📈 **Earnings Momentum**: Consistent earnings beat screening
-- ⬆️ **Analyst Activity**: Upgrade/downgrade filtering
-- 💬 **Sentiment Validation**: News and social sentiment checks
-- 🔗 **Integration**: Seamless handoff to Quill for deep-dive analysis
-
-**Tools**: 15 specialized tools across Yahoo Finance, Finnhub, Alpha Vantage
-
-**Command**: `/screen`
-
-**Example Query**:
-> "Screen for stocks with consistent earnings beats over last 3 quarters and analyst upgrades"
-
-</details>
-
-<details>
-<summary><h4>🌍 Macro Lens - Market Strategist</h4></summary>
-
-**Top-down macro analysis & regime identification**
-
-**Core Capabilities**:
-- 🔄 **Economic Cycles**: 4-phase regime analysis (early/mid/late expansion, recession)
-- 📈 **Yield Curve**: Interpretation and recession signal detection (inversions)
-- 🏭 **Sector Allocation**: Macro-driven sector positioning guidance
-- 📊 **Factor Recommendations**: Value vs. growth, size, low-volatility tilts
-- 📉 **Macro Tracking**: Inflation, GDP growth, employment, Fed policy
-- 📊 **Market Indices**: S&P 500, Nasdaq, VIX for regime correlation
-- 💹 **Interest Rates**: Fed funds, treasury rates, spreads
-
-**Tools**: 13 specialized tools across FRED, U.S. Treasury, Yahoo Finance, NewsAPI
-
-**Command**: `/macro`
-
-**Example Query**:
-> "What's the current macro regime and which sectors should I overweight?"
-
-</details>
-
-<details>
-<summary><h4>🗺️ Atlas - Investment Strategist</h4></summary>
-
-**Strategic asset allocation & portfolio construction**
-
-**Core Capabilities**:
-- 📋 **IPS Development**: Investment Policy Statement creation
-- 🎯 **Asset Allocation**: Strategic allocation frameworks (stocks/bonds/alternatives)
-- 📊 **Risk Profiling**: Conservative/Moderate/Aggressive tolerance assessment
-- 🔄 **Tactical Tilts**: Macro-driven portfolio adjustments
-- ⚖️ **Rebalancing**: Threshold-based, calendar-based, tax-aware strategies
-- 🏗️ **Construction**: Portfolio building with constraint optimization
-
-**Tools**: 12 specialized tools across all data sources
-
-**Command**: `/atlas`
-
-**Example Query**:
-> "Create an IPS for moderate risk tolerance with $100k portfolio"
-
-</details>
-
-<details>
-<summary><h4>📁 Portfolio & Research (Legacy)</h4></summary>
-
-**Backward-compatible general-purpose agents**
-
-- **Portfolio** (`/portfolio`): 24 tools for quotes, fundamentals, news, SEC filings
-- **Research** (`/research`): 10 tools for macro indicators, yield curves, FRED data
-
-*Note: Will be phased out in v0.2.0 in favor of specialized agents*
-
-</details>
+| Agent | Purpose | Tools | Use Case |
+|-------|---------|-------|----------|
+| **[Quill](#-quill---equity-research-analyst)** | Deep fundamental research | 36 | "Analyze AAPL with DCF valuation and insider activity" |
+| **[Earnings Whisperer](#-earnings-whisperer---earnings-specialist)** | Earnings surprise analysis | 14 | "Find post-earnings drift opportunities in NVDA" |
+| **[Screen Forge](#-screen-forge---equity-screener)** | Systematic stock screening | 15 | "Screen for stocks with 3+ consecutive earnings beats" |
+| **[Macro Lens](#-macro-lens---market-strategist)** | Top-down macro analysis | 13 | "What's the current economic regime for tech stocks?" |
+| **[News Sentry](#-news-sentry---real-time-event-monitor)** | Real-time event detection | 13 | "Alert me to material 8-K filings and insider trades" |
+| **[Atlas](#-atlas---investment-strategist)** | Strategic asset allocation | 12 | "Create an IPS for $200K portfolio" |
+| **Portfolio/Research** | Legacy general-purpose | 24/10 | Backward compatibility (will be phased out) |
 
 ### 🔀 Multi-Agent Workflows
 
-> **Coordinated agent collaboration combining specialized expertise**
+**Agents don't just answer questions—they collaborate:**
 
-#### Investment Analysis Workflow
+```bash
+/analyze MSFT
 
-**Command**: `/analyze <SYMBOL>`
-
-**Sequential Orchestration**: Quill (bottom-up) → Macro Lens (top-down) → Synthesis
-
-<table>
-<tr>
-<td width="33%">
-
-**Step 1: Fundamental Analysis**
-
-Quill performs bottom-up analysis:
-- Business overview
-- Financial health (5-year trends)
-- Valuation (P/E, DCF)
-- Earnings trends
-- Analyst sentiment
-- Investment thesis
-
-</td>
-<td width="33%">
-
-**Step 2: Macro Validation**
-
-Macro Lens validates timing:
-- Receives Quill's thesis
-- Assesses macro regime
-- Evaluates sector positioning
-- Validates entry point
-- Market indices correlation
-
-</td>
-<td width="33%">
-
-**Step 3: Synthesis**
-
-Combined recommendation:
-- Overall rating (BUY/HOLD/SELL)
-- Confidence level
-- Key reasoning from both agents
-- Risk warnings
-- Suggested action
-
-</td>
-</tr>
-</table>
-
-**Example Output**:
-```
-/analyze AAPL
-
-📊 Quill analyzing fundamentals...
-  ✓ Strong earnings momentum (+3% avg beat, 4 qtrs)
-  ✓ 81% analyst buy ratings, $248 mean target (+9% upside)
-
-🌍 Macro Lens validating timing...
-  ✓ Late expansion phase, inverted yield curve (-0.54%)
-  ⚠️ Tech sector vulnerability (Nasdaq -8% from highs)
-
-🎯 Final Recommendation: HOLD - Medium Confidence
-Apple shows strong fundamentals but late-cycle macro timing
-suggests cautious positioning. Dollar-cost average on dips below $210.
+# 1. Quill performs bottom-up fundamental analysis
+#    → Financial health, valuation, earnings trends
+# 2. Macro Lens validates with top-down regime analysis
+#    → Economic cycles, sector positioning, yield curve
+# 3. Final synthesis combines both perspectives
+#    → BUY/HOLD/SELL with confidence level and reasoning
 ```
 
-### 📊 Data Sources
+**Result**: Institutional-quality investment analysis in seconds, not hours.
 
-**32 tools across 9 APIs** (3 completely free, 6 with generous free tiers)
+### 📊 Free & Premium Data Sources
 
-| Data Source | Tools | Purpose | Free Tier | Cost |
-|-------------|-------|---------|-----------|------|
-| **Yahoo Finance** 🆓 | 11 | Real-time quotes, earnings, analyst ratings, ownership | Unlimited | **FREE** |
-| **SEC EDGAR** 🆓 | 9 | Corporate filings (10-K, 10-Q, 8-K), XBRL, insider transactions | Unlimited | **FREE** |
-| **U.S. Treasury** 🆓 | 4 | Yield curves, treasury rates | Unlimited | **FREE** |
-| **Tiingo** | 4 | Historical fundamentals (5yr), quarterly data | 50 symbols/hr | Optional |
-| **Finnhub** | 5 | News/social/insider sentiment, analyst ratings | 60 calls/min | Optional |
-| **Alpha Vantage** | 2 | Stock prices, company overviews | 25-500 calls/day | Optional |
-| **FRED** | 2 | Economic indicators, macro data | Unlimited | Optional |
-| **NewsAPI.org** | 3 | Market news, headlines | 1,000 calls/day | Optional |
-| **Anthropic Claude** | - | AI reasoning (Sonnet 4.5) | Pay-as-you-go | Required |
+**32 tools across 9 APIs** (3 completely free, 6 with generous free tiers):
 
-**💡 Total Free Data**: 3 out of 9 sources require no API key! (Yahoo Finance, SEC, Treasury)
+| Data Source | Coverage | Free Tier | Cost |
+|-------------|----------|-----------|------|
+| **Yahoo Finance** 🆓 | Real-time quotes, earnings, analyst ratings, ownership | Unlimited | **FREE** |
+| **SEC EDGAR** 🆓 | Corporate filings (10-K, 10-Q, 8-K), insider transactions | Unlimited | **FREE** |
+| **U.S. Treasury** 🆓 | Yield curves, treasury rates | Unlimited | **FREE** |
+| **Tiingo** | 5-year historical fundamentals | 50 symbols/hr | Optional |
+| **Finnhub** | News/social sentiment, insider trades | 60 calls/min | Optional |
+| **Alpha Vantage** | Stock prices, company overviews | 25-500 calls/day | Optional |
+| **FRED** | Economic indicators (GDP, CPI, unemployment) | Unlimited | Optional |
+| **NewsAPI.org** | Market news, headlines | 1,000 calls/day | Optional |
+| **Anthropic Claude** | AI reasoning engine (Sonnet 4.5) | Pay-as-you-go | **Required** |
 
-### 💬 Interactive Terminal UI
+**💡 80% of functionality works with just Yahoo Finance + SEC EDGAR (no API keys needed!)**
 
-**Built with Textual - Modern Python TUI Framework**
+### 💬 Modern Terminal UI
 
-**Real-Time Processing Indicators** 🆕:
-- ✅ **Smart Input Disabling**: Input grayed out during agent processing
-- ✅ **Live Status Updates**: `"⏳ Processing your request..."` placeholder
-- ✅ **Footer Progress**: Current agent + processing state in footer bar
-- ✅ **Error Recovery**: Auto-enables input even on errors
-- ✅ **Auto-Focus**: Returns cursor to input when ready
+**Built with Textual framework** for a responsive, beautiful CLI experience:
 
-**Core Features**:
-- ✅ **Chat Interface**: Natural language interaction with specialized agents
-- ✅ **Real-time Streaming**: Watch agents think and reason live
-- ✅ **Multi-Agent Progress**: See workflow transitions and agent collaboration
-- ✅ **Tool Tracking**: Granular visibility into which tools are called with what arguments
-- ✅ **Markdown Rendering**: Beautiful formatted output with tables, code blocks, lists
-- ✅ **Agent Switching**: Quick commands to switch between agents
-- ✅ **Workflow Commands**: Multi-agent orchestration with single commands
-- ✅ **Auto-Save Reports**: All agent responses saved to `reports/` directory with timestamps
-
-**Keyboard Shortcuts**:
-- `Ctrl+C`: Clear chat history
-- `Ctrl+Q`: Quit application
-- Mouse scroll for history navigation
-
-### 📄 Automatic Report Saving
-
-**All agent-generated reports are automatically saved** to the `reports/` directory:
-
-- **Investment Analysis** (`/analyze`): Complete multi-section reports with fundamentals, macro validation, and final recommendation
-- **Agent Responses**: All substantial responses (>200 chars) automatically saved as markdown files
-- **Organized Naming**: `{symbol}_{report_type}_{timestamp}.md`
-- **Full Context**: Metadata (date, symbol, query) and formatted markdown content
-
-**Supported Report Types**:
-- `analysis` - Multi-agent investment analysis workflow
-- `equity_research` - Quill equity research reports
-- `earnings` - Earnings surprise analysis
-- `screening` - Stock screening results
-- `macro_analysis` - Macro regime analysis
-- `portfolio` - Portfolio analysis reports
+- ✅ **Real-time streaming**: Watch agents think and reason live
+- ✅ **Smart input management**: Auto-disabled during processing (no accidental duplicate queries)
+- ✅ **Tool execution tracking**: See exactly which data sources agents are calling
+- ✅ **Multi-agent progress**: Visual workflow transitions with status updates
+- ✅ **Markdown rendering**: Tables, code blocks, syntax highlighting
+- ✅ **Auto-save reports**: All responses >200 chars saved to `reports/` directory
+- ✅ **Keyboard shortcuts**: `Ctrl+C` (clear), `Ctrl+Q` (quit)
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-
-- **Python 3.9+** (3.13 recommended)
-- **pip** package manager
-- **Anthropic API key** (required) - Get it at [console.anthropic.com](https://console.anthropic.com/)
-
 ### Installation
 
-#### Option 1: Install from PyPI (Recommended)
+**Requirements**: Python 3.9+ and an Anthropic API key
 
 ```bash
+# Install from PyPI
 pip install navam-invest
+
+# Start the interactive terminal
+navam invest
 ```
 
-#### Option 2: Install from Source
+### 5-Minute Setup
 
-```bash
-git clone https://github.com/navam-io/navam-invest.git
-cd navam-invest
-python3 -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -e ".[dev]"
-```
-
-### Configuration
-
-#### 1. Create Environment File
+**1. Create environment file:**
 
 ```bash
 cp .env.example .env
 ```
 
-#### 2. Add Your API Keys
-
-Edit `.env` with your API keys:
+**2. Add your Anthropic API key** (required):
 
 ```bash
-# Required - AI reasoning engine
-ANTHROPIC_API_KEY=sk-ant-...
-
-# Optional - Enhanced data coverage (all have free tiers)
-ALPHA_VANTAGE_API_KEY=your_key_here
-TIINGO_API_KEY=your_key_here
-FINNHUB_API_KEY=your_key_here
-FRED_API_KEY=your_key_here
-NEWSAPI_API_KEY=your_key_here
-
-# No keys needed for Yahoo Finance, SEC EDGAR, U.S. Treasury!
+# .env file
+ANTHROPIC_API_KEY=sk-ant-your-key-here
 ```
 
-#### 3. Get Free API Keys
+Get your free key at [console.anthropic.com](https://console.anthropic.com/)
+💰 **Cost**: ~$3-15/month for typical usage (pay-as-you-go)
 
-| Service | Link | Free Tier | Required? |
-|---------|------|-----------|-----------|
-| **Anthropic** ⭐ | [console.anthropic.com](https://console.anthropic.com/) | Pay-as-you-go ($3-15/M tokens) | ✅ Required |
-| **Yahoo Finance** 🆓 | - | Unlimited, no key needed | ✅ Built-in |
-| **SEC EDGAR** 🆓 | - | Unlimited, no key needed | ✅ Built-in |
-| **U.S. Treasury** 🆓 | - | Unlimited, no key needed | ✅ Built-in |
-| **Alpha Vantage** | [alphavantage.co/support/#api-key](https://www.alphavantage.co/support/#api-key) | 25 calls/day | Optional |
-| **Tiingo** | [tiingo.com](https://www.tiingo.com/) | 50 symbols/hr, 5yr history | Optional |
-| **Finnhub** | [finnhub.io/register](https://finnhub.io/register) | 60 calls/min | Optional |
-| **FRED** | [fredaccount.stlouisfed.org/apikeys](https://fredaccount.stlouisfed.org/apikeys) | Unlimited | Optional |
-| **NewsAPI.org** | [newsapi.org/register](https://newsapi.org/register) | 1,000 calls/day | Optional |
+**3. Optional: Add free-tier API keys** (recommended for full features):
 
-#### 4. Verify Setup
+```bash
+# Optional - all have generous free tiers
+FRED_API_KEY=your_key_here          # Unlimited economic data
+TIINGO_API_KEY=your_key_here        # 50 symbols/hr historical data
+FINNHUB_API_KEY=your_key_here       # 60 calls/min sentiment data
+NEWSAPI_API_KEY=your_key_here       # 1,000 calls/day news
+ALPHA_VANTAGE_API_KEY=your_key_here # 25-500 calls/day quotes
+```
+
+[Get free API keys →](docs/user-guide/getting-started.md#get-free-api-keys)
+
+**4. Verify setup:**
 
 ```bash
 navam invest
 > /api
-# Shows status table with ✅ working / ❌ failed / ⚪ not configured
+# Shows status table: ✅ working / ❌ failed / ⚪ not configured
 ```
 
-### Usage
-
-#### Launch the Interactive Interface
+### First Query
 
 ```bash
 navam invest
+
+# Try multi-agent investment analysis
+> /analyze AAPL
+
+# Or ask specific agents
+> /quill
+> Analyze Microsoft's earnings trends and institutional ownership
+
+> /macro
+> What's the current economic regime for tech stocks?
+
+> /screen
+> Find stocks with consistent earnings beats and analyst upgrades
 ```
 
-This opens an interactive chat interface with 7 specialized AI agents and multi-agent workflows.
+**🎓 New to Navam Invest?** Check the [Getting Started Guide](docs/user-guide/getting-started.md) for detailed walkthroughs.
 
-#### Available Commands
+---
 
-**System Commands**:
-- `/api` - Check API connectivity and status of all data providers
-- `/help` - Show all available commands
-- `/examples` - Show example prompts for current agent
-- `/clear` - Clear chat history
-- `/quit` - Exit the application
+## 🤖 Specialized AI Agents
 
-**Agent Selection**:
-- `/analyze <SYMBOL>` - Multi-agent investment analysis workflow (Quill + Macro Lens)
-- `/quill` - Switch to Quill (Equity Research) agent
-- `/earnings` - Switch to Earnings Whisperer agent
-- `/screen` - Switch to Screen Forge agent
-- `/macro` - Switch to Macro Lens agent
-- `/atlas` - Switch to Atlas (Investment Strategist) agent
-- `/portfolio` - Switch to Portfolio (legacy) agent
-- `/research` - Switch to Research (legacy) agent
+### ⭐ Quill - Equity Research Analyst
+
+**Deep fundamental analysis & investment thesis development**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What Quill Does**:
+- 📊 **DCF Valuation**: Discounted cash flow models with sensitivity analysis
+- 📈 **5-Year Trends**: Revenue growth, margins, ROIC, FCF, debt ratios
+- 💰 **Earnings Analysis**: Historical beats, estimates, surprise patterns
+- 🎯 **Analyst Coverage**: Consensus ratings, price targets, upgrades/downgrades
+- 🏢 **Ownership Tracking**: Institutional holders, insider transactions (Form 4)
+- 📋 **SEC Filings**: 10-K/10-Q deep-dives, 8-K material events, XBRL data
+- 💵 **Dividend Analysis**: Yield, payout sustainability, history
+- 📰 **News Validation**: Company-specific news with sentiment
+
+**Tools**: 36 specialized tools across Yahoo Finance, SEC EDGAR, Tiingo, Finnhub, NewsAPI
+
+**Example Query**:
+```
+/quill
+Analyze NVDA with focus on:
+- Recent earnings momentum vs estimates
+- Institutional ownership changes (13F filings)
+- Material events from 8-K filings
+- DCF valuation vs current price
+```
+
+**Expected Output**: 5-section investment thesis with BUY/HOLD/SELL recommendation, fair value range, key catalysts, and risk factors.
+
+</details>
+
+### 📊 Earnings Whisperer - Earnings Specialist
+
+**Earnings surprise analysis & post-earnings drift detection**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What Earnings Whisperer Does**:
+- 🎯 **Historical Tracking**: 4-8 quarter earnings surprise analysis
+- 📈 **Drift Detection**: 1-3 day post-earnings momentum patterns
+- 🔄 **Analyst Revisions**: Estimate changes post-earnings
+- ✅ **Quality Assessment**: Revenue vs EPS beats, non-recurring items
+- 📅 **Calendar Monitoring**: Upcoming earnings with probability scoring
+- 🏆 **Pattern Recognition**: Consistent beaters, accelerating growth, quality issues
+- 💹 **Trading Signals**: BUY/HOLD/SELL based on drift probability
+
+**Tools**: 14 specialized tools across Yahoo Finance, SEC, Finnhub
+
+**Example Query**:
+```
+/earnings
+Analyze META's last 6 quarters of earnings:
+- Average beat percentage (EPS and revenue)
+- Post-earnings drift patterns (1-day, 3-day returns)
+- Analyst estimate revision trends
+- Is there a drift opportunity for next earnings?
+```
+
+**Expected Output**: Earnings momentum scorecard with drift probability, pattern analysis, and trading recommendation.
+
+</details>
+
+### 🔍 Screen Forge - Equity Screener
+
+**Systematic stock discovery & idea generation**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What Screen Forge Does**:
+- 📐 **Multi-Factor Screening**: Value, growth, quality, momentum factors
+- 🎯 **Systematic Discovery**: Weekly watchlist generation with ranking
+- 📈 **Earnings Momentum**: Filter for consistent earnings beaters
+- ⬆️ **Analyst Activity**: Upgrade/downgrade-based screening
+- 💬 **Sentiment Validation**: News and social sentiment checks
+- 🔗 **Seamless Handoff**: Passes top candidates to Quill for deep-dive
+
+**Tools**: 15 specialized tools across Yahoo Finance, Finnhub, Alpha Vantage
+
+**Example Query**:
+```
+/screen
+Screen for stocks meeting these criteria:
+- Market cap > $10B
+- 3+ consecutive quarterly earnings beats
+- Average surprise > 5%
+- Analyst upgrades in last 30 days
+- Positive news sentiment
+```
+
+**Expected Output**: Ranked table of 10-20 candidates with screening criteria, key metrics, and suggested next steps.
+
+</details>
+
+### 🌍 Macro Lens - Market Strategist
+
+**Top-down economic analysis & regime identification**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What Macro Lens Does**:
+- 🔄 **Economic Cycles**: 4-phase regime analysis (early/mid/late expansion, recession)
+- 📈 **Yield Curve**: Interpretation and recession signal detection (inversions)
+- 🏭 **Sector Allocation**: Macro-driven positioning guidance
+- 📊 **Factor Recommendations**: Value vs growth, size, volatility tilts
+- 📉 **Macro Tracking**: Inflation, GDP, employment, Fed policy
+- 📊 **Market Indices**: S&P 500, Nasdaq, VIX correlation analysis
+- 💹 **Interest Rates**: Fed funds, treasury rates, credit spreads
+
+**Tools**: 13 specialized tools across FRED, U.S. Treasury, Yahoo Finance, NewsAPI
+
+**Example Query**:
+```
+/macro
+Given current macro conditions:
+- What's the economic regime? (early/mid/late expansion, recession)
+- Is the yield curve signaling recession?
+- Which sectors should I overweight/underweight?
+- Value vs growth positioning?
+```
+
+**Expected Output**: Regime assessment with sector allocation matrix, factor positioning, and macro risk scenarios.
+
+</details>
+
+### 🗞️ News Sentry - Real-Time Event Monitor
+
+**Material event detection & breaking news alerts**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What News Sentry Does**:
+- 📋 **8-K Monitoring**: Material corporate events (M&A, management changes, bankruptcy)
+- 📝 **Form 4 Tracking**: Insider buying/selling by officers and directors
+- 📰 **Breaking News**: Real-time company-specific news with sentiment
+- 📊 **Analyst Actions**: Rating changes, price target updates
+- 🎯 **Event Prioritization**: CRITICAL/HIGH/MEDIUM/LOW urgency scoring
+- ⚡ **Rapid Response**: Detect market-moving events as they happen
+
+**Tools**: 13 specialized tools across SEC EDGAR, NewsAPI, Finnhub, Yahoo Finance
+
+**Example Query**:
+```
+/news
+Monitor TSLA for:
+- Any 8-K filings in last 7 days
+- Insider transactions (Form 4) by executives
+- Breaking news with negative sentiment
+- Analyst downgrades
+- Prioritize by market impact
+```
+
+**Expected Output**: Prioritized event list with urgency levels, event details, and recommended actions.
+
+</details>
+
+### 🗺️ Atlas - Investment Strategist
+
+**Strategic asset allocation & portfolio construction**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What Atlas Does**:
+- 📋 **IPS Development**: Investment Policy Statement creation
+- 🎯 **Asset Allocation**: Strategic allocation frameworks (stocks/bonds/alternatives)
+- 📊 **Risk Profiling**: Conservative/Moderate/Aggressive tolerance assessment
+- 🔄 **Tactical Tilts**: Macro-driven portfolio adjustments
+- ⚖️ **Rebalancing Strategies**: Threshold-based, calendar-based, tax-aware
+- 🏗️ **Portfolio Construction**: Building with constraint optimization
+
+**Tools**: 12 specialized tools across all data sources
+
+**Example Query**:
+```
+/atlas
+Create an Investment Policy Statement for:
+- Portfolio value: $200,000
+- Time horizon: 20 years (retirement)
+- Risk tolerance: Moderate
+- Income needs: None currently
+- Tax considerations: Taxable account
+```
+
+**Expected Output**: Complete IPS document with asset allocation targets, rebalancing rules, and risk constraints.
+
+</details>
 
 ---
 
 ## 💡 Example Workflows
 
-### 1. Multi-Agent Investment Analysis
+### Multi-Agent Investment Analysis
+
+**Command**: `/analyze <SYMBOL>`
+
+**What Happens**:
+
+1. **Quill** performs bottom-up fundamental analysis
+2. **Macro Lens** validates with top-down economic context
+3. **Synthesis** combines both perspectives into final recommendation
 
 <details>
-<summary><b>Complete fundamental + macro analysis for MSFT</b></summary>
+<summary><b>Example: /analyze MSFT (click to expand)</b></summary>
 
 ```
 You: /analyze MSFT
 
 Investment Analysis Workflow: Starting multi-agent analysis...
 
-📊 Quill analyzing fundamentals...
-  → get_quote(symbol=MSFT)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 1: FUNDAMENTAL ANALYSIS (Quill)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Quill (Equity Research):
+  → Calling get_quote(symbol=MSFT)
   ✓ MSFT: $420.45, +0.8%, P/E 31x, Market Cap $3.1T
 
-  → get_earnings_history(symbol=MSFT)
+  → Calling get_earnings_history(symbol=MSFT)
   ✓ 4 consecutive earnings beats, avg +4.2% surprise
 
-  → get_analyst_recommendations(symbol=MSFT)
+  → Calling get_analyst_recommendations(symbol=MSFT)
   ✓ 89% buy ratings, mean target $475 (+13% upside)
 
-  → get_financials(symbol=MSFT)
+  → Calling get_financials(symbol=MSFT)
   ✓ Revenue +15% YoY, 42% gross margin, $87B FCF
 
-  ✓ Fundamental analysis complete
+**Fundamental Assessment**: STRONG
+- Exceptional profitability (42% ROE)
+- Consistent earnings outperformance
+- Strong analyst conviction
+- Reasonable valuation (31x P/E vs 15% growth)
 
-🌍 Macro Lens validating timing...
-  → get_key_macro_indicators()
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+STEP 2: MACRO VALIDATION (Macro Lens)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Macro Lens (Market Strategist):
+  → Calling get_key_macro_indicators()
   ✓ GDP +2.4%, CPI +3.1%, Unemployment 3.7%
 
-  → get_treasury_yield_curve()
+  → Calling get_treasury_yield_curve()
   ✓ 10Y-2Y inverted -0.54% (recession warning)
 
-  → get_market_indices()
+  → Calling get_market_indices()
   ✓ S&P 500 +12% YTD, Nasdaq -8% from highs, VIX 14.2
 
-  ✓ Macro validation complete
-
-🎯 Synthesizing recommendation...
+**Macro Context**: LATE EXPANSION with CAUTION
+- Inverted yield curve signals recession risk (12-18 month window)
+- Tech sector vulnerability (Nasdaq off highs)
+- But Microsoft has defensive characteristics
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Final Recommendation: BUY - Medium Confidence
+STEP 3: FINAL SYNTHESIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 RECOMMENDATION: BUY (Dollar-Cost Average)
+📊 Confidence Level: MEDIUM
 
 **Key Reasoning**:
 
-Microsoft demonstrates exceptional fundamental quality:
-- 42% ROE, $87B annual free cash flow
-- Strong competitive moats (Azure cloud, enterprise software)
+Microsoft shows exceptional fundamental quality:
+- 42% ROE, $87B annual FCF (best-in-class capital efficiency)
+- Strong competitive moats (Azure cloud, enterprise software lock-in)
 - Consistent earnings beats (+4.2% avg surprise, 4 quarters)
 - 89% analyst buy ratings, $475 mean target (+13% upside)
-- Current valuation 31x P/E reasonable given 15% revenue growth
 
-However, macro timing presents headwinds:
-- Late expansion phase (GDP +2.4%, but slowing)
-- Inverted yield curve (-0.54%) signals recession risk within 12 months
-- Tech sector vulnerability (Nasdaq -8% from highs)
+However, macro timing suggests staged entry:
+- Late expansion phase (GDP slowing from 2.8% to 2.4%)
+- Inverted yield curve (-0.54%) signals 70% recession probability
+- Tech sector vulnerable (Nasdaq -8% from highs)
 
 **Suggested Action**:
 
-Consider accumulating MSFT on dips rather than full position immediately.
-Dollar-cost average over 3-6 months to capture potential volatility from
-macro headwinds. Microsoft's defensive characteristics (enterprise
-subscriptions, cloud infrastructure) should outperform cyclical tech
-peers in downturn.
+Instead of full position immediately, dollar-cost average over 3-6 months:
+- Tranche 1: 40% now (defensive exposure to quality)
+- Tranche 2: 30% if MSFT dips below $390 (-7% from current)
+- Tranche 3: 30% if macro deteriorates (recession confirmed)
 
-**Risk Warning**:
+Microsoft's defensive characteristics (enterprise subscriptions,
+recurring revenue) position it to outperform cyclical tech peers
+in downturn.
 
-Monitor enterprise cloud spending trends and Azure growth rates. If Azure
-growth decelerates below 25% YoY, fundamental thesis weakens. Macro risk:
-Recession could compress P/E multiple to 24-26x (historical trough),
-implying 15-20% downside risk from current levels.
+**Risk Warnings**:
+
+1. **Fundamental**: Azure growth deceleration below 25% YoY would
+   weaken investment thesis
+2. **Valuation**: Recession could compress P/E to 24-26x (historical
+   trough), implying 15-20% downside
+3. **Macro**: If yield curve steepens rapidly, indicates imminent
+   recession—pause accumulation
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -554,35 +518,36 @@ implying 15-20% downside risk from current levels.
 
 </details>
 
-### 2. Earnings Momentum Screening
+### Earnings Momentum Screening
 
 <details>
-<summary><b>Screen for stocks with consistent earnings beats</b></summary>
+<summary><b>Example: Screen for consistent earnings beaters (click to expand)</b></summary>
 
 ```
 You: /screen
-You: Screen for stocks with consistent earnings beats over last 3 quarters
+You: Find stocks with 3+ consecutive earnings beats and analyst upgrades
 
 Screen Forge (Equity Screening):
-  → screen_stocks(market_cap_min=1000000000)
-  ✓ 347 stocks retrieved
+  → Calling screen_stocks(market_cap_min=1000000000)
+  ✓ Retrieved 347 stocks > $1B market cap
 
-  → get_earnings_history (batch for 347 stocks)
-  ✓ Earnings data retrieved for 298 stocks
+  → Filtering by earnings history...
+  ✓ 42 stocks with 3+ consecutive beats
 
-  → Filtering for 3+ consecutive beats
-  ✓ 42 stocks match criteria
+  → Filtering by analyst activity...
+  ✓ 18 stocks with recent upgrades
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Earnings Beat Momentum Screen Results
+EARNINGS MOMENTUM SCREEN RESULTS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **Criteria**:
 - Market Cap: > $1B
 - Earnings Beats: 3+ consecutive quarters
 - Average Surprise: > 2%
+- Analyst Activity: Upgrades in last 30 days
 
-**Top 10 Candidates** (Ranked by avg surprise %):
+**Top 10 Candidates** (Ranked by earnings momentum):
 
 ┏━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━┓
 ┃ Rank┃ Ticker ┃ Company        ┃ Mkt Cap┃ Avg Surprise ┃ Streak ┃ Latest Beat ┃
@@ -599,56 +564,18 @@ Earnings Beat Momentum Screen Results
 │ 10  │ CRM    │ Salesforce     │ $308B  │ +6.2%        │ 5 qtrs │ +7.8%       │
 └─────┴────────┴────────────────┴────────┴──────────────┴────────┴─────────────┘
 
+**Key Insights**:
+- NVDA shows exceptional momentum (18.4% avg beat, accelerating)
+- Mega-cap tech dominates (7 of top 10)
+- Payment processors (V, MA) show consistent quality
+
 **Recommended Next Steps**:
-Type `/quill` then "Analyze GOOGL with earnings momentum focus"
+1. Deep-dive analysis: `/quill` then "Analyze GOOGL"
+2. Earnings timing: `/earnings` then "Check NVDA post-earnings drift"
+3. Macro validation: `/macro` then "Tech sector positioning"
 
 📄 Report saved to: reports/SCREENER_earnings_beats_20251008_144530.md
 ```
-
-</details>
-
-### 3. Real-Time Processing Feedback
-
-<details>
-<summary><b>Watch the improved UX during agent processing</b></summary>
-
-**Before Query**:
-```
-Footer: Agent: Quill | Ready
-Input: [Ask about stocks or economic indicators...]
-```
-
-**During Processing** (input automatically disabled):
-```
-Footer: Processing...
-Input: [⏳ Processing your request...] (grayed out, uneditable)
-```
-
-**During Long Operations** (no more confusion!):
-```
-Quill (Equity Research):
-  → Calling get_financials(symbol=AAPL)
-  ✓ get_financials completed
-  → Calling get_earnings_history(symbol=AAPL)
-  ✓ get_earnings_history completed
-
-Footer: Processing...
-Input: [⏳ Processing your request...] (still disabled)
-
-[Even during pauses, you know the system is working!]
-```
-
-**After Completion** (input automatically re-enabled):
-```
-Footer: Agent: Quill | Ready
-Input: [Ask about stocks or economic indicators...] (cursor auto-focused)
-```
-
-**Benefits**:
-- ✅ No confusion about whether system is frozen or working
-- ✅ Can't accidentally submit duplicate requests
-- ✅ Clear visual feedback at multiple levels
-- ✅ Auto-recovers even on errors
 
 </details>
 
@@ -656,196 +583,138 @@ Input: [Ask about stocks or economic indicators...] (cursor auto-focused)
 
 ## 📚 Documentation
 
-### User Documentation
+### User Guides
 
-- 🚀 **[Getting Started](docs/user-guide/getting-started.md)** - Installation, setup, and first queries
-- ❓ **[FAQ](docs/faq.md)** - Comprehensive Q&A covering all features
-- 🤖 **[Agents Guide](docs/user-guide/agents.md)** - Complete agent reference
+- 🚀 **[Getting Started](docs/user-guide/getting-started.md)** - Installation, setup, first queries, troubleshooting
+- ❓ **[FAQ](docs/faq.md)** - 100+ answered questions covering all features
+- 🤖 **[Agents Guide](docs/user-guide/agents.md)** - Complete reference for all 7 specialized agents
 - 🔀 **[Multi-Agent Workflows](docs/user-guide/multi-agent-workflows.md)** - Agent collaboration patterns
 - 🛠️ **[API Tools](docs/user-guide/api-tools.md)** - Data sources and tool capabilities
 
 ### Developer Resources
 
-- **[GitHub Repository](https://github.com/navam-io/navam-invest)** - Source code, issues, PRs
-- **[PyPI Package](https://pypi.org/project/navam-invest/)** - Latest releases
-- **[Release Notes](backlog/)** - Detailed changelog for each version
-- **[Architecture](docs/architecture/about.md)** - System design and technical overview
-- **[Development Docs](docs/development/)** - Implementation notes
-- **[LangGraph Guide](refer/langgraph/)** - Multi-agent patterns & best practices
+- 📦 **[PyPI Package](https://pypi.org/project/navam-invest/)** - Latest releases and version history
+- 🔧 **[GitHub Repository](https://github.com/navam-io/navam-invest)** - Source code, issues, pull requests
+- 🏗️ **[Architecture](docs/architecture/about.md)** - System design and technical overview
+- 📝 **[Release Notes](backlog/)** - Detailed changelog for each version
+- 📖 **[LangGraph Guide](refer/langgraph/)** - Multi-agent patterns & best practices
 
 ### API Documentation
 
 - **[Anthropic Claude](https://docs.anthropic.com/)** - AI reasoning engine
 - **[LangGraph](https://langchain-ai.github.io/langgraph/)** - Agent orchestration framework
 - **[Yahoo Finance (yfinance)](https://github.com/ranaroussi/yfinance)** - Free market data library
-- **[SEC EDGAR](https://www.sec.gov/edgar/sec-api-documentation)** - Corporate filings
+- **[SEC EDGAR](https://www.sec.gov/edgar/sec-api-documentation)** - Corporate filings API
 - **[Alpha Vantage](https://www.alphavantage.co/documentation/)** - Stock market data
 - **[Tiingo](https://www.tiingo.com/documentation/)** - Historical fundamentals
 - **[Finnhub](https://finnhub.io/docs/api)** - Alternative data & sentiment
 - **[FRED](https://fred.stlouisfed.org/docs/api/fred/)** - Economic indicators
 
-### Development
-
-#### Running Tests
-
-```bash
-pytest                    # Run all tests
-pytest -v                # Verbose output
-pytest tests/test_*.py   # Specific test file
-pytest --cov             # With coverage report
-```
-
-#### Code Quality
-
-```bash
-black src/ tests/        # Format code (88 char line length)
-ruff check src/ tests/   # Lint code
-mypy src/                # Type check (strict mode)
-```
-
-#### Building from Source
-
-```bash
-# Install in editable mode with dev dependencies
-pip install -e ".[dev]"
-
-# Build distribution
-python -m build
-
-# Check package before upload
-twine check dist/*
-
-# Upload to PyPI (maintainers only)
-twine upload dist/*
-```
-
 ---
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.31 (In Development)
+### Current Release: v0.1.32 (In Development)
 
-**Status**: Active development
+**Latest Features**:
+- ✅ **News Sentry Agent**: Real-time 8-K monitoring, insider tracking, breaking news
+- ✅ **Enhanced Documentation**: Reorganized docs with FAQ, getting started guide
+- ✅ **Smart Input Management**: Auto-disable during processing, clear status feedback
+- ✅ **Auto-Save Reports**: All responses >200 chars saved to `reports/`
 
-**Latest Updates**:
-- ✅ **Enhanced UX**: Smart input disabling during processing
-- ✅ **Live Status**: Real-time footer updates ("Processing..." → "Ready")
-- ✅ **Full Responses**: Increased max_tokens to 8192 (no more truncation)
-- ✅ **Error Recovery**: Input always re-enables, even on errors
+**Planned for v0.1.33-0.1.35** (Q1 2025):
+- [ ] **Risk Shield Agent**: Portfolio risk management, VAR, drawdown analysis
+- [ ] **Tax Scout Agent**: Tax optimization, loss harvesting, wash-sale detection
+- [ ] **Hedge Smith Agent**: Options strategies, protective puts, covered calls
+- [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls
+- [ ] **Enhanced Workflows**: Parallel agent execution, conditional branching
 
-**Planned Features**:
-- [ ] News Sentry agent (real-time event detection, 8-K material event monitoring)
-- [ ] Enhanced multi-agent workflows (extend `/analyze` with additional agents)
-- [ ] API caching layer (DuckDB-based caching to reduce API calls)
-- [ ] Options analysis tools (Yahoo Finance options chain integration)
-- [ ] Risk management enhancements (drawdown analysis, VAR calculations)
+### Future Releases
+
+**v0.2.0+** (Q2 2025):
+- [ ] **Backtesting Engine**: Test investment strategies on historical data
+- [ ] **Web UI**: Browser-based interface (in addition to TUI)
+- [ ] **State Persistence**: PostgreSQL checkpointer for LangGraph
+- [ ] **Cloud Deployment**: LangGraph Cloud integration
+- [ ] **Custom Agents**: User-defined agent templates and tools
+- [ ] **Python SDK**: Programmatic API for third-party integrations
 
 ### Recent Releases
 
 <details>
-<summary><b>v0.1.30 (Jan 8, 2025) - API Reliability Improvements</b></summary>
+<summary><b>v0.1.31 (Jan 10, 2025) - UX Improvements</b></summary>
 
-**Removed**: Financial Modeling Prep (FMP) API due to free tier access errors
+- ✅ Enhanced input management (auto-disable during processing)
+- ✅ Increased max_tokens to 8192 (no more truncated responses)
+- ✅ Automatic report saving for all agent responses
+- ✅ Live footer status updates ("Processing..." → "Ready")
 
-**Benefits**:
-- ✅ 100% reliable APIs (Yahoo + SEC have no rate limits)
-- ✅ Better data quality (Yahoo has real-time data)
+[Full Release Notes](backlog/release-0.1.31.md)
+
+</details>
+
+<details>
+<summary><b>v0.1.30 (Jan 8, 2025) - API Reliability</b></summary>
+
+- ✅ Removed FMP API (replaced with Yahoo Finance for better reliability)
+- ✅ 100% free-tier APIs with no access errors
 - ✅ Simpler setup (one less API key required)
-- ✅ No more "Access denied" errors
-
-**Updates**: 32 tools across 9 APIs (down from 36 tools, 10 APIs)
 
 [Full Release Notes](backlog/release-0.1.30.md)
 
 </details>
 
 <details>
-<summary><b>v0.1.28 (Jan 5, 2025) - Self-Service API Status</b></summary>
+<summary><b>v0.1.28 (Jan 5, 2025) - Self-Service API Testing</b></summary>
 
-**New**: `/api` command for interactive API connectivity testing
-
-**Features**:
-- ✅ Real-time validation of all 9 data providers
-- ✅ Rich table formatting with color-coded status (✅/❌/⚪)
+- ✅ `/api` command for interactive connectivity testing
+- ✅ Rich table formatting with color-coded status
 - ✅ Troubleshooting tips and error diagnosis
-- ✅ Documentation clarifying NewsAPI.org vs NewsAPI.ai
+- ✅ NewsAPI.org vs NewsAPI.ai clarification docs
 
-[Full Release Notes](backlog/release-0.1.28.md)
+[Full Release Notes](docs/development/release-v0.1.28.md)
 
 </details>
 
 <details>
-<summary><b>v0.1.27 (Dec 29, 2024) - Earnings Whisperer Agent</b></summary>
+<summary><b>v0.1.27 (Dec 29, 2024) - Earnings Whisperer</b></summary>
 
-**New Agent**: Earnings Whisperer for earnings surprise analysis and post-earnings drift detection
-
-**Features**:
-- ✅ 14 specialized tools (Yahoo Finance + SEC + Finnhub)
+- ✅ New specialized agent for earnings analysis
+- ✅ 14 tools across Yahoo Finance, SEC, Finnhub
 - ✅ 5-step earnings analysis framework
-- ✅ Pattern recognition (consistent beaters, accelerating beats, drift opportunities)
-- ✅ Trading signals (BUY/HOLD/SELL on earnings)
-- ✅ TUI command: `/earnings`
+- ✅ Post-earnings drift detection
 
 [Full Release Notes](backlog/release-0.1.27.md)
 
 </details>
 
-<details>
-<summary><b>v0.1.26 (Dec 22, 2024) - Yahoo Finance + Enhanced EDGAR</b></summary>
-
-**Major Update**: Yahoo Finance integration (11 FREE tools) + Enhanced SEC EDGAR (4 new tools)
-
-**Features**:
-- ✅ Real-time earnings trends & surprises (Yahoo Finance)
-- ✅ Analyst consensus & price targets (Yahoo Finance)
-- ✅ Institutional ownership tracking (Yahoo Finance)
-- ✅ Material event detection (8-K filings)
-- ✅ XBRL structured data extraction
-- ✅ Insider transaction patterns (Form 4)
-- ✅ Zero cost expansion ($2.4K-$10.8K/year savings)
-
-**Agent Enhancements**: Quill (36 tools, up from 22), Screen Forge (15 tools), Macro Lens (13 tools)
-
-[Full Release Notes](backlog/release-0.1.26.md)
-
-</details>
-
-### Future Releases
-
-**v0.1.32-0.1.35** (Q1 2025):
-- [ ] Additional specialized agents (Risk Shield, Tax Scout, Hedge Smith)
-- [ ] Enhanced multi-agent workflows (parallel execution, conditional branching)
-- [ ] Portfolio tracking & performance attribution
-- [ ] State persistence (PostgreSQL checkpointer for LangGraph)
-
-**v0.2.0+** (Q2 2025):
-- [ ] Backtesting engine for investment strategies
-- [ ] Risk management workflows (VaR, stress testing)
-- [ ] Web UI (in addition to TUI)
-- [ ] Cloud deployment options (LangGraph Cloud)
-- [ ] API for third-party integrations
-
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! We're building the future of retail investment intelligence together.
+We welcome contributions! Navam Invest is built by retail investors, for retail investors.
 
 ### Ways to Contribute
 
-- 🐛 **Report Bugs** - Submit detailed bug reports via [GitHub Issues](https://github.com/navam-io/navam-invest/issues)
-- 💡 **Suggest Features** - Share ideas for new agents, workflows, or data sources
-- 📝 **Improve Documentation** - Help make docs clearer and more comprehensive
-- 🔧 **Submit PRs** - Code contributions for bug fixes, features, or tests
+- 🐛 **[Report Bugs](https://github.com/navam-io/navam-invest/issues)** - Submit detailed bug reports
+- 💡 **[Suggest Features](https://github.com/navam-io/navam-invest/issues)** - Share ideas for new agents or workflows
+- 📝 **[Improve Docs](https://github.com/navam-io/navam-invest/pulls)** - Make documentation clearer
+- 🔧 **[Submit PRs](https://github.com/navam-io/navam-invest/pulls)** - Code contributions for bugs or features
 
 ### Development Workflow
 
-1. **Fork the repository** and clone locally
-2. **Create a feature branch**: `git checkout -b feature/amazing-agent`
-3. **Make your changes** with tests and documentation
-4. **Run quality checks**: `black src/ tests/`, `ruff check`, `mypy src/`, `pytest`
-5. **Commit with semantic messages**: `feat: Add News Sentry agent`
-6. **Push and create a PR** with detailed description
+1. **Fork and clone**: `git clone https://github.com/your-username/navam-invest.git`
+2. **Create branch**: `git checkout -b feature/amazing-feature`
+3. **Make changes** with tests and documentation
+4. **Run quality checks**:
+   ```bash
+   black src/ tests/        # Format code
+   ruff check src/ tests/   # Lint
+   mypy src/                # Type check
+   pytest                   # Run tests
+   ```
+5. **Commit**: `git commit -m "feat: Add amazing feature"`
+6. **Push and create PR** with detailed description
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
@@ -853,7 +722,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see [LICENSE](LICENSE) for details.
 
 **Key Points**:
 - ✅ Free for personal and commercial use
@@ -872,7 +741,7 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 
 ### Data Providers
 
-- **[Yahoo Finance](https://finance.yahoo.com/)** - Free real-time quotes, earnings, analyst ratings (via yfinance)
+- **[Yahoo Finance](https://finance.yahoo.com/)** - Free real-time quotes, earnings, analyst ratings
 - **[SEC EDGAR](https://www.sec.gov/edgar)** - Corporate filings (10-K, 10-Q, 8-K, Form 4)
 - **[U.S. Treasury](https://home.treasury.gov/)** - Yield curves, treasury rates
 - **[Alpha Vantage](https://www.alphavantage.co/)** - Stock market data
@@ -880,10 +749,6 @@ This project is licensed under the **MIT License** - see [LICENSE](LICENSE) file
 - **[Finnhub](https://finnhub.io/)** - Alternative data & sentiment
 - **[FRED](https://fred.stlouisfed.org/)** - Federal Reserve economic data
 - **[NewsAPI.org](https://newsapi.org/)** - Market news & headlines
-
-### Community
-
-Special thanks to all contributors, users, and the open-source community for making this project possible.
 
 ---
 
