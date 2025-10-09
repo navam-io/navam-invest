@@ -18,6 +18,7 @@ from navam_invest.agents.screen_forge import create_screen_forge_agent
 from navam_invest.agents.macro_lens import create_macro_lens_agent
 from navam_invest.agents.earnings_whisperer import create_earnings_whisperer_agent
 from navam_invest.agents.news_sentry import create_news_sentry_agent
+from navam_invest.agents.risk_shield import create_risk_shield_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
@@ -100,6 +101,17 @@ NEWS_SENTRY_EXAMPLES = [
     "Check for insider buying clusters in tech stocks",
 ]
 
+RISK_SHIELD_EXAMPLES = [
+    "Analyze my portfolio risk - what are my concentration exposures?",
+    "Calculate VAR for my holdings at 95% and 99% confidence levels",
+    "What's my portfolio's maximum drawdown and current risk score?",
+    "Run a stress test - how would my portfolio perform in a 2008-style crisis?",
+    "Identify any sector concentration risks in my portfolio",
+    "What's my portfolio volatility compared to S&P 500?",
+    "Check if I'm breaching any position size limits (>10% single stock)",
+    "Recommend risk mitigation strategies for my current exposures",
+]
+
 WORKFLOW_EXAMPLES = [
     "/analyze AAPL - Complete investment analysis (fundamental + macro)",
     "/analyze MSFT - Should I invest? Get both bottom-up and top-down view",
@@ -146,6 +158,7 @@ class ChatUI(App):
         self.macro_lens_agent: Optional[object] = None
         self.earnings_whisperer_agent: Optional[object] = None
         self.news_sentry_agent: Optional[object] = None
+        self.risk_shield_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
@@ -182,6 +195,7 @@ class ChatUI(App):
                 "- `/macro` - Switch to Macro Lens market strategist\n"
                 "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                 "- `/news` - Switch to News Sentry event monitoring agent\n"
+                "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
@@ -203,10 +217,11 @@ class ChatUI(App):
             self.macro_lens_agent = await create_macro_lens_agent()
             self.earnings_whisperer_agent = await create_earnings_whisperer_agent()
             self.news_sentry_agent = await create_news_sentry_agent()
+            self.risk_shield_agent = await create_risk_shield_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
             self.sub_title = f"Agent: {self.current_agent.title()} | Ready"
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry)[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield)[/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -296,6 +311,10 @@ class ChatUI(App):
                 agent = self.news_sentry_agent
                 agent_name = "News Sentry"
                 report_type = "news_monitoring"
+            elif self.current_agent == "risk":
+                agent = self.risk_shield_agent
+                agent_name = "Risk Shield Manager"
+                report_type = "risk_analysis"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -396,7 +415,8 @@ class ChatUI(App):
                 "screen": "Screen Forge",
                 "macro": "Macro Lens",
                 "earnings": "Earnings Whisperer",
-                "news": "News Sentry"
+                "news": "News Sentry",
+                "risk": "Risk Shield"
             }
             agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
             self.sub_title = f"Agent: {agent_name} | Ready"
@@ -568,6 +588,7 @@ class ChatUI(App):
                     "- `/macro` - Switch to Macro Lens market strategist\n"
                     "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                     "- `/news` - Switch to News Sentry event monitoring agent\n"
+                    "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
                     "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                     "- `/api` - Check API connectivity and status\n"
                     "- `/examples` - Show example prompts for current agent\n"
@@ -604,6 +625,10 @@ class ChatUI(App):
             self.current_agent = "news"
             self.sub_title = "Agent: News Sentry | Ready"
             chat_log.write("\n[green]✓ Switched to News Sentry (Event Monitoring) agent[/green]\n")
+        elif command == "/risk":
+            self.current_agent = "risk"
+            self.sub_title = "Agent: Risk Shield | Ready"
+            chat_log.write("\n[green]✓ Switched to Risk Shield (Portfolio Risk Manager) agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -627,6 +652,9 @@ class ChatUI(App):
             elif self.current_agent == "news":
                 examples = NEWS_SENTRY_EXAMPLES
                 agent_name = "News Sentry (Event Monitoring)"
+            elif self.current_agent == "risk":
+                examples = RISK_SHIELD_EXAMPLES
+                agent_name = "Risk Shield (Portfolio Risk Manager)"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"

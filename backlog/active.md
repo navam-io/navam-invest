@@ -29,12 +29,13 @@ Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integratio
   - Analyst rating change tracking with actionability scoring (1-10 scale)
   - TUI command: `/news`
 
-#### Medium Priority Agents (Phase 3B - v0.1.30-0.1.32)
+#### Medium Priority Agents (Phase 3B - v0.1.30-0.1.33)
 
-- [ ] **Risk Shield Manager** - Portfolio risk management and exposure monitoring
+- [x] **Risk Shield Manager** - Portfolio risk management and exposure monitoring → Completed in release-0.1.33.md
   - Drawdown analysis and limit breach detection
   - VAR calculations and scenario testing
   - Risk mitigation strategies
+  - TUI command: `/risk`
 
 - [ ] **Tax Scout** - Tax optimization and loss harvesting
   - Tax-loss harvesting opportunities

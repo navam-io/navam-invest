@@ -366,6 +366,32 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "read_local_file",
             "list_local_files",
         ],
+        # Risk Shield (Portfolio Risk Manager): Comprehensive risk analysis and exposure monitoring
+        "risk_shield": [
+            # Portfolio holdings and positions (requires file reading)
+            "read_local_file",
+            "list_local_files",
+            # Market data for risk calculations (Yahoo Finance)
+            "get_quote",
+            "get_historical_data",
+            "get_market_indices",
+            # Volatility and beta data
+            "get_company_info",
+            "get_financials",
+            # Correlation analysis (historical returns needed)
+            "get_stock_price",
+            "get_stock_overview",
+            # Historical fundamentals for financial health checks
+            "get_fundamentals_daily",
+            "get_historical_fundamentals",
+            # Macro indicators for scenario testing
+            "get_economic_indicator",
+            "get_key_macro_indicators",
+            # Treasury data for interest rate risk
+            "get_treasury_yield_curve",
+            "get_treasury_rate",
+            "get_treasury_yield_spread",
+        ],
         # Portfolio (Generalist - Legacy): Broad portfolio analysis
         "portfolio": [
             # Market data
