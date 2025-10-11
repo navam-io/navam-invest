@@ -19,6 +19,7 @@ from navam_invest.agents.macro_lens import create_macro_lens_agent
 from navam_invest.agents.earnings_whisperer import create_earnings_whisperer_agent
 from navam_invest.agents.news_sentry import create_news_sentry_agent
 from navam_invest.agents.risk_shield import create_risk_shield_agent
+from navam_invest.agents.tax_scout import create_tax_scout_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
@@ -112,6 +113,17 @@ RISK_SHIELD_EXAMPLES = [
     "Recommend risk mitigation strategies for my current exposures",
 ]
 
+TAX_SCOUT_EXAMPLES = [
+    "Identify tax-loss harvesting opportunities in my portfolio",
+    "Check for potential wash-sale violations in my recent transactions",
+    "What are my short-term vs long-term capital gains/losses?",
+    "Recommend tax-efficient rebalancing strategies for my portfolio",
+    "Calculate potential tax savings from harvesting losses this year",
+    "Suggest substitute securities for positions I want to harvest",
+    "What's my carryforward loss balance from previous years?",
+    "Plan year-end tax moves to minimize my 2025 tax liability",
+]
+
 WORKFLOW_EXAMPLES = [
     "/analyze AAPL - Complete investment analysis (fundamental + macro)",
     "/analyze MSFT - Should I invest? Get both bottom-up and top-down view",
@@ -159,6 +171,7 @@ class ChatUI(App):
         self.earnings_whisperer_agent: Optional[object] = None
         self.news_sentry_agent: Optional[object] = None
         self.risk_shield_agent: Optional[object] = None
+        self.tax_scout_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
@@ -196,6 +209,7 @@ class ChatUI(App):
                 "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                 "- `/news` - Switch to News Sentry event monitoring agent\n"
                 "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
+                "- `/tax` - Switch to Tax Scout tax optimization agent\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
@@ -218,10 +232,11 @@ class ChatUI(App):
             self.earnings_whisperer_agent = await create_earnings_whisperer_agent()
             self.news_sentry_agent = await create_news_sentry_agent()
             self.risk_shield_agent = await create_risk_shield_agent()
+            self.tax_scout_agent = await create_tax_scout_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
             self.sub_title = f"Agent: {self.current_agent.title()} | Ready"
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield)[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout)[/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -315,6 +330,10 @@ class ChatUI(App):
                 agent = self.risk_shield_agent
                 agent_name = "Risk Shield Manager"
                 report_type = "risk_analysis"
+            elif self.current_agent == "tax":
+                agent = self.tax_scout_agent
+                agent_name = "Tax Scout"
+                report_type = "tax_optimization"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -416,7 +435,8 @@ class ChatUI(App):
                 "macro": "Macro Lens",
                 "earnings": "Earnings Whisperer",
                 "news": "News Sentry",
-                "risk": "Risk Shield"
+                "risk": "Risk Shield",
+                "tax": "Tax Scout"
             }
             agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
             self.sub_title = f"Agent: {agent_name} | Ready"
@@ -589,6 +609,7 @@ class ChatUI(App):
                     "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                     "- `/news` - Switch to News Sentry event monitoring agent\n"
                     "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
+                    "- `/tax` - Switch to Tax Scout tax optimization agent\n"
                     "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                     "- `/api` - Check API connectivity and status\n"
                     "- `/examples` - Show example prompts for current agent\n"
@@ -629,6 +650,10 @@ class ChatUI(App):
             self.current_agent = "risk"
             self.sub_title = "Agent: Risk Shield | Ready"
             chat_log.write("\n[green]✓ Switched to Risk Shield (Portfolio Risk Manager) agent[/green]\n")
+        elif command == "/tax":
+            self.current_agent = "tax"
+            self.sub_title = "Agent: Tax Scout | Ready"
+            chat_log.write("\n[green]✓ Switched to Tax Scout (Tax Optimization) agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -655,6 +680,9 @@ class ChatUI(App):
             elif self.current_agent == "risk":
                 examples = RISK_SHIELD_EXAMPLES
                 agent_name = "Risk Shield (Portfolio Risk Manager)"
+            elif self.current_agent == "tax":
+                examples = TAX_SCOUT_EXAMPLES
+                agent_name = "Tax Scout (Tax Optimization)"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"

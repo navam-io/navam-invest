@@ -392,6 +392,25 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_treasury_rate",
             "get_treasury_yield_spread",
         ],
+        # Tax Scout (Tax Optimization): Tax-loss harvesting and wash-sale compliance
+        "tax_scout": [
+            # Portfolio holdings with cost basis and purchase dates
+            "read_local_file",
+            "list_local_files",
+            # Market data for unrealized gain/loss calculations (Yahoo Finance)
+            "get_quote",
+            "get_historical_data",
+            "get_stock_price",
+            # Company info for substitute security identification
+            "get_company_info",
+            "get_financials",
+            "get_stock_overview",
+            # Historical data for wash-sale window analysis
+            "get_fundamentals_daily",
+            # Similar securities screening for wash-sale compliant alternatives
+            "get_analyst_recommendations",
+            "get_company_news",
+        ],
         # Portfolio (Generalist - Legacy): Broad portfolio analysis
         "portfolio": [
             # Market data

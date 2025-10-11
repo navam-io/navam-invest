@@ -37,10 +37,11 @@ Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integratio
   - Risk mitigation strategies
   - TUI command: `/risk`
 
-- [ ] **Tax Scout** - Tax optimization and loss harvesting
+- [x] **Tax Scout** - Tax optimization and loss harvesting → Completed in release-0.1.34.md
   - Tax-loss harvesting opportunities
   - Wash-sale rule compliance
   - Year-end tax planning
+  - TUI command: `/tax`
 
 - [ ] **Hedge Smith** - Options strategies for portfolio protection
   - Leverages Yahoo Finance options chain (`get_options_chain`)
