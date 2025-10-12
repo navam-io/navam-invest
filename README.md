@@ -26,7 +26,7 @@ Built on [LangGraph](https://langchain-ai.github.io/langgraph/) • Powered by [
 
 **Replace $1,000-$10,000/year wealth management fees with AI agents that research, analyze, and explain investment decisions in plain English.**
 
-Navam Invest is an **open-source AI investment advisory platform** designed for retail investors managing $50K-$1M portfolios. Instead of paying 1% AUM fees, you get a **team of 10 specialized AI agents** that collaborate through multi-agent workflows—all running locally with your API keys, using free public data.
+Navam Invest is an **open-source AI investment advisory platform** designed for retail investors managing $50K-$1M portfolios. Instead of paying 1% AUM fees, you get a **team of 10 specialized AI agents** with **automatic intent-based routing**—all running locally with your API keys, using free public data.
 
 ### Why Choose Navam Invest?
 
@@ -36,8 +36,8 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 
 **🏦 Institutional Intelligence, Retail Access**
 - 10 specialized AI agents (equity research, earnings analysis, risk management, tax optimization, options strategies)
+- **Automatic routing**: Just ask naturally—no need to know which agent to use
 - Multi-agent workflows that combine bottom-up + top-down analysis
-- Same frameworks used by professional analysts
 
 </td>
 <td width="50%">
@@ -53,7 +53,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 <td width="50%">
 
 **🔍 Transparent & Explainable**
-- Watch AI agents reason in real-time
+- Watch AI agents reason in real-time with progressive streaming
 - Full audit trails of tool calls and data sources
 - Educational explanations, not black-box recommendations
 
@@ -61,7 +61,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 <td width="50%">
 
 **⚡ Production-Ready Today**
-- Interactive terminal UI (TUI) with real-time streaming
+- Interactive terminal UI (TUI) with real-time agent streaming
 - 32 tools across 9 APIs (3 require zero setup)
 - Auto-save reports, multi-agent orchestration
 
@@ -73,12 +73,36 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 
 ## ✨ Key Features
 
+### 🔀 Automatic Intent-Based Routing (NEW in v0.1.36)
+
+**No more manual agent switching!** Just ask your question naturally:
+
+```bash
+navam invest
+
+# Simply ask - the router automatically selects the right agent(s)
+> Should I invest in AAPL?
+# → Router analyzes intent
+# → Routes to Quill (fundamentals) + Macro Lens (timing) + Risk Shield (exposure)
+# → Synthesizes comprehensive recommendation
+
+> Find undervalued tech stocks with strong earnings momentum
+# → Router detects screening + earnings intent
+# → Routes to Screen Forge + Earnings Whisperer
+
+> Protect my NVDA position with options
+# → Router detects hedging intent
+# → Routes to Hedge Smith for options strategies
+```
+
+**Power users** can still use manual commands (`/quill`, `/hedge`, `/risk`) for direct agent control.
+
 ### 🤖 10 Specialized AI Agents
 
 Each agent is purpose-built with curated tools and expert system prompts:
 
-| Agent | Purpose | Tools | Use Case |
-|-------|---------|-------|----------|
+| Agent | Purpose | Tools | Example Query |
+|-------|---------|-------|---------------|
 | **[Quill](#-quill---equity-research-analyst)** | Deep fundamental research | 36 | "Analyze AAPL with DCF valuation and insider activity" |
 | **[Earnings Whisperer](#-earnings-whisperer---earnings-specialist)** | Earnings surprise analysis | 14 | "Find post-earnings drift opportunities in NVDA" |
 | **[Screen Forge](#-screen-forge---equity-screener)** | Systematic stock screening | 15 | "Screen for stocks with 3+ consecutive earnings beats" |
@@ -88,7 +112,7 @@ Each agent is purpose-built with curated tools and expert system prompts:
 | **[Tax Scout](#-tax-scout---tax-optimization-specialist)** | Tax-loss harvesting | 12 | "Identify tax-loss harvesting opportunities" |
 | **[Hedge Smith](#-hedge-smith---options-strategist)** | Options strategies | 13 | "Design a protective collar for my AAPL position" |
 | **Atlas** | Strategic asset allocation | 12 | "Create an IPS for $200K portfolio" |
-| **Portfolio/Research** | Legacy general-purpose | 24/10 | Backward compatibility (will be phased out) |
+| **Portfolio/Research** | Legacy general-purpose | 24/10 | Backward compatibility |
 
 ### 🔀 Multi-Agent Workflows
 
@@ -125,12 +149,13 @@ Each agent is purpose-built with curated tools and expert system prompts:
 
 **💡 80% of functionality works with just Yahoo Finance + SEC EDGAR (no API keys needed!)**
 
-### 💬 Modern Terminal UI
+### 💬 Modern Terminal UI with Progressive Streaming
 
 **Built with Textual framework** for a responsive, beautiful CLI experience:
 
-- ✅ **Real-time streaming**: Watch agents think and reason live
-- ✅ **Smart input management**: Auto-disabled during processing (no accidental duplicate queries)
+- ✅ **Progressive streaming**: Watch sub-agent tool calls appear in real-time (NEW in v0.1.36)
+- ✅ **Real-time reasoning**: See agents think and make decisions live
+- ✅ **Smart input management**: Auto-disabled during processing (no duplicate queries)
 - ✅ **Tool execution tracking**: See exactly which data sources agents are calling
 - ✅ **Multi-agent progress**: Visual workflow transitions with status updates
 - ✅ **Markdown rendering**: Tables, code blocks, syntax highlighting
@@ -197,10 +222,17 @@ navam invest
 ```bash
 navam invest
 
-# Try multi-agent investment analysis
-> /analyze AAPL
+# NEW: Just ask naturally - automatic routing!
+> Should I invest in Apple stock right now?
+# Router automatically selects Quill, Macro Lens, and Risk Shield
 
-# Or ask specific agents
+> Find undervalued tech companies with strong earnings
+# Router automatically selects Screen Forge and Earnings Whisperer
+
+> How can I reduce my tax bill before year-end?
+# Router automatically selects Tax Scout
+
+# Or use manual commands for specific agents (power users)
 > /quill
 > Analyze Microsoft's earnings trends and institutional ownership
 
@@ -209,12 +241,6 @@ navam invest
 
 > /risk
 > Calculate VAR for my portfolio and identify concentration risks
-
-> /tax
-> Identify tax-loss harvesting opportunities before year-end
-
-> /hedge
-> Design a protective collar for my 500 AAPL shares at $200
 ```
 
 **🎓 New to Navam Invest?** Check the [Getting Started Guide](docs/user-guide/getting-started.md) for detailed walkthroughs.
@@ -242,14 +268,14 @@ navam invest
 
 **Tools**: 36 specialized tools across Yahoo Finance, SEC EDGAR, Tiingo, Finnhub, NewsAPI
 
-**Example Query**:
+**Example Queries**:
 ```
-/quill
-Analyze NVDA with focus on:
-- Recent earnings momentum vs estimates
-- Institutional ownership changes (13F filings)
-- Material events from 8-K filings
-- DCF valuation vs current price
+# Automatic routing (just ask naturally)
+> Analyze NVDA fundamentals and give me a buy/hold/sell recommendation
+
+# Manual mode (power users)
+> /quill
+> Deep dive on AAPL: recent earnings, institutional ownership changes, and DCF valuation
 ```
 
 **Expected Output**: 5-section investment thesis with BUY/HOLD/SELL recommendation, fair value range, key catalysts, and risk factors.
@@ -274,14 +300,14 @@ Analyze NVDA with focus on:
 
 **Tools**: 14 specialized tools across Yahoo Finance, SEC, Finnhub
 
-**Example Query**:
+**Example Queries**:
 ```
-/earnings
-Analyze META's last 6 quarters of earnings:
-- Average beat percentage (EPS and revenue)
-- Post-earnings drift patterns (1-day, 3-day returns)
-- Analyst estimate revision trends
-- Is there a drift opportunity for next earnings?
+# Automatic routing
+> Is there a post-earnings drift opportunity in META after recent earnings?
+
+# Manual mode
+> /earnings
+> Analyze TSLA's last 6 quarters - average beat percentage and drift patterns
 ```
 
 **Expected Output**: Earnings momentum scorecard with drift probability, pattern analysis, and trading recommendation.
@@ -305,15 +331,14 @@ Analyze META's last 6 quarters of earnings:
 
 **Tools**: 15 specialized tools across Yahoo Finance, Finnhub, Alpha Vantage
 
-**Example Query**:
+**Example Queries**:
 ```
-/screen
-Screen for stocks meeting these criteria:
-- Market cap > $10B
-- 3+ consecutive quarterly earnings beats
-- Average surprise > 5%
-- Analyst upgrades in last 30 days
-- Positive news sentiment
+# Automatic routing
+> Find undervalued growth stocks with strong earnings momentum
+
+# Manual mode
+> /screen
+> Screen for stocks with P/E under 15, 3+ consecutive earnings beats, and positive sentiment
 ```
 
 **Expected Output**: Ranked table of 10-20 candidates with screening criteria, key metrics, and suggested next steps.
@@ -338,14 +363,14 @@ Screen for stocks meeting these criteria:
 
 **Tools**: 13 specialized tools across FRED, U.S. Treasury, Yahoo Finance, NewsAPI
 
-**Example Query**:
+**Example Queries**:
 ```
-/macro
-Given current macro conditions:
-- What's the economic regime? (early/mid/late expansion, recession)
-- Is the yield curve signaling recession?
-- Which sectors should I overweight/underweight?
-- Value vs growth positioning?
+# Automatic routing
+> What's the current market environment for tech stocks?
+
+# Manual mode
+> /macro
+> Analyze the yield curve - is it signaling recession? Which sectors should I overweight?
 ```
 
 **Expected Output**: Regime assessment with sector allocation matrix, factor positioning, and macro risk scenarios.
@@ -369,15 +394,14 @@ Given current macro conditions:
 
 **Tools**: 13 specialized tools across SEC EDGAR, NewsAPI, Finnhub, Yahoo Finance
 
-**Example Query**:
+**Example Queries**:
 ```
-/news
-Monitor TSLA for:
-- Any 8-K filings in last 7 days
-- Insider transactions (Form 4) by executives
-- Breaking news with negative sentiment
-- Analyst downgrades
-- Prioritize by market impact
+# Automatic routing
+> Any material events or insider activity at TSLA recently?
+
+# Manual mode
+> /news
+> Monitor AAPL for 8-K filings, insider transactions, and breaking news in last 7 days
 ```
 
 **Expected Output**: Prioritized event list with urgency levels, event details, and recommended actions.
@@ -403,14 +427,14 @@ Monitor TSLA for:
 
 **Tools**: 18 specialized tools across market data, fundamentals, macro indicators, treasury data
 
-**Example Query**:
+**Example Queries**:
 ```
-/risk
-Analyze my portfolio risk:
-- Calculate VAR at 95% and 99% confidence
-- Identify sector concentration risks (>30% any sector)
-- Stress test against 2008 financial crisis scenario
-- Recommend risk mitigation strategies
+# Automatic routing
+> Analyze my portfolio risk and recommend mitigation strategies
+
+# Manual mode
+> /risk
+> Calculate VAR at 95% and 99%, identify sector concentration risks, stress test against 2008 crisis
 ```
 
 **Expected Output**: Risk scorecard (1-10 scale), concentration analysis, VAR metrics, stress test results, and actionable mitigation recommendations.
@@ -435,15 +459,14 @@ Analyze my portfolio risk:
 
 **Tools**: 12 specialized tools for portfolio data, market pricing, fundamentals
 
-**Example Query**:
+**Example Queries**:
 ```
-/tax
-Analyze my portfolio for tax optimization:
-- Identify positions with unrealized losses >5%
-- Check for wash-sale violations in last 30 days
-- Suggest replacement securities for harvested positions
-- Calculate potential tax savings ($X at my tax bracket)
-- Year-end planning recommendations
+# Automatic routing
+> How can I reduce my tax bill before year-end?
+
+# Manual mode
+> /tax
+> Identify tax-loss harvesting opportunities with >5% unrealized losses, check wash-sale violations
 ```
 
 **Expected Output**: TLH opportunities table with tax savings estimates, wash-sale violations, replacement candidates, and year-end action plan.
@@ -466,54 +489,20 @@ Analyze my portfolio for tax optimization:
 - 📅 **Expiration Optimization**: 30-45 days for theta decay, 60-90 days for protection
 - 📊 **Options Greeks**: Delta, gamma, theta, vega, IV percentile analysis
 - ⚖️ **Risk/Reward Profiling**: Max profit, max loss, breakeven, probability estimates
-- 💡 **Strategy Design**: Detailed trade specifications with example implementations
 
 **Tools**: 13 specialized tools for options chain data, market data, fundamentals, volatility
 
-**Example Query**:
+**Example Queries**:
 ```
-/hedge
-I hold 500 shares of AAPL at $180 cost basis, currently $200.
-Design a protective collar strategy to:
-- Lock in most of my $20/share gain ($10,000 total)
-- Allow modest upside to $210
-- Minimize net cost (or generate credit)
-- 45-day expiration
-```
+# Automatic routing
+> How can I protect my AAPL position with options?
 
-**Expected Output**: Complete collar strategy specification with specific strikes, premiums, Greeks, risk/reward analysis, and exit strategy.
-
-</details>
-
-### 🗺️ Atlas - Investment Strategist
-
-**Strategic asset allocation & portfolio construction**
-
-<details>
-<summary><b>View Capabilities & Examples</b></summary>
-
-**What Atlas Does**:
-- 📋 **IPS Development**: Investment Policy Statement creation
-- 🎯 **Asset Allocation**: Strategic allocation frameworks (stocks/bonds/alternatives)
-- 📊 **Risk Profiling**: Conservative/Moderate/Aggressive tolerance assessment
-- 🔄 **Tactical Tilts**: Macro-driven portfolio adjustments
-- ⚖️ **Rebalancing Strategies**: Threshold-based, calendar-based, tax-aware
-- 🏗️ **Portfolio Construction**: Building with constraint optimization
-
-**Tools**: 12 specialized tools across all data sources
-
-**Example Query**:
-```
-/atlas
-Create an Investment Policy Statement for:
-- Portfolio value: $200,000
-- Time horizon: 20 years (retirement)
-- Risk tolerance: Moderate
-- Income needs: None currently
-- Tax considerations: Taxable account
+# Manual mode
+> /hedge
+> I hold 500 shares of AAPL at $180 cost, currently $200. Design a protective collar for 45-day expiration.
 ```
 
-**Expected Output**: Complete IPS document with asset allocation targets, rebalancing rules, and risk constraints.
+**Expected Output**: Complete strategy specification with specific strikes, premiums, Greeks, risk/reward analysis, and exit strategy.
 
 </details>
 
@@ -523,7 +512,7 @@ Create an Investment Policy Statement for:
 
 ### Multi-Agent Investment Analysis
 
-**Command**: `/analyze <SYMBOL>`
+**Command**: `/analyze <SYMBOL>` or just ask naturally
 
 **What Happens**:
 
@@ -532,57 +521,78 @@ Create an Investment Policy Statement for:
 3. **Synthesis** combines both perspectives into final recommendation
 
 <details>
-<summary><b>Example: /analyze MSFT (click to expand)</b></summary>
+<summary><b>Example: Comprehensive MSFT Analysis (click to expand)</b></summary>
 
 ```
-You: /analyze MSFT
+You: Should I invest in Microsoft?
 
-Investment Analysis Workflow: Starting multi-agent analysis...
+🔀 Router analyzing your query to select appropriate agent(s)...
+
+Router (Analyzing Intent):
+→ Detected investment decision query
+→ Routing to Quill (fundamental analysis)
+→ Routing to Macro Lens (market timing validation)
+→ Routing to Risk Shield (exposure assessment)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 1: FUNDAMENTAL ANALYSIS (Quill)
+QUILL: FUNDAMENTAL ANALYSIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Quill (Equity Research):
-  → Calling get_quote(symbol=MSFT)
-  ✓ MSFT: $420.45, +0.8%, P/E 31x, Market Cap $3.1T
-
-  → Calling get_earnings_history(symbol=MSFT)
-  ✓ 4 consecutive earnings beats, avg +4.2% surprise
-
-  → Calling get_analyst_recommendations(symbol=MSFT)
-  ✓ 89% buy ratings, mean target $475 (+13% upside)
-
-  → Calling get_financials(symbol=MSFT)
-  ✓ Revenue +15% YoY, 42% gross margin, $87B FCF
+  → Calling route_to_quill
+     Quill analyzing: Should I invest in Microsoft...
+     Running specialist tools (fundamental analysis, valuation, investment thesis)...
+      → get_quote({'symbol': 'MSFT'})
+      → get_earnings_history({'symbol': 'MSFT'})
+      → get_analyst_recommendations({'symbol': 'MSFT'})
+      → get_financials({'symbol': 'MSFT'})
+  ✓ Quill (Fundamental Analysis) completed
 
 **Fundamental Assessment**: STRONG
+- Price: $420.45 (+0.8%), P/E 31x, Market Cap $3.1T
+- 4 consecutive earnings beats, avg +4.2% surprise
+- 89% buy ratings, mean target $475 (+13% upside)
+- Revenue +15% YoY, 42% gross margin, $87B FCF
 - Exceptional profitability (42% ROE)
-- Consistent earnings outperformance
-- Strong analyst conviction
-- Reasonable valuation (31x P/E vs 15% growth)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 2: MACRO VALIDATION (Macro Lens)
+MACRO LENS: TIMING VALIDATION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Macro Lens (Market Strategist):
-  → Calling get_key_macro_indicators()
-  ✓ GDP +2.4%, CPI +3.1%, Unemployment 3.7%
-
-  → Calling get_treasury_yield_curve()
-  ✓ 10Y-2Y inverted -0.54% (recession warning)
-
-  → Calling get_market_indices()
-  ✓ S&P 500 +12% YTD, Nasdaq -8% from highs, VIX 14.2
+  → Calling route_to_macro_lens
+     Macro Lens analyzing: What is the current market environment...
+     Running specialist tools (market timing, sector allocation, economic regime)...
+      → get_key_macro_indicators()
+      → get_treasury_yield_curve()
+      → get_market_indices()
+  ✓ Macro Lens (Market Timing) completed
 
 **Macro Context**: LATE EXPANSION with CAUTION
-- Inverted yield curve signals recession risk (12-18 month window)
-- Tech sector vulnerability (Nasdaq off highs)
-- But Microsoft has defensive characteristics
+- GDP +2.4%, CPI +3.1%, Unemployment 3.7%
+- 10Y-2Y inverted -0.54% (recession warning)
+- S&P 500 +12% YTD, Nasdaq -8% from highs, VIX 14.2
+- Late expansion phase suggests staged entry
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-STEP 3: FINAL SYNTHESIS
+RISK SHIELD: EXPOSURE ASSESSMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Risk Shield (Portfolio Risk):
+  → Calling route_to_risk_shield
+     Risk Shield analyzing: What are the key risk considerations...
+     Running specialist tools (portfolio risk, VAR, drawdown analysis)...
+      → get_volatility_metrics({'symbol': 'MSFT'})
+      → calculate_portfolio_beta({'symbol': 'MSFT'})
+  ✓ Risk Shield (Portfolio Risk) completed
+
+**Risk Profile**: MODERATE
+- Beta: 0.95 (slightly less volatile than market)
+- Defensive characteristics (enterprise subscriptions)
+- Position sizing: Recommend 5-10% of portfolio max
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FINAL SYNTHESIS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🎯 RECOMMENDATION: BUY (Dollar-Cost Average)
@@ -603,27 +613,22 @@ However, macro timing suggests staged entry:
 
 **Suggested Action**:
 
-Instead of full position immediately, dollar-cost average over 3-6 months:
+Dollar-cost average over 3-6 months:
 - Tranche 1: 40% now (defensive exposure to quality)
 - Tranche 2: 30% if MSFT dips below $390 (-7% from current)
 - Tranche 3: 30% if macro deteriorates (recession confirmed)
 
-Microsoft's defensive characteristics (enterprise subscriptions,
-recurring revenue) position it to outperform cyclical tech peers
-in downturn.
+Microsoft's defensive characteristics position it to outperform
+cyclical tech peers in downturn.
 
 **Risk Warnings**:
-
-1. **Fundamental**: Azure growth deceleration below 25% YoY would
-   weaken investment thesis
-2. **Valuation**: Recession could compress P/E to 24-26x (historical
-   trough), implying 15-20% downside
-3. **Macro**: If yield curve steepens rapidly, indicates imminent
-   recession—pause accumulation
+1. Azure growth deceleration below 25% YoY would weaken thesis
+2. Recession could compress P/E to 24-26x (15-20% downside)
+3. If yield curve steepens rapidly, pause accumulation
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📄 Report saved to: reports/MSFT_analysis_20251008_143022.md
+📄 Report saved to: reports/MSFT_analysis_20251012_143022.md
 ```
 
 </details>
@@ -663,21 +668,25 @@ in downturn.
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.35 (In Development)
+### Current Release: v0.1.36 (In Development)
 
 **Latest Features**:
-- ✅ **Hedge Smith Agent**: Options strategies (collars, covered calls, puts), Greeks analysis, strike/expiration optimization
+- ✅ **Automatic Intent-Based Routing**: No more manual agent switching—just ask naturally
+- ✅ **Progressive Streaming**: Real-time display of sub-agent tool calls as they execute
+- ✅ **Router Agent**: LangGraph tool-calling supervisor that coordinates 10 specialist agents
+- ✅ **Enhanced Transparency**: Watch router analyze intent and select appropriate agents
+- ✅ **Backward Compatible**: All `/command` syntax still works for power users
+
+**Recently Completed**:
+- ✅ **Hedge Smith Agent**: Options strategies (collars, covered calls, puts), Greeks analysis (v0.1.35)
 - ✅ **Tax Scout Agent**: Tax-loss harvesting, wash-sale compliance, year-end planning (v0.1.34)
 - ✅ **Risk Shield Agent**: Portfolio risk management, VAR, drawdown analysis (v0.1.33)
 - ✅ **News Sentry Agent**: Real-time 8-K monitoring, insider tracking, breaking news (v0.1.32)
-- ✅ **Enhanced Documentation**: Reorganized docs with FAQ, getting started guide
-- ✅ **Smart Input Management**: Auto-disable during processing, clear status feedback
-- ✅ **Auto-Save Reports**: All responses >200 chars saved to `reports/`
 
-**Planned for v0.1.36** (Q1 2025):
-- [ ] **Prompt Routing**: Automatic agent selection based on user intent (no manual /command switching)
+**Planned for v0.1.37** (Q1 2025):
+- [ ] **Enhanced Workflows**: Extended `/analyze` with News Sentry, Risk Shield, Tax Scout
+- [ ] **New Workflows**: `/discover` (Screen Forge → Quill → Risk Shield), `/optimize-tax`, `/protect`
 - [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls
-- [ ] **Enhanced Workflows**: Parallel agent execution, conditional branching
 
 ### Future Releases
 
@@ -690,6 +699,20 @@ in downturn.
 - [ ] **Python SDK**: Programmatic API for third-party integrations
 
 ### Recent Releases
+
+<details>
+<summary><b>v0.1.35 (Oct 13, 2025) - Hedge Smith Agent</b></summary>
+
+- ✅ Options strategies for portfolio protection and yield enhancement
+- ✅ Protective collars, covered calls, protective puts, cash-secured puts
+- ✅ Greeks analysis (delta, gamma, theta, vega, IV)
+- ✅ Strike selection and expiration optimization
+- ✅ 13 specialized tools for options analysis
+- ✅ TUI integration with `/hedge` command
+
+[Full Release Notes](backlog/release-0.1.35.md)
+
+</details>
 
 <details>
 <summary><b>v0.1.34 (Oct 12, 2025) - Tax Scout Agent</b></summary>
@@ -713,30 +736,6 @@ in downturn.
 - ✅ TUI integration with `/risk` command
 
 [Full Release Notes](backlog/release-0.1.33.md)
-
-</details>
-
-<details>
-<summary><b>v0.1.32 (Jan 12, 2025) - News Sentry Agent</b></summary>
-
-- ✅ Real-time 8-K monitoring and insider tracking
-- ✅ Event prioritization (CRITICAL/HIGH/MEDIUM/LOW)
-- ✅ 13 specialized tools for event detection
-- ✅ TUI integration with `/news` command
-
-[Full Release Notes](backlog/release-0.1.32.md)
-
-</details>
-
-<details>
-<summary><b>v0.1.31 (Jan 10, 2025) - UX Improvements</b></summary>
-
-- ✅ Enhanced input management (auto-disable during processing)
-- ✅ Increased max_tokens to 8192 (no more truncated responses)
-- ✅ Automatic report saving for all agent responses
-- ✅ Live footer status updates ("Processing..." → "Ready")
-
-[Full Release Notes](backlog/release-0.1.31.md)
 
 </details>
 
