@@ -416,6 +416,22 @@ class ChatUI(App):
                                                 "route_to_research": "Research (Macro Data)",
                                             }
                                             agent_display = agent_name_map.get(tool_name, tool_name)
+
+                                            # Parse tool call log from message content
+                                            if hasattr(msg, "content") and "[TOOL CALLS]" in msg.content:
+                                                # Extract and display sub-agent tool calls
+                                                lines = msg.content.split("\n")
+                                                in_tool_section = False
+                                                for line in lines:
+                                                    if line.strip() == "[TOOL CALLS]":
+                                                        in_tool_section = True
+                                                        continue
+                                                    elif line.strip() == "[ANALYSIS]":
+                                                        break
+                                                    elif in_tool_section and line.strip().startswith("→"):
+                                                        # Display sub-agent tool call
+                                                        chat_log.write(f"[dim]      {line.strip()}[/dim]\n")
+
                                             chat_log.write(f"[dim]  ✓ {agent_display} completed[/dim]\n")
                                         else:
                                             chat_log.write(f"[dim]  ✓ {tool_name} completed[/dim]\n")
