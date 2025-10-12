@@ -144,6 +144,8 @@ class ChatUI(App):
         height: 1fr;
         border: solid $primary;
         padding: 1;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     #input-container {
@@ -179,7 +181,7 @@ class ChatUI(App):
     def compose(self) -> ComposeResult:
         """Compose the UI."""
         yield Header()
-        yield RichLog(id="chat-log", highlight=True, markup=True)
+        yield RichLog(id="chat-log", highlight=True, markup=True, wrap=True)
         yield Container(
             Input(
                 placeholder="Ask about stocks or economic indicators (/examples for ideas, /help for commands)...",
