@@ -19,6 +19,7 @@ from navam_invest.agents.macro_lens import create_macro_lens_agent
 from navam_invest.agents.earnings_whisperer import create_earnings_whisperer_agent
 from navam_invest.agents.news_sentry import create_news_sentry_agent
 from navam_invest.agents.risk_shield import create_risk_shield_agent
+from navam_invest.agents.tax_scout import create_tax_scout_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
@@ -112,6 +113,17 @@ RISK_SHIELD_EXAMPLES = [
     "Recommend risk mitigation strategies for my current exposures",
 ]
 
+TAX_SCOUT_EXAMPLES = [
+    "Identify tax-loss harvesting opportunities in my portfolio",
+    "Which positions have unrealized losses I can harvest before Dec 31?",
+    "Check for wash-sale violations - did I violate the 30-day rule?",
+    "I sold AAPL at a loss last week. Can I buy it back now?",
+    "Find replacement securities for TSLA that won't trigger wash-sale rules",
+    "Calculate my potential tax savings from harvesting losses",
+    "What's my year-to-date capital gains/loss situation?",
+    "Recommend tax-efficient rebalancing strategies for year-end",
+]
+
 WORKFLOW_EXAMPLES = [
     "/analyze AAPL - Complete investment analysis (fundamental + macro)",
     "/analyze MSFT - Should I invest? Get both bottom-up and top-down view",
@@ -132,6 +144,8 @@ class ChatUI(App):
         height: 1fr;
         border: solid $primary;
         padding: 1;
+        overflow-x: hidden;
+        overflow-y: auto;
     }
 
     #input-container {
@@ -159,6 +173,7 @@ class ChatUI(App):
         self.earnings_whisperer_agent: Optional[object] = None
         self.news_sentry_agent: Optional[object] = None
         self.risk_shield_agent: Optional[object] = None
+        self.tax_scout_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
@@ -166,7 +181,7 @@ class ChatUI(App):
     def compose(self) -> ComposeResult:
         """Compose the UI."""
         yield Header()
-        yield RichLog(id="chat-log", highlight=True, markup=True)
+        yield RichLog(id="chat-log", highlight=True, markup=True, wrap=True)
         yield Container(
             Input(
                 placeholder="Ask about stocks or economic indicators (/examples for ideas, /help for commands)...",
@@ -196,6 +211,7 @@ class ChatUI(App):
                 "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                 "- `/news` - Switch to News Sentry event monitoring agent\n"
                 "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
+                "- `/tax` - Switch to Tax Scout tax optimization agent\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
@@ -218,11 +234,16 @@ class ChatUI(App):
             self.earnings_whisperer_agent = await create_earnings_whisperer_agent()
             self.news_sentry_agent = await create_news_sentry_agent()
             self.risk_shield_agent = await create_risk_shield_agent()
+            self.tax_scout_agent = await create_tax_scout_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
             self.sub_title = f"Agent: {self.current_agent.title()} | Ready"
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield)[/green]")
-            chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
+            chat_log.write(
+                "[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout)[/green]"
+            )
+            chat_log.write(
+                "[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]"
+            )
         except ConfigurationError as e:
             self.agents_initialized = False
             # Show helpful setup instructions for missing API keys
@@ -315,6 +336,10 @@ class ChatUI(App):
                 agent = self.risk_shield_agent
                 agent_name = "Risk Shield Manager"
                 report_type = "risk_analysis"
+            elif self.current_agent == "tax":
+                agent = self.tax_scout_agent
+                agent_name = "Tax Scout"
+                report_type = "tax_optimization"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -331,7 +356,7 @@ class ChatUI(App):
             tool_calls_shown = set()
             async for event in agent.astream(
                 {"messages": [HumanMessage(content=text)]},
-                stream_mode=["values", "updates"]
+                stream_mode=["values", "updates"],
             ):
                 # Parse the event tuple
                 if isinstance(event, tuple) and len(event) == 2:
@@ -345,7 +370,9 @@ class ChatUI(App):
                                 for msg in node_output["messages"]:
                                     if hasattr(msg, "name"):
                                         tool_name = msg.name
-                                        chat_log.write(f"[dim]  ✓ {tool_name} completed[/dim]\n")
+                                        chat_log.write(
+                                            f"[dim]  ✓ {tool_name} completed[/dim]\n"
+                                        )
 
                             # Show agent making tool calls
                             elif node_name == "agent" and "messages" in node_output:
@@ -355,12 +382,17 @@ class ChatUI(App):
                                             call_id = tool_call.get("id", "")
                                             if call_id not in tool_calls_shown:
                                                 tool_calls_shown.add(call_id)
-                                                tool_name = tool_call.get("name", "unknown")
+                                                tool_name = tool_call.get(
+                                                    "name", "unknown"
+                                                )
                                                 tool_args = tool_call.get("args", {})
 
                                                 # Format args for display
                                                 args_preview = ", ".join(
-                                                    f"{k}={str(v)[:30]}" for k, v in list(tool_args.items())[:3]
+                                                    f"{k}={str(v)[:30]}"
+                                                    for k, v in list(tool_args.items())[
+                                                        :3
+                                                    ]
                                                 )
                                                 if len(tool_args) > 3:
                                                     args_preview += "..."
@@ -375,7 +407,10 @@ class ChatUI(App):
                             last_msg = event_data["messages"][-1]
                             if hasattr(last_msg, "content") and last_msg.content:
                                 # Show final response only
-                                if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+                                if (
+                                    not hasattr(last_msg, "tool_calls")
+                                    or not last_msg.tool_calls
+                                ):
                                     agent_response = last_msg.content
                                     chat_log.write(Markdown(agent_response))
 
@@ -384,7 +419,8 @@ class ChatUI(App):
                 try:
                     # Extract context from user message (e.g., stock symbols)
                     import re
-                    symbols = re.findall(r'\b[A-Z]{2,5}\b', text.upper())
+
+                    symbols = re.findall(r"\b[A-Z]{2,5}\b", text.upper())
 
                     context = {"query": text[:50]}
                     if symbols:
@@ -397,7 +433,9 @@ class ChatUI(App):
                     )
                     chat_log.write(f"\n[dim]📄 Report saved to: {report_path}[/dim]\n")
                 except Exception as save_error:
-                    chat_log.write(f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n")
+                    chat_log.write(
+                        f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n"
+                    )
 
         except Exception as e:
             chat_log.write(f"\n[red]Error: {str(e)}[/red]")
@@ -416,9 +454,12 @@ class ChatUI(App):
                 "macro": "Macro Lens",
                 "earnings": "Earnings Whisperer",
                 "news": "News Sentry",
-                "risk": "Risk Shield"
+                "risk": "Risk Shield",
+                "tax": "Tax Scout",
             }
-            agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
+            agent_name = agent_display_names.get(
+                self.current_agent, self.current_agent.title()
+            )
             self.sub_title = f"Agent: {agent_name} | Ready"
 
             # Focus back on input for next query
@@ -440,7 +481,9 @@ class ChatUI(App):
 
             symbol = parts[1].upper()
             chat_log.write(f"\n[bold cyan]You:[/bold cyan] Analyze {symbol}\n")
-            chat_log.write(f"[bold green]Investment Analysis Workflow:[/bold green] Starting multi-agent analysis...\n")
+            chat_log.write(
+                f"[bold green]Investment Analysis Workflow:[/bold green] Starting multi-agent analysis...\n"
+            )
 
             try:
                 # Track analysis sections for report saving
@@ -457,7 +500,7 @@ class ChatUI(App):
                         "quill_analysis": "",
                         "macro_context": "",
                     },
-                    stream_mode=["values", "updates"]
+                    stream_mode=["values", "updates"],
                 ):
                     # Parse the event tuple
                     if isinstance(event, tuple) and len(event) == 2:
@@ -468,22 +511,35 @@ class ChatUI(App):
                             for node_name, node_output in event_data.items():
                                 # Show which agent is working
                                 if node_name == "quill":
-                                    chat_log.write("[dim]  📊 Quill analyzing fundamentals...[/dim]\n")
+                                    chat_log.write(
+                                        "[dim]  📊 Quill analyzing fundamentals...[/dim]\n"
+                                    )
                                 elif node_name == "macro_lens":
-                                    chat_log.write("[dim]  🌍 Macro Lens validating timing...[/dim]\n")
+                                    chat_log.write(
+                                        "[dim]  🌍 Macro Lens validating timing...[/dim]\n"
+                                    )
                                 elif node_name == "synthesize":
-                                    chat_log.write("[dim]  🎯 Synthesizing recommendation...[/dim]\n")
+                                    chat_log.write(
+                                        "[dim]  🎯 Synthesizing recommendation...[/dim]\n"
+                                    )
 
                                 # Show tool calls
                                 if "messages" in node_output:
                                     for msg in node_output["messages"]:
-                                        if hasattr(msg, "tool_calls") and msg.tool_calls:
+                                        if (
+                                            hasattr(msg, "tool_calls")
+                                            and msg.tool_calls
+                                        ):
                                             for tool_call in msg.tool_calls:
                                                 call_id = tool_call.get("id", "")
                                                 if call_id not in tool_calls_shown:
                                                     tool_calls_shown.add(call_id)
-                                                    tool_name = tool_call.get("name", "unknown")
-                                                    chat_log.write(f"[dim]    → {tool_name}[/dim]\n")
+                                                    tool_name = tool_call.get(
+                                                        "name", "unknown"
+                                                    )
+                                                    chat_log.write(
+                                                        f"[dim]    → {tool_name}[/dim]\n"
+                                                    )
 
                         # Handle final values
                         elif event_type == "values":
@@ -497,9 +553,14 @@ class ChatUI(App):
                                 last_msg = event_data["messages"][-1]
                                 if hasattr(last_msg, "content") and last_msg.content:
                                     # Show final recommendation
-                                    if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+                                    if (
+                                        not hasattr(last_msg, "tool_calls")
+                                        or not last_msg.tool_calls
+                                    ):
                                         final_recommendation = last_msg.content
-                                        chat_log.write("\n[bold green]Final Recommendation:[/bold green]\n")
+                                        chat_log.write(
+                                            "\n[bold green]Final Recommendation:[/bold green]\n"
+                                        )
                                         chat_log.write(Markdown(final_recommendation))
 
                 # Save the complete report
@@ -512,14 +573,18 @@ class ChatUI(App):
                     )
                     chat_log.write(f"\n[dim]📄 Report saved to: {report_path}[/dim]\n")
                 except Exception as save_error:
-                    chat_log.write(f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n")
+                    chat_log.write(
+                        f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n"
+                    )
 
             except Exception as e:
                 chat_log.write(f"\n[red]Error running workflow: {str(e)}[/red]")
 
         elif command == "/api":
             chat_log.write("\n[bold cyan]Checking API Status...[/bold cyan]\n")
-            chat_log.write("[dim]Testing connectivity to all configured APIs...\n\n[/dim]")
+            chat_log.write(
+                "[dim]Testing connectivity to all configured APIs...\n\n[/dim]"
+            )
 
             try:
                 # Run API checks
@@ -549,11 +614,7 @@ class ChatUI(App):
                     else:
                         status_styled = f"[dim]{status}[/dim]"
 
-                    table.add_row(
-                        result["api"],
-                        status_styled,
-                        result["details"]
-                    )
+                    table.add_row(result["api"], status_styled, result["details"])
 
                 # Display table
                 chat_log.write(table)
@@ -589,6 +650,7 @@ class ChatUI(App):
                     "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
                     "- `/news` - Switch to News Sentry event monitoring agent\n"
                     "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
+                    "- `/tax` - Switch to Tax Scout tax optimization agent\n"
                     "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                     "- `/api` - Check API connectivity and status\n"
                     "- `/examples` - Show example prompts for current agent\n"
@@ -608,15 +670,21 @@ class ChatUI(App):
         elif command == "/quill":
             self.current_agent = "quill"
             self.sub_title = "Agent: Quill | Ready"
-            chat_log.write("\n[green]✓ Switched to Quill (Equity Research) agent[/green]\n")
+            chat_log.write(
+                "\n[green]✓ Switched to Quill (Equity Research) agent[/green]\n"
+            )
         elif command == "/screen":
             self.current_agent = "screen"
             self.sub_title = "Agent: Screen Forge | Ready"
-            chat_log.write("\n[green]✓ Switched to Screen Forge (Equity Screening) agent[/green]\n")
+            chat_log.write(
+                "\n[green]✓ Switched to Screen Forge (Equity Screening) agent[/green]\n"
+            )
         elif command == "/macro":
             self.current_agent = "macro"
             self.sub_title = "Agent: Macro Lens | Ready"
-            chat_log.write("\n[green]✓ Switched to Macro Lens (Market Strategist) agent[/green]\n")
+            chat_log.write(
+                "\n[green]✓ Switched to Macro Lens (Market Strategist) agent[/green]\n"
+            )
         elif command == "/earnings":
             self.current_agent = "earnings"
             self.sub_title = "Agent: Earnings Whisperer | Ready"
@@ -624,11 +692,21 @@ class ChatUI(App):
         elif command == "/news":
             self.current_agent = "news"
             self.sub_title = "Agent: News Sentry | Ready"
-            chat_log.write("\n[green]✓ Switched to News Sentry (Event Monitoring) agent[/green]\n")
+            chat_log.write(
+                "\n[green]✓ Switched to News Sentry (Event Monitoring) agent[/green]\n"
+            )
         elif command == "/risk":
             self.current_agent = "risk"
             self.sub_title = "Agent: Risk Shield | Ready"
-            chat_log.write("\n[green]✓ Switched to Risk Shield (Portfolio Risk Manager) agent[/green]\n")
+            chat_log.write(
+                "\n[green]✓ Switched to Risk Shield (Portfolio Risk Manager) agent[/green]\n"
+            )
+        elif command == "/tax":
+            self.current_agent = "tax"
+            self.sub_title = "Agent: Tax Scout | Ready"
+            chat_log.write(
+                "\n[green]✓ Switched to Tax Scout (Tax Optimization) agent[/green]\n"
+            )
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -655,6 +733,9 @@ class ChatUI(App):
             elif self.current_agent == "risk":
                 examples = RISK_SHIELD_EXAMPLES
                 agent_name = "Risk Shield (Portfolio Risk Manager)"
+            elif self.current_agent == "tax":
+                examples = TAX_SCOUT_EXAMPLES
+                agent_name = "Tax Scout (Tax Optimization)"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"
@@ -662,10 +743,14 @@ class ChatUI(App):
             # Randomly select 4 examples to show
             selected_examples = random.sample(examples, min(4, len(examples)))
 
-            examples_text = "\n".join(f"{i+1}. {ex}" for i, ex in enumerate(selected_examples))
+            examples_text = "\n".join(
+                f"{i+1}. {ex}" for i, ex in enumerate(selected_examples)
+            )
 
             # Add workflow examples
-            workflow_text = "\n".join(f"{i+1}. {ex}" for i, ex in enumerate(WORKFLOW_EXAMPLES))
+            workflow_text = "\n".join(
+                f"{i+1}. {ex}" for i, ex in enumerate(WORKFLOW_EXAMPLES)
+            )
 
             chat_log.write(
                 Markdown(
