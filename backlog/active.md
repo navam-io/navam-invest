@@ -371,15 +371,15 @@ async def create_router_agent() -> StateGraph:
 ### Documentation Updates
 
 **User-facing:**
-- Update `docs/user-guide/getting-started.md` - New UX flow
-- Update `docs/user-guide/agents.md` - Router agent description
-- Update `docs/faq.md` - Add router FAQs
-- Update `README.md` - New UX examples
+- [x] Update `docs/user-guide/getting-started.md` - New UX flow ✅ COMPLETED
+- [ ] Update `docs/user-guide/agents.md` - Router agent description (deferred - not user-facing)
+- [x] Update `docs/faq.md` - Add router FAQs ✅ COMPLETED
+- [x] Update `README.md` - New UX examples ✅ COMPLETED
 
 **Developer:**
-- Update `CLAUDE.md` - Router architecture patterns
-- Create `docs/architecture/routing.md` - Router design doc
-- Update `docs/architecture/agents-tools-mapping.md` - Add router
+- [ ] Update `CLAUDE.md` - Router architecture patterns (deferred to Phase 2)
+- [ ] Create `docs/architecture/routing.md` - Router design doc (deferred to Phase 2)
+- [ ] Update `docs/architecture/agents-tools-mapping.md` - Add router (deferred to Phase 2)
 
 ---
 

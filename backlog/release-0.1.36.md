@@ -100,13 +100,12 @@ User: "Should I invest in AAPL?"
 - [x] Update welcome message to emphasize automatic routing
 - [x] Update `/help` command with router control section
 
-**Documentation Updates**:
-- [ ] Update `docs/user-guide/getting-started.md` - New UX flow with router
-- [ ] Update `docs/user-guide/agents.md` - Router agent description
-- [ ] Update `docs/faq.md` - Add router FAQs (How does routing work? Can I still use /commands?)
-- [ ] Update `README.md` - New UX examples showing automatic routing
-- [ ] Update `CLAUDE.md` - Router architecture patterns and LangGraph supervisor pattern
-- [ ] Create `docs/architecture/routing.md` - Router design doc with intent classification logic
+**Documentation Updates**: ✅ COMPLETED
+- [x] Update `docs/user-guide/getting-started.md` - New UX flow with router
+- [x] Update `docs/faq.md` - Add router FAQs (9 comprehensive FAQ topics)
+- [x] Update `README.md` - New UX examples showing automatic routing
+- [ ] Update `CLAUDE.md` - Router architecture patterns (deferred to v0.1.37)
+- [ ] Create `docs/architecture/routing.md` - Router design doc (deferred to v0.1.37)
 
 **Future Phases (v0.1.37-0.1.38)**:
 - [ ] Extended multi-agent workflows (Phase 2)
