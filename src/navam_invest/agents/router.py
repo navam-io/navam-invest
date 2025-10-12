@@ -117,6 +117,52 @@ async def _get_hedge_smith_agent():
     return _hedge_smith_agent
 
 
+# Helper function to stream agent execution and collect tool calls
+async def _stream_agent_with_tool_log(agent, query: str) -> str:
+    """Stream agent execution and collect tool call information.
+
+    Args:
+        agent: The LangGraph agent to stream
+        query: The query to send to the agent
+
+    Returns:
+        Formatted string with [TOOL CALLS] section and analysis
+    """
+    tool_calls_log = []
+    final_response = ""
+
+    async for event in agent.astream(
+        {"messages": [HumanMessage(content=query)]},
+        stream_mode=["values", "updates"]
+    ):
+        if isinstance(event, tuple) and len(event) == 2:
+            event_type, event_data = event
+
+            # Collect tool call information
+            if event_type == "updates":
+                for node_name, node_output in event_data.items():
+                    if node_name == "agent" and "messages" in node_output:
+                        for msg in node_output["messages"]:
+                            if hasattr(msg, "tool_calls") and msg.tool_calls:
+                                for tool_call in msg.tool_calls:
+                                    tool_name = tool_call.get("name", "unknown")
+                                    tool_args = tool_call.get("args", {})
+                                    tool_calls_log.append(f"→ {tool_name}({tool_args})")
+
+            # Capture final response
+            elif event_type == "values":
+                if "messages" in event_data and event_data["messages"]:
+                    last_msg = event_data["messages"][-1]
+                    if hasattr(last_msg, "content") and last_msg.content:
+                        final_response = last_msg.content
+
+    # Return response with tool call log prefix
+    if tool_calls_log:
+        log_str = "\n".join(tool_calls_log)
+        return f"[TOOL CALLS]\n{log_str}\n\n[ANALYSIS]\n{final_response}"
+    return final_response
+
+
 # Agent tool wrappers
 @tool
 async def route_to_quill(query: str) -> str:
@@ -138,42 +184,7 @@ async def route_to_quill(query: str) -> str:
     """
     try:
         agent = await _get_quill_agent()
-
-        # Stream agent execution to collect tool calls
-        tool_calls_log = []
-        final_response = ""
-
-        async for event in agent.astream(
-            {"messages": [HumanMessage(content=query)]},
-            stream_mode=["values", "updates"]
-        ):
-            if isinstance(event, tuple) and len(event) == 2:
-                event_type, event_data = event
-
-                # Collect tool call information
-                if event_type == "updates":
-                    for node_name, node_output in event_data.items():
-                        if node_name == "agent" and "messages" in node_output:
-                            for msg in node_output["messages"]:
-                                if hasattr(msg, "tool_calls") and msg.tool_calls:
-                                    for tool_call in msg.tool_calls:
-                                        tool_name = tool_call.get("name", "unknown")
-                                        tool_args = tool_call.get("args", {})
-                                        tool_calls_log.append(f"→ {tool_name}({tool_args})")
-
-                # Capture final response
-                elif event_type == "values":
-                    if "messages" in event_data and event_data["messages"]:
-                        last_msg = event_data["messages"][-1]
-                        if hasattr(last_msg, "content") and last_msg.content:
-                            final_response = last_msg.content
-
-        # Return response with tool call log prefix
-        if tool_calls_log:
-            log_str = "\n".join(tool_calls_log)
-            return f"[TOOL CALLS]\n{log_str}\n\n[ANALYSIS]\n{final_response}"
-        return final_response
-
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Quill agent failed - {str(e)}"
 
@@ -197,8 +208,7 @@ async def route_to_screen_forge(query: str) -> str:
     """
     try:
         agent = await _get_screen_forge_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Screen Forge agent failed - {str(e)}"
 
@@ -223,8 +233,7 @@ async def route_to_macro_lens(query: str) -> str:
     """
     try:
         agent = await _get_macro_lens_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Macro Lens agent failed - {str(e)}"
 
@@ -249,8 +258,7 @@ async def route_to_earnings_whisperer(query: str) -> str:
     """
     try:
         agent = await _get_earnings_whisperer_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Earnings Whisperer agent failed - {str(e)}"
 
@@ -275,8 +283,7 @@ async def route_to_news_sentry(query: str) -> str:
     """
     try:
         agent = await _get_news_sentry_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: News Sentry agent failed - {str(e)}"
 
@@ -301,8 +308,7 @@ async def route_to_risk_shield(query: str) -> str:
     """
     try:
         agent = await _get_risk_shield_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Risk Shield agent failed - {str(e)}"
 
@@ -327,8 +333,7 @@ async def route_to_tax_scout(query: str) -> str:
     """
     try:
         agent = await _get_tax_scout_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Tax Scout agent failed - {str(e)}"
 
@@ -354,8 +359,7 @@ async def route_to_hedge_smith(query: str) -> str:
     """
     try:
         agent = await _get_hedge_smith_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Hedge Smith agent failed - {str(e)}"
 
@@ -379,8 +383,7 @@ async def route_to_portfolio(query: str) -> str:
     """
     try:
         agent = await _get_portfolio_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Portfolio agent failed - {str(e)}"
 
@@ -404,8 +407,7 @@ async def route_to_research(query: str) -> str:
     """
     try:
         agent = await _get_research_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+        return await _stream_agent_with_tool_log(agent, query)
     except Exception as e:
         return f"Error: Research agent failed - {str(e)}"
 
