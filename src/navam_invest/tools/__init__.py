@@ -392,24 +392,22 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_treasury_rate",
             "get_treasury_yield_spread",
         ],
-        # Tax Scout (Tax Optimization): Tax-loss harvesting and compliance
+        # Tax Scout (Tax Optimization): Tax-loss harvesting and wash-sale compliance
         "tax_scout": [
-            # Portfolio holdings and transaction history
+            # Portfolio holdings with cost basis and purchase dates
             "read_local_file",
             "list_local_files",
-            # Current market data for loss calculations
+            # Market data for unrealized gain/loss calculations (Yahoo Finance)
             "get_quote",
-            "get_stock_price",
             "get_historical_data",
-            # Fundamentals for replacement candidate analysis
+            "get_stock_price",
+            # Company info for substitute security identification
             "get_company_info",
             "get_financials",
             "get_stock_overview",
-            # Sector classification for replacement matching
+            # Historical data for wash-sale window analysis
             "get_fundamentals_daily",
-            # Historical data for wash-sale period checking
-            "get_historical_fundamentals",
-            # Correlation metrics for finding similar replacements
+            # Similar securities screening for wash-sale compliant alternatives
             "get_analyst_recommendations",
             "get_company_news",
         ],
@@ -475,7 +473,7 @@ def _create_bound_wrapper(original_func, api_key: str):
     @wraps(original_func)
     async def wrapper(*args, **kwargs):
         # Remove api_key from kwargs if LLM passed it to avoid duplicate
-        kwargs.pop("api_key", None)
+        kwargs.pop('api_key', None)
         return await original_func(*args, api_key=api_key, **kwargs)
 
     return wrapper

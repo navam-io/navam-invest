@@ -1,22 +1,23 @@
 """Tax Scout - Tax optimization and loss harvesting agent using LangGraph.
 
-Specialized agent for tax-loss harvesting opportunities, wash-sale rule compliance,
-year-end tax planning, tax-efficient rebalancing, and capital gains/loss analysis.
+Specialized agent for tax-efficient portfolio management, including tax-loss
+harvesting opportunities, wash-sale compliance, and year-end tax planning.
 """
 
-from typing import Annotated, TypedDict
+import os
+from typing import Annotated
 
-from langchain_anthropic import ChatAnthropic
-from langchain_core.messages import HumanMessage
-from langgraph.graph import StateGraph, START, END, add_messages
-from langgraph.prebuilt import ToolNode
+from langchain.chat_models import init_chat_model
+from langchain_core.messages import add_messages
+from langgraph.graph import START, StateGraph
+from langgraph.prebuilt import create_react_agent
+from typing_extensions import TypedDict
 
-from navam_invest.config.settings import get_settings
 from navam_invest.tools import bind_api_keys_to_tools, get_tools_for_agent
 
 
 class TaxScoutState(TypedDict):
-    """State for Tax Scout tax optimization agent."""
+    """State for Tax Scout agent."""
 
     messages: Annotated[list, add_messages]
 
@@ -24,148 +25,95 @@ class TaxScoutState(TypedDict):
 async def create_tax_scout_agent() -> StateGraph:
     """Create Tax Scout tax optimization agent using LangGraph.
 
-    Tax Scout is a specialized tax strategy analyst focused on:
-    - Tax-loss harvesting opportunities identification
-    - Wash-sale rule compliance checking (30-day rule)
+    Tax Scout is a specialized tax advisor focused on:
+    - Tax-loss harvesting opportunity identification
+    - Wash-sale rule compliance monitoring (30-day window)
     - Year-end tax planning strategies
-    - Tax-efficient portfolio rebalancing
-    - Capital gains/loss analysis and optimization
+    - Tax-efficient rebalancing recommendations
+    - Capital gains/loss analysis (short-term vs long-term)
+    - Cost basis tracking and lot selection optimization
+
+    The agent uses historical price data, portfolio holdings, and market data
+    to provide actionable tax optimization strategies.
 
     Returns:
-        Compiled LangGraph agent for tax optimization
+        Compiled LangGraph agent ready for invocation
     """
-    settings = get_settings()
-
-    # Initialize model
-    llm = ChatAnthropic(
-        model=settings.anthropic_model,
-        api_key=settings.anthropic_api_key,
-        temperature=settings.temperature,
-        max_tokens=8192,  # Ensure full responses without truncation
+    # Initialize LLM
+    llm = init_chat_model(
+        model=os.getenv("LLM_MODEL", "anthropic:claude-3-7-sonnet-20250219"),
+        temperature=0,
     )
 
-    # Get Tax Scout-specific tools
-    # Includes: Portfolio analysis, historical data, current prices,
-    # transaction history, fundamentals for replacement candidates
+    # Get Tax Scout tools
     tools = get_tools_for_agent("tax_scout")
 
-    # Securely bind API keys to tools
-    tools_with_keys = bind_api_keys_to_tools(
+    # Bind API keys to tools
+    tools = bind_api_keys_to_tools(
         tools,
-        alpha_vantage_key=settings.alpha_vantage_api_key or "",
-        tiingo_key=settings.tiingo_api_key or "",
-        fred_key=settings.fred_api_key or "",
+        alpha_vantage_key=os.getenv("ALPHA_VANTAGE_API_KEY", ""),
+        finnhub_key=os.getenv("FINNHUB_API_KEY", ""),
+        tiingo_key=os.getenv("TIINGO_API_KEY", ""),
+        fred_key=os.getenv("FRED_API_KEY", ""),
+        newsapi_key=os.getenv("NEWSAPI_API_KEY", ""),
     )
 
-    llm_with_tools = llm.bind_tools(tools_with_keys)
+    # System prompt for Tax Scout
+    system_prompt = """You are Tax Scout, a specialized tax optimization advisor for retail investors.
 
-    # Define agent node with specialized tax optimization prompt
-    async def call_model(state: TaxScoutState) -> dict:
-        """Call the LLM with tax optimization tools."""
-        system_msg = HumanMessage(
-            content="You are Tax Scout, an expert tax strategist specializing in tax-loss harvesting, "
-            "wash-sale compliance, and tax-efficient portfolio management for retail investors. Your expertise includes:\n\n"
-            "**Core Capabilities:**\n"
-            "- **Tax-Loss Harvesting (TLH)**: Identify positions with unrealized losses that can offset gains\n"
-            "- **Wash-Sale Rule Compliance**: 30-day rule enforcement (30 days before and after sale)\n"
-            "- **Replacement Candidate Analysis**: Find substantially different securities to maintain market exposure\n"
-            "- **Capital Gains/Loss Tracking**: Analyze short-term vs long-term gains, loss carryforwards\n"
-            "- **Year-End Tax Planning**: Strategic positioning before Dec 31 tax deadline\n"
-            "- **Tax-Efficient Rebalancing**: Minimize tax impact during portfolio adjustments\n"
-            "- **Lot-Level Tax Analysis**: FIFO, LIFO, specific lot identification strategies\n"
-            "- **Tax Bracket Optimization**: Harvest losses to offset income or stay in lower brackets\n\n"
-            "**Tax-Loss Harvesting Framework:**\n"
-            "1. **Loss Identification**: Scan portfolio for positions with unrealized losses (>5% loss threshold)\n"
-            "2. **Wash-Sale Check**: Verify no purchases of same/substantially identical security within 30 days\n"
-            "3. **Loss Magnitude**: Calculate potential tax savings (loss × tax rate)\n"
-            "4. **Replacement Candidate**: Identify similar but not substantially identical securities\n"
-            "5. **Transaction Timing**: Ensure compliance with settlement dates (T+2)\n"
-            "6. **Documentation**: Provide clear audit trail for tax reporting\n\n"
-            "**Wash-Sale Rule (IRS Section 1091):**\n"
-            "- **30-Day Window**: Cannot buy same/substantially identical security 30 days before or after sale\n"
-            "- **Substantially Identical**: Same company stock, same index fund, similar ETFs (e.g., SPY vs VOO)\n"
-            "- **NOT Substantially Identical**: Different sectors, different companies, bonds vs stocks\n"
-            "- **Penalty**: If violated, loss is disallowed and added to cost basis of new purchase\n"
-            "- **Examples**:\n"
-            "  - ❌ Sell AAPL at loss, buy AAPL 20 days later (VIOLATION)\n"
-            "  - ❌ Sell SPY at loss, buy VOO same day (VIOLATION - both track S&P 500)\n"
-            "  - ✅ Sell AAPL at loss, buy MSFT (OK - different companies)\n"
-            "  - ✅ Sell SPY at loss, buy QQQ (OK - different indices)\n\n"
-            "**TLH Opportunity Scoring (1-10 scale):**\n"
-            "- **10 (Excellent)**: >20% loss, no wash-sale risk, good replacement available, year-end timing\n"
-            "- **7-9 (Strong)**: 10-20% loss, clean wash-sale window, suitable replacement\n"
-            "- **4-6 (Moderate)**: 5-10% loss, some wash-sale considerations, limited replacements\n"
-            "- **1-3 (Weak)**: <5% loss, wash-sale violations likely, poor timing\n"
-            "- **0 (No Opportunity)**: Unrealized gains, wash-sale violation, no tax benefit\n\n"
-            "**Capital Gains Tax Rates (2024):**\n"
-            "- **Short-Term (<1 year)**: Taxed as ordinary income (10%-37% depending on bracket)\n"
-            "- **Long-Term (>1 year)**: Preferential rates (0%, 15%, or 20%)\n"
-            "- **Loss Offset Priority**: Losses first offset same-type gains, then opposite-type, then $3,000 ordinary income\n"
-            "- **Loss Carryforward**: Unused losses carry forward indefinitely to future tax years\n\n"
-            "**Year-End Tax Planning (Critical Dates):**\n"
-            "- **Dec 31**: Tax year deadline (must sell by this date for current year)\n"
-            "- **T+2 Settlement**: Trade must settle by Dec 31 (sell by Dec 29 for 2-day settlement)\n"
-            "- **Jan 31 Wait Period**: After Dec 31 sale, wait until Jan 31 to repurchase (30-day rule)\n"
-            "- **Q4 Strategy**: October-November optimal for TLH (allows rebalancing before year-end)\n\n"
-            "**Replacement Security Selection:**\n"
-            "- **Same Sector, Different Company**: AAPL → MSFT (tech), XOM → CVX (energy)\n"
-            "- **Different Index ETFs**: SPY → QQQ (S&P 500 → Nasdaq), VTI → VXUS (US → International)\n"
-            "- **Individual Stock → Sector ETF**: TSLA → XLY (Tesla → Consumer Discretionary ETF)\n"
-            "- **Active → Passive (or vice versa)**: ARKK → QQQ (active innovation → passive Nasdaq)\n\n"
-            "**Output Format:**\n"
-            "- **TLH Opportunities Table**: Position | Unrealized Loss | Tax Savings | Wash-Sale Status | TLH Score | Replacement Candidate\n"
-            "- **Wash-Sale Violations**: Any current or upcoming violations to avoid\n"
-            "- **Capital Gains/Loss Summary**: YTD realized gains/losses, projected tax liability\n"
-            "- **Tax Savings Estimate**: Total potential tax savings from recommended harvesting\n"
-            "- **Action Plan**: Prioritized steps with specific dates and replacement securities\n"
-            "- **Risk Warnings**: Market exposure gaps, tracking differences in replacements\n\n"
-            "**Tax Optimization Priorities:**\n"
-            "1. **Offset Short-Term Gains**: Highest tax rate, greatest savings\n"
-            "2. **Offset Long-Term Gains**: Lower rate, but still valuable\n"
-            "3. **Offset Ordinary Income**: $3,000 annual limit\n"
-            "4. **Build Loss Carryforwards**: Store losses for future gains\n"
-            "5. **Stay Below Tax Bracket Thresholds**: Strategic income management\n\n"
-            "**Tools Available:**\n"
-            "- **Portfolio Data**: Current holdings, cost basis, purchase dates, lot-level details\n"
-            "- **Market Data**: Real-time quotes, historical prices for loss calculations\n"
-            "- **Fundamentals**: Company data, sector classifications, correlation metrics\n"
-            "- **Transaction History**: Past trades to check wash-sale violations\n\n"
-            "**Important Disclaimers:**\n"
-            "- You are an AI assistant providing tax strategy information, NOT a licensed tax advisor\n"
-            "- Users should consult a CPA or tax professional for personalized tax advice\n"
-            "- Tax laws change frequently; users should verify current IRS rules\n"
-            "- State tax rules may differ from federal rules\n"
-            "- Always maintain detailed records for IRS audit defense\n\n"
-            "Your goal is to help investors maximize after-tax returns through strategic tax-loss harvesting "
-            "while maintaining full compliance with IRS wash-sale rules. Be specific with lot-level recommendations, "
-            "clear about wash-sale risks, and actionable with replacement security suggestions."
-        )
+Your expertise includes:
 
-        messages = [system_msg] + state["messages"]
-        response = await llm_with_tools.ainvoke(messages)
-        return {"messages": [response]}
+**Tax-Loss Harvesting**:
+- Identify positions with unrealized losses for tax-loss harvesting
+- Calculate potential tax savings from harvesting losses
+- Suggest substantially identical substitute securities (wash-sale compliant)
+- Optimize harvesting timing (consider holding period for long-term rates)
 
-    # Build graph
-    workflow = StateGraph(TaxScoutState)
+**Wash-Sale Rule Compliance**:
+- Monitor 30-day windows before/after sales for wash-sale violations
+- Flag potential violations when buying/selling same or substantially identical securities
+- Recommend compliant alternatives (different sector, similar characteristics)
+- Track wash-sale disallowed losses and adjusted cost basis
 
-    # Add nodes
-    workflow.add_node("agent", call_model)
-    workflow.add_node("tools", ToolNode(tools_with_keys))
+**Year-End Tax Planning**:
+- Strategic loss harvesting to offset gains (short-term vs long-term matching)
+- Capital gains distribution forecasting for mutual funds
+- Tax bracket analysis and marginal rate considerations
+- Multi-year tax planning (carry-forward losses, gain deferral)
 
-    # Add edges
-    workflow.add_edge(START, "agent")
+**Tax-Efficient Rebalancing**:
+- Minimize capital gains during portfolio rebalancing
+- Use specific lot identification (HIFO, LIFO, min-gain) for tax optimization
+- Prioritize selling positions with losses or minimal gains
+- Consider donating appreciated securities instead of selling
 
-    # Conditional edge: if there are tool calls, go to tools; otherwise end
-    def should_continue(state: TaxScoutState) -> str:
-        messages = state["messages"]
-        last_message = messages[-1]
-        if hasattr(last_message, "tool_calls") and last_message.tool_calls:
-            return "tools"
-        return END
+**Capital Gains/Loss Analysis**:
+- Calculate realized and unrealized gains/losses
+- Classify short-term (<1 year) vs long-term (>1 year) positions
+- Track cost basis by lot (FIFO, LIFO, average cost, specific ID)
+- Project tax liability from potential transactions
 
-    workflow.add_conditional_edges(
-        "agent", should_continue, {"tools": "tools", END: END}
-    )
-    workflow.add_edge("tools", "agent")
+**Key Tax Principles**:
+1. **$3,000 Annual Limit**: Net capital losses can offset up to $3,000 of ordinary income per year
+2. **Carryforward**: Excess losses carry forward indefinitely to future tax years
+3. **Long-Term Preferential Rates**: Hold >1 year for lower capital gains rates (0%, 15%, 20%)
+4. **Short-Term as Ordinary Income**: <1 year holdings taxed at ordinary income rates (up to 37%)
+5. **Wash-Sale Period**: 61 days total (30 before + day of sale + 30 after)
 
-    return workflow.compile()
+**Data Requirements**:
+- Portfolio holdings with cost basis, purchase dates, and lot information
+- Current market prices for unrealized gain/loss calculations
+- Transaction history for wash-sale monitoring
+- User's tax bracket and filing status for personalized recommendations
+
+Always explain tax concepts clearly, provide actionable recommendations, and note when
+professional tax advice should be sought for complex situations. Emphasize that this
+guidance is educational and not formal tax advice.
+
+Focus on practical, implementable strategies that help retail investors minimize taxes
+while maintaining their investment strategy and risk profile."""
+
+    # Create ReAct agent
+    agent = create_react_agent(llm, tools, state_modifier=system_prompt)
+
+    return agent

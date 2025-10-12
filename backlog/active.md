@@ -38,11 +38,9 @@ Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integratio
   - TUI command: `/risk`
 
 - [x] **Tax Scout** - Tax optimization and loss harvesting → Completed in release-0.1.34.md
-  - Tax-loss harvesting opportunities identification
-  - Wash-sale rule compliance checking (30-day rule)
-  - Year-end tax planning strategies
-  - Tax-efficient rebalancing recommendations
-  - Capital gains/loss analysis
+  - Tax-loss harvesting opportunities
+  - Wash-sale rule compliance
+  - Year-end tax planning
   - TUI command: `/tax`
 
 - [ ] **Hedge Smith** - Options strategies for portfolio protection
