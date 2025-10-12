@@ -205,6 +205,15 @@ Always explain which agent(s) you're using and why, to maintain transparency.
    - ✅ Display tool names and arguments with proper indentation (6 spaces)
    - ✅ Users now see full transparency: router tools → sub-agent tools → results
 
+6. **True Progressive Streaming** (`router.py`, `app.py`) ✅ COMPLETED (Phase 1d)
+   - ✅ Implemented AsyncIO queue-based streaming architecture
+   - ✅ Router pushes tool call events to queue as they occur (non-blocking)
+   - ✅ TUI background consumer displays events in real-time
+   - ✅ Proper task lifecycle management (start/stop with query)
+   - ✅ Tool calls now stream progressively, not in batches
+   - ✅ Works correctly with parallel multi-agent execution
+   - ✅ Graceful error handling and task cancellation
+
 **Example TUI Flow:**
 ```
 User: "Should I invest in TSLA?"
