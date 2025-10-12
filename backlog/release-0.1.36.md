@@ -1,11 +1,11 @@
 # Release 0.1.36
 
 ## Status
-IN DEVELOPMENT
+Published: October 12, 2025
 
 ## Features
 
-### 🚧 Planned Features
+### ✅ Completed Features
 
 **Prompt Routing & Orchestration** - Automatic agent selection based on user intent
 
@@ -122,7 +122,7 @@ None planned for this release.
 ---
 
 ## Release Date
-TBD
+October 12, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.36/
