@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Downloads](https://static.pepy.tech/badge/navam-invest)](https://pepy.tech/project/navam-invest)
 
-Institutional-grade portfolio intelligence powered by specialized AI agents
+Institutional-grade portfolio intelligence powered by **10 specialized AI agents**
 Built on [LangGraph](https://langchain-ai.github.io/langgraph/) • Powered by [Anthropic Claude](https://www.anthropic.com/claude)
 
 [Quick Start](#-quick-start) •
@@ -37,7 +37,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 **🏦 Institutional Intelligence, Retail Access**
 - 10 specialized AI agents (equity research, earnings analysis, risk management, tax optimization, options strategies)
 - **Automatic routing**: Just ask naturally—no need to know which agent to use
-- Multi-agent workflows that combine bottom-up + top-down analysis
+- Multi-agent workflows combining bottom-up + top-down analysis
 
 </td>
 <td width="50%">
@@ -114,19 +114,40 @@ Each agent is purpose-built with curated tools and expert system prompts:
 | **Atlas** | Strategic asset allocation | 12 | "Create an IPS for $200K portfolio" |
 | **Portfolio/Research** | Legacy general-purpose | 24/10 | Backward compatibility |
 
-### 🔀 Multi-Agent Workflows
+### 🔀 Multi-Agent Workflows (NEW in v0.1.37)
 
-**Agents don't just answer questions—they collaborate:**
+**Agents don't just answer questions—they collaborate in sophisticated workflows:**
 
+#### `/analyze` - Comprehensive Investment Analysis (5 Agents)
 ```bash
 /analyze MSFT
 
 # 1. Quill performs bottom-up fundamental analysis
 #    → Financial health, valuation, earnings trends
-# 2. Macro Lens validates with top-down regime analysis
+# 2. News Sentry checks for material events
+#    → 8-K filings, insider trading, breaking news
+# 3. Macro Lens validates with top-down regime analysis
 #    → Economic cycles, sector positioning, yield curve
-# 3. Final synthesis combines both perspectives
+# 4. Risk Shield assesses portfolio fit
+#    → Concentration risk, VAR, correlation analysis
+# 5. Tax Scout evaluates tax implications
+#    → Wash-sale checks, holding period optimization
+# 6. Final synthesis combines all perspectives
 #    → BUY/HOLD/SELL with confidence level and reasoning
+```
+
+#### `/discover` - Systematic Idea Generation (3 Agents) **NEW!**
+```bash
+/discover quality growth stocks with strong margins
+
+# 1. Screen Forge identifies 10-15 candidates
+#    → Factor-based screening, momentum analysis
+# 2. Quill analyzes top 3-5 picks
+#    → Deep fundamental analysis, valuation
+# 3. Risk Shield assesses portfolio fit
+#    → Position sizing, concentration analysis
+# 4. Final synthesis ranks candidates
+#    → Actionable recommendations with entry points
 ```
 
 **Result**: Institutional-quality investment analysis in seconds, not hours.
@@ -231,6 +252,13 @@ navam invest
 
 > How can I reduce my tax bill before year-end?
 # Router automatically selects Tax Scout
+
+# Or use workflows for systematic analysis
+> /analyze MSFT
+# Comprehensive 5-agent investment analysis
+
+> /discover dividend stocks with P/E under 20
+# Systematic 3-agent idea generation workflow
 
 # Or use manual commands for specific agents (power users)
 > /quill
@@ -517,8 +545,11 @@ navam invest
 **What Happens**:
 
 1. **Quill** performs bottom-up fundamental analysis
-2. **Macro Lens** validates with top-down economic context
-3. **Synthesis** combines both perspectives into final recommendation
+2. **News Sentry** checks for material events and insider trading
+3. **Macro Lens** validates with top-down economic context
+4. **Risk Shield** assesses portfolio fit and concentration risks
+5. **Tax Scout** evaluates tax implications and timing
+6. **Synthesis** combines all perspectives into final recommendation
 
 <details>
 <summary><b>Example: Comprehensive MSFT Analysis (click to expand)</b></summary>
@@ -531,8 +562,10 @@ You: Should I invest in Microsoft?
 Router (Analyzing Intent):
 → Detected investment decision query
 → Routing to Quill (fundamental analysis)
+→ Routing to News Sentry (event monitoring)
 → Routing to Macro Lens (market timing validation)
 → Routing to Risk Shield (exposure assessment)
+→ Routing to Tax Scout (tax implications)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 QUILL: FUNDAMENTAL ANALYSIS
@@ -554,6 +587,23 @@ Quill (Equity Research):
 - 89% buy ratings, mean target $475 (+13% upside)
 - Revenue +15% YoY, 42% gross margin, $87B FCF
 - Exceptional profitability (42% ROE)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NEWS SENTRY: EVENT MONITORING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+News Sentry (Event Monitor):
+  → Calling route_to_news_sentry
+     News Sentry analyzing: Material events for Microsoft...
+     Running specialist tools (8-K monitoring, insider trades)...
+      → get_latest_8k({'symbol': 'MSFT'})
+      → get_insider_transactions({'symbol': 'MSFT'})
+  ✓ News Sentry (Event Monitoring) completed
+
+**Material Events**: NEUTRAL
+- No significant 8-K filings in last 30 days
+- Routine insider sales by executives (tax-related)
+- No unusual insider buying activity
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 MACRO LENS: TIMING VALIDATION
@@ -590,6 +640,20 @@ Risk Shield (Portfolio Risk):
 - Beta: 0.95 (slightly less volatile than market)
 - Defensive characteristics (enterprise subscriptions)
 - Position sizing: Recommend 5-10% of portfolio max
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TAX SCOUT: TAX IMPLICATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Tax Scout (Tax Optimization):
+  → Calling route_to_tax_scout
+     Tax Scout analyzing: Tax considerations for purchase...
+  ✓ Tax Scout (Tax Optimization) completed
+
+**Tax Considerations**: NO ISSUES
+- No wash-sale concerns (new purchase)
+- Consider tax-advantaged accounts for large positions
+- Hold >1 year for long-term capital gains treatment
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FINAL SYNTHESIS
@@ -633,6 +697,129 @@ cyclical tech peers in downturn.
 
 </details>
 
+### Systematic Idea Generation
+
+**Command**: `/discover [CRITERIA]` **NEW in v0.1.37!**
+
+**What Happens**:
+
+1. **Screen Forge** identifies 10-15 candidates using factor-based screening
+2. **Quill** performs deep fundamental analysis on top 3-5 picks
+3. **Risk Shield** assesses portfolio fit and position sizing for each
+4. **Synthesis** ranks candidates with actionable recommendations
+
+<details>
+<summary><b>Example: Discover Dividend Stocks (click to expand)</b></summary>
+
+```
+You: /discover dividend stocks with P/E under 20 and yield over 3%
+
+Idea Discovery Workflow: Starting systematic screening...
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SCREEN FORGE: CANDIDATE IDENTIFICATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Screen Forge (Equity Screener):
+  🔍 Screen Forge identifying candidates...
+    → get_stock_screener
+    → get_dividend_stocks
+    → get_financial_ratios
+
+**Screening Results**: 12 CANDIDATES IDENTIFIED
+
+| Symbol | Price | P/E | Yield | Payout | Score |
+|--------|-------|-----|-------|--------|-------|
+| VZ     | $38.50 | 8.2x | 6.8% | 54% | 8.5 |
+| MO     | $43.20 | 9.1x | 7.9% | 78% | 8.2 |
+| T      | $16.80 | 7.5x | 6.2% | 55% | 8.0 |
+| ABBV   | $172.50 | 15.3x | 3.8% | 45% | 7.8 |
+| PFE    | $28.40 | 11.2x | 5.9% | 65% | 7.5 |
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUILL: FUNDAMENTAL ANALYSIS (TOP 3)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Quill (Equity Research):
+  📊 Quill analyzing top picks...
+    → Analyzing VZ, MO, T
+
+**Top Pick #1: Verizon (VZ)**
+- **Valuation**: Attractive at 8.2x P/E (telecom avg: 12x)
+- **Dividend Safety**: Strong (54% payout, $8B annual FCF)
+- **Business Quality**: Infrastructure moat, recession-resistant
+- **5-Year Returns**: Total return 45% (35% from dividends)
+- **Rating**: BUY
+
+**Top Pick #2: Altria (MO)**
+- **Valuation**: Cheap at 9.1x P/E
+- **Dividend Safety**: Moderate risk (78% payout)
+- **Business Quality**: Declining smoker base, regulatory risk
+- **5-Year Returns**: Total return 38% (mostly dividends)
+- **Rating**: HOLD (monitor payout sustainability)
+
+**Top Pick #3: AT&T (T)**
+- **Valuation**: Very cheap at 7.5x P/E
+- **Dividend Safety**: Stable (55% payout, post-cut)
+- **Business Quality**: Fiber buildout improving outlook
+- **5-Year Returns**: Total return 28% (post-dividend cut recovery)
+- **Rating**: HOLD (improving fundamentals)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RISK SHIELD: PORTFOLIO FIT ASSESSMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Risk Shield (Risk Manager):
+  🛡️ Risk Shield assessing portfolio fit...
+    → calculate_correlation
+    → assess_sector_concentration
+
+**Position Sizing Recommendations**:
+- **VZ**: 5-7% allocation (defensive core holding)
+- **MO**: 2-3% allocation (higher risk, satellite position)
+- **T**: 3-5% allocation (value/turnaround play)
+
+**Concentration Risk**: MODERATE
+- 10-15% combined telecom exposure acceptable
+- Provides defensive characteristics, recession hedge
+- Low correlation with tech-heavy portfolios
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FINAL RECOMMENDATIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 **RANKED INVESTMENT IDEAS**
+
+**#1 BEST: Verizon (VZ) - BUY**
+- Entry: $38-40 range
+- Target yield: 6.5-7.0%
+- Position size: 5-7% of portfolio
+- Thesis: Infrastructure moat + recession-resistant + attractive valuation
+
+**#2 HOLD: Altria (MO) - Monitor**
+- Entry: Below $42 (current $43.20)
+- Target yield: 8%+
+- Position size: 2-3% maximum (satellite)
+- Thesis: High yield but declining business, payout risk
+
+**#3 HOLD: AT&T (T) - Turnaround Play**
+- Entry: $15-17 range
+- Target yield: 6-7%
+- Position size: 3-5%
+- Thesis: Post-cut stabilization, fiber buildout upside
+
+**Action Steps**:
+1. Start with VZ (5% allocation) for defensive income core
+2. Watch for MO dip below $42 for small satellite position
+3. Monitor AT&T fiber subscriber growth for entry signal
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📄 Report saved to: reports/report_idea_discovery_20251012_145200.md
+```
+
+</details>
+
 ---
 
 ## 📚 Documentation
@@ -668,25 +855,31 @@ cyclical tech peers in downturn.
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.36 (In Development)
+### Current Release: v0.1.37 (In Development)
 
 **Latest Features**:
-- ✅ **Automatic Intent-Based Routing**: No more manual agent switching—just ask naturally
+- ✅ **Extended `/analyze` Workflow**: 5-agent comprehensive analysis (Quill + News Sentry + Macro Lens + Risk Shield + Tax Scout)
+- ✅ **`/discover` Workflow**: NEW systematic idea generation (Screen Forge + Quill + Risk Shield)
 - ✅ **Progressive Streaming**: Real-time display of sub-agent tool calls as they execute
-- ✅ **Router Agent**: LangGraph tool-calling supervisor that coordinates 10 specialist agents
+- ✅ **State Accumulation**: Each agent receives context from previous agents
+- ✅ **Workflow Synthesis**: Comprehensive recommendations integrating all perspectives
+
+**Recently Completed** (v0.1.36):
+- ✅ **Automatic Intent-Based Routing**: No more manual agent switching—just ask naturally
+- ✅ **Router Agent**: LangGraph tool-calling supervisor coordinating 10 specialist agents
 - ✅ **Enhanced Transparency**: Watch router analyze intent and select appropriate agents
 - ✅ **Backward Compatible**: All `/command` syntax still works for power users
 
-**Recently Completed**:
+**Earlier Releases**:
 - ✅ **Hedge Smith Agent**: Options strategies (collars, covered calls, puts), Greeks analysis (v0.1.35)
 - ✅ **Tax Scout Agent**: Tax-loss harvesting, wash-sale compliance, year-end planning (v0.1.34)
 - ✅ **Risk Shield Agent**: Portfolio risk management, VAR, drawdown analysis (v0.1.33)
 - ✅ **News Sentry Agent**: Real-time 8-K monitoring, insider tracking, breaking news (v0.1.32)
 
-**Planned for v0.1.37** (Q1 2025):
-- [ ] **Enhanced Workflows**: Extended `/analyze` with News Sentry, Risk Shield, Tax Scout
-- [ ] **New Workflows**: `/discover` (Screen Forge → Quill → Risk Shield), `/optimize-tax`, `/protect`
-- [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls
+**Planned for v0.1.38** (Q1 2025):
+- [ ] **New Workflows**: `/optimize-tax` (Tax Scout + Hedge Smith), `/protect` (Risk Shield + Hedge Smith)
+- [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls and improve performance
+- [ ] **Workflow Progress Visualization**: Enhanced TUI display for multi-agent workflows
 
 ### Future Releases
 
@@ -699,6 +892,21 @@ cyclical tech peers in downturn.
 - [ ] **Python SDK**: Programmatic API for third-party integrations
 
 ### Recent Releases
+
+<details>
+<summary><b>v0.1.36 (Oct 15, 2025) - Router Agent & Progressive Streaming</b></summary>
+
+- ✅ Automatic intent-based routing eliminates manual agent switching
+- ✅ Router supervisor agent coordinates 10 specialist agents
+- ✅ Progressive streaming shows real-time sub-agent tool calls
+- ✅ AsyncIO queue-based streaming architecture
+- ✅ Enhanced transparency with router reasoning display
+- ✅ Backward compatible with manual `/command` syntax
+- ✅ 16 comprehensive tests (all passing)
+
+[Full Release Notes](backlog/release-0.1.36.md)
+
+</details>
 
 <details>
 <summary><b>v0.1.35 (Oct 13, 2025) - Hedge Smith Agent</b></summary>

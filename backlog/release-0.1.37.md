@@ -1,7 +1,7 @@
 # Release 0.1.37
 
 ## Status
-IN DEVELOPMENT
+PUBLISHED - October 12, 2025
 
 ## Features
 
@@ -145,7 +145,7 @@ None planned for this release.
 ---
 
 ## Release Date
-TBD
+October 12, 2025
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.37/
