@@ -190,6 +190,7 @@ class ChatUI(App):
         self.hedge_smith_agent: Optional[object] = None
         self.router_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
+        self.idea_discovery_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.router_mode: bool = True  # True = automatic routing, False = manual agent selection
         self.agents_initialized: bool = False
@@ -292,7 +293,8 @@ class ChatUI(App):
                 "- `/research` - Macro research agent\n\n"
                 "**⚙️ Other Commands:**\n"
                 "- `/router on|off` - Toggle automatic routing\n"
-                "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
+                "- `/analyze <SYMBOL>` - Multi-agent investment analysis workflow\n"
+                "- `/discover [CRITERIA]` - Systematic idea generation workflow\n"
                 "- `/examples` - Show example prompts\n"
                 "- `/help` - Show all commands\n\n"
                 "**Keyboard Shortcuts:** `Ctrl+C` Clear | `Ctrl+Q` Quit\n\n"
@@ -318,11 +320,12 @@ class ChatUI(App):
             self.hedge_smith_agent = await create_hedge_smith_agent()
             self.router_agent = await create_router_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
+            self.idea_discovery_workflow = await create_idea_discovery_workflow()
             self.agents_initialized = True
             self.sub_title = "Router: Active | Ready"
             chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout, Hedge Smith)[/green]")
             chat_log.write("[green]✓ Router agent initialized - automatic intent-based routing enabled![/green]")
-            chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
+            chat_log.write("[green]✓ Multi-agent workflows ready (Investment Analysis, Idea Discovery)[/green]")
             chat_log.write("[dim]✓ Progressive streaming enabled for sub-agent tool calls[/dim]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -700,6 +703,96 @@ class ChatUI(App):
             except Exception as e:
                 chat_log.write(f"\n[red]Error running workflow: {str(e)}[/red]")
 
+        elif command.startswith("/discover"):
+            # Extract optional criteria from command
+            parts = command.split(maxsplit=1)
+            criteria = parts[1] if len(parts) > 1 else "Generate a balanced watchlist of quality growth stocks"
+
+            chat_log.write(f"\n[bold cyan]You:[/bold cyan] Discover investment ideas\n")
+            if len(parts) > 1:
+                chat_log.write(f"[dim]Criteria: {criteria}[/dim]\n")
+            chat_log.write(f"[bold green]Idea Discovery Workflow:[/bold green] Starting systematic screening...\n")
+
+            try:
+                # Track analysis sections for report saving
+                screen_results = ""
+                fundamental_analysis = ""
+                risk_assessment = ""
+                final_recommendations = ""
+
+                # Run the workflow
+                tool_calls_shown = set()
+                async for event in self.idea_discovery_workflow.astream(
+                    {
+                        "messages": [HumanMessage(content=criteria)],
+                        "screening_criteria": criteria,
+                        "screen_results": "",
+                        "fundamental_analysis": "",
+                        "risk_assessment": "",
+                    },
+                    stream_mode=["values", "updates"]
+                ):
+                    # Parse the event tuple
+                    if isinstance(event, tuple) and len(event) == 2:
+                        event_type, event_data = event
+
+                        # Handle node updates
+                        if event_type == "updates":
+                            for node_name, node_output in event_data.items():
+                                # Show which agent is working
+                                if node_name == "screen_forge":
+                                    chat_log.write("[dim]  🔍 Screen Forge identifying candidates...[/dim]\n")
+                                elif node_name == "quill":
+                                    chat_log.write("[dim]  📊 Quill analyzing top picks...[/dim]\n")
+                                elif node_name == "risk_shield":
+                                    chat_log.write("[dim]  🛡️ Risk Shield assessing portfolio fit...[/dim]\n")
+                                elif node_name == "synthesize":
+                                    chat_log.write("[dim]  🎯 Synthesizing final recommendations...[/dim]\n")
+
+                                # Show tool calls
+                                if "messages" in node_output:
+                                    for msg in node_output["messages"]:
+                                        if hasattr(msg, "tool_calls") and msg.tool_calls:
+                                            for tool_call in msg.tool_calls:
+                                                call_id = tool_call.get("id", "")
+                                                if call_id not in tool_calls_shown:
+                                                    tool_calls_shown.add(call_id)
+                                                    tool_name = tool_call.get("name", "unknown")
+                                                    chat_log.write(f"[dim]    → {tool_name}[/dim]\n")
+
+                        # Handle final values
+                        elif event_type == "values":
+                            # Capture state data for report
+                            if "screen_results" in event_data:
+                                screen_results = event_data["screen_results"]
+                            if "fundamental_analysis" in event_data:
+                                fundamental_analysis = event_data["fundamental_analysis"]
+                            if "risk_assessment" in event_data:
+                                risk_assessment = event_data["risk_assessment"]
+
+                            if "messages" in event_data and event_data["messages"]:
+                                last_msg = event_data["messages"][-1]
+                                if hasattr(last_msg, "content") and last_msg.content:
+                                    # Show final recommendation
+                                    if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+                                        final_recommendations = last_msg.content
+                                        chat_log.write("\n[bold green]Final Recommendations:[/bold green]\n")
+                                        chat_log.write(Markdown(final_recommendations))
+
+                # Save the complete report
+                try:
+                    report_path = save_agent_report(
+                        content=f"# Investment Idea Discovery\n\n## Screening Criteria\n{criteria}\n\n## Screen Results\n{screen_results}\n\n## Fundamental Analysis\n{fundamental_analysis}\n\n## Risk Assessment\n{risk_assessment}\n\n## Final Recommendations\n{final_recommendations}",
+                        report_type="idea_discovery",
+                        context={"criteria": criteria[:50]},
+                    )
+                    chat_log.write(f"\n[dim]📄 Report saved to: {report_path}[/dim]\n")
+                except Exception as save_error:
+                    chat_log.write(f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n")
+
+            except Exception as e:
+                chat_log.write(f"\n[red]Error running workflow: {str(e)}[/red]")
+
         elif command == "/api":
             chat_log.write("\n[bold cyan]Checking API Status...[/bold cyan]\n")
             chat_log.write("[dim]Testing connectivity to all configured APIs...\n\n[/dim]")
@@ -824,7 +917,8 @@ class ChatUI(App):
                     "- `/tax` - Tax Scout tax optimization agent\n"
                     "- `/hedge` - Hedge Smith options strategies agent\n\n"
                     "**Multi-Agent Workflows:**\n"
-                    "- `/analyze <SYMBOL>` - Complete investment analysis (Quill + Macro Lens)\n\n"
+                    "- `/analyze <SYMBOL>` - Complete investment analysis (Quill + Macro Lens + News Sentry + Risk Shield + Tax Scout)\n"
+                    "- `/discover [CRITERIA]` - Systematic idea generation (Screen Forge + Quill + Risk Shield)\n\n"
                     "**Utilities:**\n"
                     "- `/api` - Check API connectivity and status\n"
                     "- `/examples` - Show example prompts\n"

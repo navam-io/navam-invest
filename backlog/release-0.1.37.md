@@ -38,23 +38,15 @@ The `/analyze` workflow has been extended from 2 agents to 5 agents, providing c
 - `src/navam_invest/workflows/investment_analysis.py` - Complete 5-agent workflow (435 lines)
 - `docs/faq.md` - Updated workflow documentation to reflect 5-agent sequence
 
-### 🚧 In Progress Features
-
-**`/discover` Workflow - Systematic Idea Discovery** (IN PROGRESS)
+**`/discover` Workflow - Systematic Idea Discovery** ✅ COMPLETED
 
 A 3-agent workflow for systematic investment idea generation and validation.
 
 **Workflow Sequence**:
-1. **Screen Forge (Equity Screener)** - Systematic screening with factor-based filters
+1. **Screen Forge (Equity Screener)** - Systematic screening with factor-based filters (10-15 candidates)
 2. **Quill (Equity Research)** - Deep fundamental analysis on top 3-5 candidates
-3. **Risk Shield (Risk Manager)** - Portfolio fit assessment and position sizing
-4. **Synthesis** - Final ranked recommendations with action steps
-
-**Implementation Status**:
-- ✅ Core workflow implementation (`src/navam_invest/workflows/idea_discovery.py` - 435 lines)
-- ✅ Workflow export in `__init__.py`
-- ✅ FAQ documentation updated
-- ⏳ TUI integration pending (needs `/discover` command handler + workflow initialization)
+3. **Risk Shield (Risk Manager)** - Portfolio fit assessment and position sizing for each candidate
+4. **Synthesis** - Final ranked recommendations with actionable next steps
 
 **Key Features**:
 - Sequential execution with state accumulation (each agent sees prior analyses)
@@ -62,11 +54,25 @@ A 3-agent workflow for systematic investment idea generation and validation.
 - Quill performs deep analysis on top 3-5 picks
 - Risk Shield provides portfolio fit assessment and position sizing recommendations
 - Final synthesis ranks candidates and provides actionable next steps
+- Progressive streaming support shows real-time tool calls from all 3 agents
+
+**Implementation Details**:
+- Extended `IdeaDiscoveryState` TypedDict with 4 fields: `screening_criteria`, `screen_results`, `fundamental_analysis`, `risk_assessment`
+- Added 3 agent node functions with specialized system prompts
+- Added 3 tool nodes for Screen Forge, Quill, and Risk Shield
+- Added conditional edge functions for tool routing
+- Implemented synthesis function to combine all 3 agent analyses
+- Modified workflow graph with sequential edges connecting all agents
 
 **Files Modified**:
 - `src/navam_invest/workflows/idea_discovery.py` - NEW (435 lines)
 - `src/navam_invest/workflows/__init__.py` - Export new workflow
+- `src/navam_invest/tui/app.py` - Added `/discover` command handler + workflow initialization
 - `docs/faq.md` - Documented new workflow
+
+### 🚧 In Progress Features
+
+None currently.
 
 ### 🚧 Planned Features
 
