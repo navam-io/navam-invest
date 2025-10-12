@@ -26,7 +26,7 @@ Built on [LangGraph](https://langchain-ai.github.io/langgraph/) • Powered by [
 
 **Replace $1,000-$10,000/year wealth management fees with AI agents that research, analyze, and explain investment decisions in plain English.**
 
-Navam Invest is an **open-source AI investment advisory platform** designed for retail investors managing $50K-$1M portfolios. Instead of paying 1% AUM fees, you get a **team of 7 specialized AI agents** that collaborate through multi-agent workflows—all running locally with your API keys, using free public data.
+Navam Invest is an **open-source AI investment advisory platform** designed for retail investors managing $50K-$1M portfolios. Instead of paying 1% AUM fees, you get a **team of 9 specialized AI agents** that collaborate through multi-agent workflows—all running locally with your API keys, using free public data.
 
 ### Why Choose Navam Invest?
 
@@ -35,7 +35,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 <td width="50%">
 
 **🏦 Institutional Intelligence, Retail Access**
-- 7 specialized AI agents (equity research, earnings analysis, macro strategy)
+- 9 specialized AI agents (equity research, earnings analysis, risk management, tax optimization)
 - Multi-agent workflows that combine bottom-up + top-down analysis
 - Same frameworks used by professional analysts
 
@@ -73,7 +73,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 
 ## ✨ Key Features
 
-### 🤖 7 Specialized AI Agents
+### 🤖 9 Specialized AI Agents
 
 Each agent is purpose-built with curated tools and expert system prompts:
 
@@ -84,7 +84,9 @@ Each agent is purpose-built with curated tools and expert system prompts:
 | **[Screen Forge](#-screen-forge---equity-screener)** | Systematic stock screening | 15 | "Screen for stocks with 3+ consecutive earnings beats" |
 | **[Macro Lens](#-macro-lens---market-strategist)** | Top-down macro analysis | 13 | "What's the current economic regime for tech stocks?" |
 | **[News Sentry](#-news-sentry---real-time-event-monitor)** | Real-time event detection | 13 | "Alert me to material 8-K filings and insider trades" |
-| **[Atlas](#-atlas---investment-strategist)** | Strategic asset allocation | 12 | "Create an IPS for $200K portfolio" |
+| **[Risk Shield](#-risk-shield---portfolio-risk-manager)** | Portfolio risk management | 18 | "Calculate VAR and analyze concentration risks" |
+| **[Tax Scout](#-tax-scout---tax-optimization-specialist)** | Tax-loss harvesting | 12 | "Identify tax-loss harvesting opportunities" |
+| **Atlas** | Strategic asset allocation | 12 | "Create an IPS for $200K portfolio" |
 | **Portfolio/Research** | Legacy general-purpose | 24/10 | Backward compatibility (will be phased out) |
 
 ### 🔀 Multi-Agent Workflows
@@ -204,8 +206,11 @@ navam invest
 > /macro
 > What's the current economic regime for tech stocks?
 
-> /screen
-> Find stocks with consistent earnings beats and analyst upgrades
+> /risk
+> Calculate VAR for my portfolio and identify concentration risks
+
+> /tax
+> Identify tax-loss harvesting opportunities before year-end
 ```
 
 **🎓 New to Navam Invest?** Check the [Getting Started Guide](docs/user-guide/getting-started.md) for detailed walkthroughs.
@@ -375,6 +380,72 @@ Monitor TSLA for:
 
 </details>
 
+### 🛡️ Risk Shield - Portfolio Risk Manager
+
+**Comprehensive risk analysis & exposure monitoring**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What Risk Shield Does**:
+- 📊 **Concentration Analysis**: Sector, geographic, single-stock exposures
+- 📉 **Drawdown Metrics**: Historical drawdowns, peak-to-trough, recovery periods
+- 💹 **VAR Calculations**: Value at Risk (95%, 99% confidence levels)
+- 🎲 **Scenario Testing**: Stress tests against historical crises (2008, 2020)
+- 🔗 **Correlation Analysis**: Diversification quality, correlation matrices
+- 📈 **Volatility Metrics**: Portfolio vol, beta, Sharpe, Sortino ratios
+- ⚠️ **Limit Breach Detection**: Position size, sector concentration thresholds
+- 🛠️ **Risk Mitigation**: Hedging strategies, rebalancing recommendations
+
+**Tools**: 18 specialized tools across market data, fundamentals, macro indicators, treasury data
+
+**Example Query**:
+```
+/risk
+Analyze my portfolio risk:
+- Calculate VAR at 95% and 99% confidence
+- Identify sector concentration risks (>30% any sector)
+- Stress test against 2008 financial crisis scenario
+- Recommend risk mitigation strategies
+```
+
+**Expected Output**: Risk scorecard (1-10 scale), concentration analysis, VAR metrics, stress test results, and actionable mitigation recommendations.
+
+</details>
+
+### 💰 Tax Scout - Tax Optimization Specialist
+
+**Tax-loss harvesting & wash-sale compliance**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What Tax Scout Does**:
+- 💸 **Tax-Loss Harvesting**: Identify positions with unrealized losses
+- ⏰ **Wash-Sale Compliance**: 30-day rule monitoring (IRS Section 1091)
+- 🔄 **Replacement Candidates**: Find substantially different securities
+- 📊 **Capital Gains Analysis**: Short-term vs long-term tracking
+- 📅 **Year-End Planning**: Strategic positioning before Dec 31 deadline
+- ⚖️ **Tax-Efficient Rebalancing**: Minimize gains during portfolio adjustments
+- 📋 **Lot-Level Analysis**: FIFO, LIFO, specific lot identification
+
+**Tools**: 12 specialized tools for portfolio data, market pricing, fundamentals
+
+**Example Query**:
+```
+/tax
+Analyze my portfolio for tax optimization:
+- Identify positions with unrealized losses >5%
+- Check for wash-sale violations in last 30 days
+- Suggest replacement securities for harvested positions
+- Calculate potential tax savings ($X at my tax bracket)
+- Year-end planning recommendations
+```
+
+**Expected Output**: TLH opportunities table with tax savings estimates, wash-sale violations, replacement candidates, and year-end action plan.
+
+</details>
+
 ### 🗺️ Atlas - Investment Strategist
 
 **Strategic asset allocation & portfolio construction**
@@ -518,67 +589,6 @@ in downturn.
 
 </details>
 
-### Earnings Momentum Screening
-
-<details>
-<summary><b>Example: Screen for consistent earnings beaters (click to expand)</b></summary>
-
-```
-You: /screen
-You: Find stocks with 3+ consecutive earnings beats and analyst upgrades
-
-Screen Forge (Equity Screening):
-  → Calling screen_stocks(market_cap_min=1000000000)
-  ✓ Retrieved 347 stocks > $1B market cap
-
-  → Filtering by earnings history...
-  ✓ 42 stocks with 3+ consecutive beats
-
-  → Filtering by analyst activity...
-  ✓ 18 stocks with recent upgrades
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-EARNINGS MOMENTUM SCREEN RESULTS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-**Criteria**:
-- Market Cap: > $1B
-- Earnings Beats: 3+ consecutive quarters
-- Average Surprise: > 2%
-- Analyst Activity: Upgrades in last 30 days
-
-**Top 10 Candidates** (Ranked by earnings momentum):
-
-┏━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━┓
-┃ Rank┃ Ticker ┃ Company        ┃ Mkt Cap┃ Avg Surprise ┃ Streak ┃ Latest Beat ┃
-┡━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━┩
-│  1  │ NVDA   │ NVIDIA         │ $3.2T  │ +18.4%       │ 8 qtrs │ +21.2%      │
-│  2  │ META   │ Meta Platforms │ $1.4T  │ +12.6%       │ 5 qtrs │ +15.8%      │
-│  3  │ GOOGL  │ Alphabet       │ $2.1T  │ +8.9%        │ 6 qtrs │ +9.4%       │
-│  4  │ MSFT   │ Microsoft      │ $3.1T  │ +4.2%        │ 4 qtrs │ +3.8%       │
-│  5  │ AAPL   │ Apple          │ $3.5T  │ +3.0%        │ 4 qtrs │ +2.5%       │
-│  6  │ AMZN   │ Amazon         │ $1.9T  │ +7.5%        │ 5 qtrs │ +8.2%       │
-│  7  │ V      │ Visa           │ $592B  │ +5.1%        │ 7 qtrs │ +4.8%       │
-│  8  │ MA     │ Mastercard     │ $453B  │ +4.9%        │ 6 qtrs │ +5.2%       │
-│  9  │ HD     │ Home Depot     │ $381B  │ +3.8%        │ 4 qtrs │ +4.1%       │
-│ 10  │ CRM    │ Salesforce     │ $308B  │ +6.2%        │ 5 qtrs │ +7.8%       │
-└─────┴────────┴────────────────┴────────┴──────────────┴────────┴─────────────┘
-
-**Key Insights**:
-- NVDA shows exceptional momentum (18.4% avg beat, accelerating)
-- Mega-cap tech dominates (7 of top 10)
-- Payment processors (V, MA) show consistent quality
-
-**Recommended Next Steps**:
-1. Deep-dive analysis: `/quill` then "Analyze GOOGL"
-2. Earnings timing: `/earnings` then "Check NVDA post-earnings drift"
-3. Macro validation: `/macro` then "Tech sector positioning"
-
-📄 Report saved to: reports/SCREENER_earnings_beats_20251008_144530.md
-```
-
-</details>
-
 ---
 
 ## 📚 Documentation
@@ -587,7 +597,7 @@ EARNINGS MOMENTUM SCREEN RESULTS
 
 - 🚀 **[Getting Started](docs/user-guide/getting-started.md)** - Installation, setup, first queries, troubleshooting
 - ❓ **[FAQ](docs/faq.md)** - 100+ answered questions covering all features
-- 🤖 **[Agents Guide](docs/user-guide/agents.md)** - Complete reference for all 7 specialized agents
+- 🤖 **[Agents Guide](docs/user-guide/agents.md)** - Complete reference for all 9 specialized agents
 - 🔀 **[Multi-Agent Workflows](docs/user-guide/multi-agent-workflows.md)** - Agent collaboration patterns
 - 🛠️ **[API Tools](docs/user-guide/api-tools.md)** - Data sources and tool capabilities
 
@@ -614,17 +624,17 @@ EARNINGS MOMENTUM SCREEN RESULTS
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.32 (In Development)
+### Current Release: v0.1.34 (In Development)
 
 **Latest Features**:
-- ✅ **News Sentry Agent**: Real-time 8-K monitoring, insider tracking, breaking news
+- ✅ **Tax Scout Agent**: Tax-loss harvesting, wash-sale compliance, year-end planning
+- ✅ **Risk Shield Agent**: Portfolio risk management, VAR, drawdown analysis (v0.1.33)
+- ✅ **News Sentry Agent**: Real-time 8-K monitoring, insider tracking, breaking news (v0.1.32)
 - ✅ **Enhanced Documentation**: Reorganized docs with FAQ, getting started guide
 - ✅ **Smart Input Management**: Auto-disable during processing, clear status feedback
 - ✅ **Auto-Save Reports**: All responses >200 chars saved to `reports/`
 
-**Planned for v0.1.33-0.1.35** (Q1 2025):
-- [ ] **Risk Shield Agent**: Portfolio risk management, VAR, drawdown analysis
-- [ ] **Tax Scout Agent**: Tax optimization, loss harvesting, wash-sale detection
+**Planned for v0.1.35** (Q1 2025):
 - [ ] **Hedge Smith Agent**: Options strategies, protective puts, covered calls
 - [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls
 - [ ] **Enhanced Workflows**: Parallel agent execution, conditional branching
@@ -642,6 +652,30 @@ EARNINGS MOMENTUM SCREEN RESULTS
 ### Recent Releases
 
 <details>
+<summary><b>v0.1.33 (Oct 9, 2025) - Risk Shield Agent</b></summary>
+
+- ✅ Portfolio risk management (VAR, drawdown, concentration)
+- ✅ 18 specialized tools across market data and macro indicators
+- ✅ Comprehensive system prompt with risk assessment frameworks
+- ✅ TUI integration with `/risk` command
+
+[Full Release Notes](backlog/release-0.1.33.md)
+
+</details>
+
+<details>
+<summary><b>v0.1.32 (Jan 12, 2025) - News Sentry Agent</b></summary>
+
+- ✅ Real-time 8-K monitoring and insider tracking
+- ✅ Event prioritization (CRITICAL/HIGH/MEDIUM/LOW)
+- ✅ 13 specialized tools for event detection
+- ✅ TUI integration with `/news` command
+
+[Full Release Notes](backlog/release-0.1.32.md)
+
+</details>
+
+<details>
 <summary><b>v0.1.31 (Jan 10, 2025) - UX Improvements</b></summary>
 
 - ✅ Enhanced input management (auto-disable during processing)
@@ -650,41 +684,6 @@ EARNINGS MOMENTUM SCREEN RESULTS
 - ✅ Live footer status updates ("Processing..." → "Ready")
 
 [Full Release Notes](backlog/release-0.1.31.md)
-
-</details>
-
-<details>
-<summary><b>v0.1.30 (Jan 8, 2025) - API Reliability</b></summary>
-
-- ✅ Removed FMP API (replaced with Yahoo Finance for better reliability)
-- ✅ 100% free-tier APIs with no access errors
-- ✅ Simpler setup (one less API key required)
-
-[Full Release Notes](backlog/release-0.1.30.md)
-
-</details>
-
-<details>
-<summary><b>v0.1.28 (Jan 5, 2025) - Self-Service API Testing</b></summary>
-
-- ✅ `/api` command for interactive connectivity testing
-- ✅ Rich table formatting with color-coded status
-- ✅ Troubleshooting tips and error diagnosis
-- ✅ NewsAPI.org vs NewsAPI.ai clarification docs
-
-[Full Release Notes](docs/development/release-v0.1.28.md)
-
-</details>
-
-<details>
-<summary><b>v0.1.27 (Dec 29, 2024) - Earnings Whisperer</b></summary>
-
-- ✅ New specialized agent for earnings analysis
-- ✅ 14 tools across Yahoo Finance, SEC, Finnhub
-- ✅ 5-step earnings analysis framework
-- ✅ Post-earnings drift detection
-
-[Full Release Notes](backlog/release-0.1.27.md)
 
 </details>
 
