@@ -39,41 +39,76 @@ This will show you which APIs are working (✅), failed (❌), or not configured
 
 ## Your First Queries
 
-### Test Basic Functionality
+### Automatic Agent Routing (NEW in v0.1.36!)
+
+**Just ask naturally** - the router automatically selects the right specialist agent(s):
 
 ```
-You: /quill
 You: What's the current price and overview of AAPL?
 ```
 
-You'll see Quill (the Equity Research agent) gather data and provide analysis!
-
-### Try Multi-Agent Analysis
+The router analyzes your intent and automatically routes to **Quill** (Equity Research) to gather data and provide analysis. You'll see:
 
 ```
-You: /analyze MSFT
+[Router] Routing to Quill for fundamental equity analysis...
+  → get_quote(symbol=AAPL)
+  → get_analyst_recommendations(symbol=AAPL)
+  ✓ Analysis complete
+
+[Quill] **AAPL Current Quote**
+Price: $185.50 (+1.2%)
+Market Cap: $2.85T
+Analyst Consensus: Buy (15 Strong Buy, 8 Buy, 2 Hold)
 ```
 
-This triggers a coordinated workflow where:
+### Multi-Agent Coordination
+
+Ask complex questions and watch multiple agents collaborate automatically:
+
+```
+You: Should I invest in MSFT right now?
+```
+
+The router coordinates multiple specialists:
 1. **Quill** analyzes fundamentals (earnings, valuation, analyst sentiment)
 2. **Macro Lens** validates macro timing (economic cycle, yield curve)
-3. **Synthesis** combines both perspectives into a final recommendation
+3. **Risk Shield** assesses portfolio fit and concentration risk
+4. **Router** synthesizes all perspectives into a final recommendation
 
-### Explore Different Agents
+### Natural Language Queries
+
+The router understands different types of investment questions:
 
 ```
-# Earnings analysis
-/earnings
+# Earnings analysis → Earnings Whisperer
 Analyze NVDA earnings history - is there a post-earnings drift opportunity?
 
-# Stock screening
-/screen
+# Stock screening → Screen Forge
 Screen for tech stocks with P/E under 20 and market cap over $10B
 
-# Macro analysis
-/macro
+# Macro analysis → Macro Lens
 What's the current macro regime and which sectors should I overweight?
+
+# Risk assessment → Risk Shield
+What's my portfolio concentration risk in tech stocks?
+
+# Tax optimization → Tax Scout
+Show me tax-loss harvesting opportunities before year-end
+
+# Options strategies → Hedge Smith
+How can I protect my NVDA position with options?
 ```
+
+### Manual Agent Selection (Power Users)
+
+You can still manually select agents using `/command` syntax if preferred:
+
+```
+/quill
+What's the current price and overview of AAPL?
+```
+
+This bypasses the router and goes directly to Quill. Use `/router on` to re-enable automatic routing.
 
 ## Understanding the Interface
 
@@ -81,44 +116,56 @@ What's the current macro regime and which sectors should I overweight?
 
 ```
 ┌─────────────────────────────────────────────┐
-│ Navam Invest                  Agent: Quill │  ← Header (shows current agent)
+│ Navam Invest            Router: Active 🔀  │  ← Header (shows router status)
 ├─────────────────────────────────────────────┤
 │                                             │
 │  You: What's the price of AAPL?            │  ← Chat history
 │                                             │
-│  Quill (Equity Research):                  │
-│    → Calling get_quote(symbol=AAPL)        │  ← Tool execution tracking
-│    ✓ get_quote completed                   │
+│  [Router] Routing to Quill...              │  ← Router coordination
+│    → get_quote(symbol=AAPL)                │  ← Sub-agent tool calls
+│    → get_analyst_recommendations(...)      │    (progressive streaming)
+│    ✓ Analysis complete                     │
 │                                             │
-│  **AAPL Current Quote**                    │  ← Agent response
+│  [Quill] **AAPL Current Quote**            │  ← Agent response
 │  Price: $185.50 (+1.2%)                    │    (rendered markdown)
 │  Market Cap: $2.85T                        │
+│  Analyst Consensus: Buy                    │
 │                                             │
 ├─────────────────────────────────────────────┤
-│ [Ask about stocks...]                      │  ← Input field
+│ [Ask any investment question...]           │  ← Input field
 ├─────────────────────────────────────────────┤
-│ ^C Clear | ^Q Quit                         │  ← Footer (keyboard shortcuts)
+│ Router: Active | Ready                     │  ← Footer (shows status)
+│ ^C Clear | ^Q Quit                         │    (keyboard shortcuts)
 └─────────────────────────────────────────────┘
 ```
 
+**Progressive Streaming (NEW in v0.1.36)**:
+Watch sub-agent tool calls appear in real-time as they execute, providing full transparency into the analysis process.
+
 ### Processing States
 
-**Before Query**:
+**Router Mode (Default)**:
 ```
-Footer: Agent: Quill | Ready
-Input: [Ask about stocks or economic indicators...]
+Footer: Router: Active | Ready
+Input: [Ask any investment question...]
+```
+
+**Manual Mode** (after using `/quill`, `/macro`, etc.):
+```
+Footer: Manual: Quill | Ready
+Input: [Ask about stocks...]
 ```
 
 **During Processing** (input automatically disabled):
 ```
-Footer: Processing...
+Footer: Router: → Quill + Macro Lens | Processing
 Input: [⏳ Processing your request...] ← Grayed out, uneditable
 ```
 
 **After Completion**:
 ```
-Footer: Agent: Quill | Ready
-Input: [Ask about stocks...] ← Auto-focused, ready for next query
+Footer: Router: Active | Ready
+Input: [Ask any investment question...] ← Auto-focused, ready for next query
 ```
 
 ## Available Commands
@@ -133,7 +180,18 @@ Input: [Ask about stocks...] ← Auto-focused, ready for next query
 | `/clear` | Clear chat history (or `Ctrl+C`) |
 | `/quit` | Exit application (or `Ctrl+Q`) |
 
-### Agent Switching
+### Router Control (NEW in v0.1.36)
+
+| Command | Purpose |
+|---------|---------|
+| `/router on` | Enable automatic agent routing (default) |
+| `/router off` | Disable router, switch to manual mode |
+
+**Note**: Router mode is ON by default. Manual agent commands (like `/quill`) automatically disable router mode.
+
+### Manual Agent Selection (Power Users)
+
+When you want to bypass the router and go directly to a specialist:
 
 | Command | Agent | Specialization |
 |---------|-------|----------------|
@@ -142,14 +200,19 @@ Input: [Ask about stocks...] ← Auto-focused, ready for next query
 | `/screen` | Screen Forge | Stock screening, idea generation |
 | `/macro` | Macro Lens | Macro analysis, sector allocation |
 | `/news` | News Sentry | Real-time event detection, 8-K monitoring |
-| `/portfolio` | Portfolio (legacy) | General portfolio analysis |
-| `/research` | Research (legacy) | General market research |
+| `/risk` | Risk Shield | Portfolio risk analysis, concentration |
+| `/tax` | Tax Scout | Tax-loss harvesting, wash-sale compliance |
+| `/hedge` | Hedge Smith | Options strategies, protective collars |
+| `/portfolio` | Portfolio | General portfolio analysis |
+| `/research` | Research | General market research |
 
 ### Multi-Agent Workflows
 
 | Command | Workflow | Agents Used |
 |---------|----------|-------------|
 | `/analyze <SYMBOL>` | Complete investment analysis | Quill → Macro Lens → Synthesis |
+
+**Tip**: In router mode (default), you can ask "Analyze MSFT" naturally without the `/analyze` command!
 
 ## Optional: Add More Data Sources
 
@@ -276,8 +339,22 @@ These three sources provide comprehensive coverage for most investment research 
 navam invest
 ```
 
+**Router Mode (Default - Just Ask Naturally)**:
+```
+You: Should I invest in AAPL right now?
+```
+
+The router automatically coordinates Quill + Macro Lens + Risk Shield for comprehensive analysis!
+
+**Or Use the Workflow Command**:
 ```
 You: /analyze AAPL
+```
+
+**Or Go Direct to an Agent** (Power Users):
+```
+You: /quill
+You: Analyze AAPL fundamentals
 ```
 
 Let the multi-agent analysis begin! 🚀
