@@ -497,9 +497,9 @@ Quill (Equity Research):
 
 **Currently Available**:
 - `/analyze <SYMBOL>` - Comprehensive Investment Analysis Workflow (5 agents)
+- `/discover [CRITERIA]` - Systematic Idea Discovery Workflow (3 agents)
 
 **Future Workflows** (planned):
-- `/discover` - Systematic idea generation (Screen Forge → Quill → Risk Shield)
 - `/optimize-tax` - Tax-loss harvesting workflow (Tax Scout → Hedge Smith)
 - `/protect` - Portfolio hedging workflow (Risk Shield → Hedge Smith)
 
@@ -516,6 +516,12 @@ Quill (Equity Research):
 4. **Risk Shield** → Portfolio fit, concentration risk, volatility analysis
 5. **Tax Scout** → Tax implications, wash-sale checks, timing optimization
 6. **Synthesis** → Combined recommendation integrating all perspectives
+
+**Current `/discover` Workflow** (NEW in v0.1.37 - 3 agents):
+1. **Screen Forge** → Systematic screening with factor-based filters (10-15 candidates)
+2. **Quill** → Deep fundamental analysis on top 3-5 candidates
+3. **Risk Shield** → Portfolio fit and position sizing for each candidate
+4. **Synthesis** → Final ranked recommendations with action steps
 
 **Future** (v0.2.0+):
 - Custom workflow builder

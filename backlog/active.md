@@ -243,7 +243,11 @@ Chat: [Quill] Analyzing TSLA fundamentals...
 - ✅ Comprehensive investment analysis with all perspectives integrated
 
 **New Workflows:**
-- `/discover` - Systematic idea generation (Screen Forge → Quill → Risk Shield)
+- 🚧 `/discover` - Systematic idea generation (Screen Forge → Quill → Risk Shield) - **IN PROGRESS**
+  - ✅ Workflow implementation complete (`idea_discovery.py`)
+  - ✅ Export in workflows `__init__.py`
+  - ✅ FAQ documentation updated
+  - ⏳ TUI integration pending (needs `/discover` command handler + initialization)
 - `/optimize-tax` - Tax-loss harvesting workflow (Tax Scout → Hedge Smith for replacement positions)
 - `/protect` - Portfolio hedging workflow (Risk Shield → Hedge Smith for protection strategies)
 

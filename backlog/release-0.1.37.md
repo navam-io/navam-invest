@@ -38,6 +38,36 @@ The `/analyze` workflow has been extended from 2 agents to 5 agents, providing c
 - `src/navam_invest/workflows/investment_analysis.py` - Complete 5-agent workflow (435 lines)
 - `docs/faq.md` - Updated workflow documentation to reflect 5-agent sequence
 
+### 🚧 In Progress Features
+
+**`/discover` Workflow - Systematic Idea Discovery** (IN PROGRESS)
+
+A 3-agent workflow for systematic investment idea generation and validation.
+
+**Workflow Sequence**:
+1. **Screen Forge (Equity Screener)** - Systematic screening with factor-based filters
+2. **Quill (Equity Research)** - Deep fundamental analysis on top 3-5 candidates
+3. **Risk Shield (Risk Manager)** - Portfolio fit assessment and position sizing
+4. **Synthesis** - Final ranked recommendations with action steps
+
+**Implementation Status**:
+- ✅ Core workflow implementation (`src/navam_invest/workflows/idea_discovery.py` - 435 lines)
+- ✅ Workflow export in `__init__.py`
+- ✅ FAQ documentation updated
+- ⏳ TUI integration pending (needs `/discover` command handler + workflow initialization)
+
+**Key Features**:
+- Sequential execution with state accumulation (each agent sees prior analyses)
+- Screen Forge identifies 10-15 candidates with factor-based scoring
+- Quill performs deep analysis on top 3-5 picks
+- Risk Shield provides portfolio fit assessment and position sizing recommendations
+- Final synthesis ranks candidates and provides actionable next steps
+
+**Files Modified**:
+- `src/navam_invest/workflows/idea_discovery.py` - NEW (435 lines)
+- `src/navam_invest/workflows/__init__.py` - Export new workflow
+- `docs/faq.md` - Documented new workflow
+
 ### 🚧 Planned Features
 
 **Enhanced Multi-Agent Workflows** - Extended agent coordination and new workflow patterns
@@ -88,11 +118,11 @@ Building on the router foundation from v0.1.36, this release continues to extend
 - [x] Create context-aware system prompts for each agent
 - [x] Add tool execution loops and conditional routing
 
-**New Workflows** (Planned):
-- [ ] Implement `/discover` systematic idea generation workflow
+**New Workflows**:
+- [x] Implement `/discover` systematic idea generation workflow (PARTIAL - core implementation done, TUI integration pending)
 - [ ] Implement `/optimize-tax` tax-loss harvesting workflow
 - [ ] Implement `/protect` portfolio hedging workflow
-- [ ] Add workflow documentation and examples
+- [x] Add workflow documentation for `/discover` in FAQ
 
 **Documentation Updates** (Planned):
 - [ ] Update `docs/user-guide/multi-agent-workflows.md` - New workflows

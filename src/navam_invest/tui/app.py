@@ -22,7 +22,7 @@ from navam_invest.agents.risk_shield import create_risk_shield_agent
 from navam_invest.agents.tax_scout import create_tax_scout_agent
 from navam_invest.agents.hedge_smith import create_hedge_smith_agent
 from navam_invest.agents.router import create_router_agent, set_streaming_queue
-from navam_invest.workflows import create_investment_analysis_workflow
+from navam_invest.workflows import create_investment_analysis_workflow, create_idea_discovery_workflow
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
 
