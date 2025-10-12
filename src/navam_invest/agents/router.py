@@ -4,7 +4,8 @@ Automatically classifies user intent and routes to appropriate specialist agents
 Coordinates multi-agent responses for complex queries.
 """
 
-from typing import Annotated, TypedDict
+import asyncio
+from typing import Annotated, TypedDict, Optional
 
 from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage
@@ -35,6 +36,29 @@ _news_sentry_agent = None
 _risk_shield_agent = None
 _tax_scout_agent = None
 _hedge_smith_agent = None
+
+# Global streaming event queue for progressive disclosure
+# Format: {"type": "tool_call"|"tool_complete"|"error", "agent": str, "tool_name": str, "args": dict, ...}
+_streaming_queue: Optional[asyncio.Queue] = None
+
+
+def set_streaming_queue(queue: asyncio.Queue) -> None:
+    """Set the global streaming queue for progressive disclosure.
+
+    Args:
+        queue: AsyncIO queue for streaming sub-agent tool call events
+    """
+    global _streaming_queue
+    _streaming_queue = queue
+
+
+def get_streaming_queue() -> Optional[asyncio.Queue]:
+    """Get the global streaming queue.
+
+    Returns:
+        The streaming queue if set, None otherwise
+    """
+    return _streaming_queue
 
 
 async def _get_portfolio_agent():
@@ -117,19 +141,21 @@ async def _get_hedge_smith_agent():
     return _hedge_smith_agent
 
 
-# Helper function to stream agent execution and collect tool calls
-async def _stream_agent_with_tool_log(agent, query: str) -> str:
-    """Stream agent execution and collect tool call information.
+# Helper function to stream agent execution and push events to queue
+async def _stream_agent_with_tool_log(agent, query: str, agent_name: str = "Unknown") -> str:
+    """Stream agent execution and push tool call events to global queue for progressive disclosure.
 
     Args:
         agent: The LangGraph agent to stream
         query: The query to send to the agent
+        agent_name: Display name of the agent (e.g., "Quill", "Macro Lens")
 
     Returns:
         Formatted string with [TOOL CALLS] section and analysis
     """
     tool_calls_log = []
     final_response = ""
+    queue = get_streaming_queue()
 
     async for event in agent.astream(
         {"messages": [HumanMessage(content=query)]},
@@ -138,7 +164,7 @@ async def _stream_agent_with_tool_log(agent, query: str) -> str:
         if isinstance(event, tuple) and len(event) == 2:
             event_type, event_data = event
 
-            # Collect tool call information
+            # Collect tool call information and push to queue immediately
             if event_type == "updates":
                 for node_name, node_output in event_data.items():
                     if node_name == "agent" and "messages" in node_output:
@@ -147,7 +173,20 @@ async def _stream_agent_with_tool_log(agent, query: str) -> str:
                                 for tool_call in msg.tool_calls:
                                     tool_name = tool_call.get("name", "unknown")
                                     tool_args = tool_call.get("args", {})
-                                    tool_calls_log.append(f"→ {tool_name}({tool_args})")
+                                    tool_call_str = f"→ {tool_name}({tool_args})"
+                                    tool_calls_log.append(tool_call_str)
+
+                                    # Push event to queue for immediate TUI display
+                                    if queue:
+                                        try:
+                                            await queue.put({
+                                                "type": "tool_call",
+                                                "agent": agent_name,
+                                                "tool_name": tool_name,
+                                                "args": tool_args,
+                                            })
+                                        except Exception:
+                                            pass  # Don't break execution if queue fails
 
             # Capture final response
             elif event_type == "values":
@@ -156,7 +195,7 @@ async def _stream_agent_with_tool_log(agent, query: str) -> str:
                     if hasattr(last_msg, "content") and last_msg.content:
                         final_response = last_msg.content
 
-    # Return response with tool call log prefix
+    # Return response with tool call log prefix (for fallback/debugging)
     if tool_calls_log:
         log_str = "\n".join(tool_calls_log)
         return f"[TOOL CALLS]\n{log_str}\n\n[ANALYSIS]\n{final_response}"
@@ -184,7 +223,7 @@ async def route_to_quill(query: str) -> str:
     """
     try:
         agent = await _get_quill_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Quill")
     except Exception as e:
         return f"Error: Quill agent failed - {str(e)}"
 
@@ -208,7 +247,7 @@ async def route_to_screen_forge(query: str) -> str:
     """
     try:
         agent = await _get_screen_forge_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Screen Forge")
     except Exception as e:
         return f"Error: Screen Forge agent failed - {str(e)}"
 
@@ -233,7 +272,7 @@ async def route_to_macro_lens(query: str) -> str:
     """
     try:
         agent = await _get_macro_lens_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Macro Lens")
     except Exception as e:
         return f"Error: Macro Lens agent failed - {str(e)}"
 
@@ -258,7 +297,7 @@ async def route_to_earnings_whisperer(query: str) -> str:
     """
     try:
         agent = await _get_earnings_whisperer_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Earnings Whisperer")
     except Exception as e:
         return f"Error: Earnings Whisperer agent failed - {str(e)}"
 
@@ -283,7 +322,7 @@ async def route_to_news_sentry(query: str) -> str:
     """
     try:
         agent = await _get_news_sentry_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "News Sentry")
     except Exception as e:
         return f"Error: News Sentry agent failed - {str(e)}"
 
@@ -308,7 +347,7 @@ async def route_to_risk_shield(query: str) -> str:
     """
     try:
         agent = await _get_risk_shield_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Risk Shield")
     except Exception as e:
         return f"Error: Risk Shield agent failed - {str(e)}"
 
@@ -333,7 +372,7 @@ async def route_to_tax_scout(query: str) -> str:
     """
     try:
         agent = await _get_tax_scout_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Tax Scout")
     except Exception as e:
         return f"Error: Tax Scout agent failed - {str(e)}"
 
@@ -359,7 +398,7 @@ async def route_to_hedge_smith(query: str) -> str:
     """
     try:
         agent = await _get_hedge_smith_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Hedge Smith")
     except Exception as e:
         return f"Error: Hedge Smith agent failed - {str(e)}"
 
@@ -383,7 +422,7 @@ async def route_to_portfolio(query: str) -> str:
     """
     try:
         agent = await _get_portfolio_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Portfolio")
     except Exception as e:
         return f"Error: Portfolio agent failed - {str(e)}"
 
@@ -407,7 +446,7 @@ async def route_to_research(query: str) -> str:
     """
     try:
         agent = await _get_research_agent()
-        return await _stream_agent_with_tool_log(agent, query)
+        return await _stream_agent_with_tool_log(agent, query, "Research")
     except Exception as e:
         return f"Error: Research agent failed - {str(e)}"
 

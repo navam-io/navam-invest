@@ -21,7 +21,7 @@ from navam_invest.agents.news_sentry import create_news_sentry_agent
 from navam_invest.agents.risk_shield import create_risk_shield_agent
 from navam_invest.agents.tax_scout import create_tax_scout_agent
 from navam_invest.agents.hedge_smith import create_hedge_smith_agent
-from navam_invest.agents.router import create_router_agent
+from navam_invest.agents.router import create_router_agent, set_streaming_queue
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
@@ -193,6 +193,8 @@ class ChatUI(App):
         self.current_agent: str = "portfolio"
         self.router_mode: bool = True  # True = automatic routing, False = manual agent selection
         self.agents_initialized: bool = False
+        self.streaming_queue: Optional[asyncio.Queue] = None  # Queue for sub-agent tool call streaming
+        self.streaming_task: Optional[asyncio.Task] = None  # Background task for queue consumption
 
     def compose(self) -> ComposeResult:
         """Compose the UI."""
@@ -206,6 +208,61 @@ class ChatUI(App):
             id="input-container",
         )
         yield Footer()
+
+    async def _consume_streaming_events(self, chat_log: RichLog) -> None:
+        """Background task to consume and display sub-agent tool call events from queue.
+
+        This task runs concurrently with agent execution to provide progressive disclosure
+        of tool calls made by sub-agents within router tools.
+
+        Args:
+            chat_log: The RichLog widget to write events to
+        """
+        try:
+            while True:
+                # Wait for event from queue (with timeout to allow task cancellation)
+                try:
+                    event = await asyncio.wait_for(self.streaming_queue.get(), timeout=0.1)
+                except asyncio.TimeoutError:
+                    continue
+
+                # Process event based on type
+                event_type = event.get("type")
+
+                if event_type == "tool_call":
+                    # Display sub-agent tool call in real-time
+                    agent_name = event.get("agent", "Unknown")
+                    tool_name = event.get("tool_name", "unknown")
+                    tool_args = event.get("args", {})
+
+                    # Format args for display (limit length)
+                    args_str = str(tool_args)
+                    if len(args_str) > 80:
+                        args_str = args_str[:77] + "..."
+
+                    # Write to chat log with proper indentation (showing hierarchy)
+                    chat_log.write(f"[dim]      → {tool_name}({args_str})[/dim]\n")
+
+                elif event_type == "tool_complete":
+                    # Optional: Show tool completion
+                    tool_name = event.get("tool_name", "unknown")
+                    chat_log.write(f"[dim]      ✓ {tool_name}[/dim]\n")
+
+                elif event_type == "error":
+                    # Show errors from sub-agents
+                    agent_name = event.get("agent", "Unknown")
+                    error_msg = event.get("message", "Unknown error")
+                    chat_log.write(f"[dim red]      ✗ {agent_name} error: {error_msg}[/dim]\n")
+
+                # Mark task as done
+                self.streaming_queue.task_done()
+
+        except asyncio.CancelledError:
+            # Task cancelled - clean shutdown
+            pass
+        except Exception as e:
+            # Log unexpected errors but don't crash
+            chat_log.write(f"[dim yellow]⚠️ Streaming error: {str(e)}[/dim]\n")
 
     async def on_mount(self) -> None:
         """Initialize agents when app mounts."""
@@ -243,6 +300,10 @@ class ChatUI(App):
             )
         )
 
+        # Initialize streaming queue for progressive disclosure of sub-agent tool calls
+        self.streaming_queue = asyncio.Queue()
+        set_streaming_queue(self.streaming_queue)
+
         # Initialize agents
         try:
             self.portfolio_agent = await create_portfolio_agent()
@@ -262,6 +323,7 @@ class ChatUI(App):
             chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout, Hedge Smith)[/green]")
             chat_log.write("[green]✓ Router agent initialized - automatic intent-based routing enabled![/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
+            chat_log.write("[dim]✓ Progressive streaming enabled for sub-agent tool calls[/dim]")
         except ConfigurationError as e:
             self.agents_initialized = False
             # Show helpful setup instructions for missing API keys
@@ -381,6 +443,10 @@ class ChatUI(App):
 
             chat_log.write(f"[bold green]{agent_name}:[/bold green] ")
 
+            # Start background streaming consumer for progressive disclosure
+            if self.router_mode:
+                self.streaming_task = asyncio.create_task(self._consume_streaming_events(chat_log))
+
             # Stream response with detailed progress
             agent_response = ""
             tool_calls_shown = set()
@@ -417,20 +483,8 @@ class ChatUI(App):
                                             }
                                             agent_display = agent_name_map.get(tool_name, tool_name)
 
-                                            # Parse tool call log from message content
-                                            if hasattr(msg, "content") and "[TOOL CALLS]" in msg.content:
-                                                # Extract and display sub-agent tool calls
-                                                lines = msg.content.split("\n")
-                                                in_tool_section = False
-                                                for line in lines:
-                                                    if line.strip() == "[TOOL CALLS]":
-                                                        in_tool_section = True
-                                                        continue
-                                                    elif line.strip() == "[ANALYSIS]":
-                                                        break
-                                                    elif in_tool_section and line.strip().startswith("→"):
-                                                        # Display sub-agent tool call
-                                                        chat_log.write(f"[dim]      {line.strip()}[/dim]\n")
+                                            # Note: Sub-agent tool calls are now streamed in real-time via background consumer
+                                            # No need to parse [TOOL CALLS] from message content anymore
 
                                             chat_log.write(f"[dim]  ✓ {agent_display} completed[/dim]\n")
                                         else:
@@ -518,6 +572,15 @@ class ChatUI(App):
             chat_log.write(f"\n[red]Error: {str(e)}[/red]")
 
         finally:
+            # Stop streaming consumer task if running
+            if self.streaming_task and not self.streaming_task.done():
+                self.streaming_task.cancel()
+                try:
+                    await self.streaming_task
+                except asyncio.CancelledError:
+                    pass
+                self.streaming_task = None
+
             # Always re-enable input and restore placeholder
             input_widget.disabled = False
             input_widget.placeholder = original_placeholder
