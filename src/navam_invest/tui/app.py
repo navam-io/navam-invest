@@ -400,7 +400,25 @@ class ChatUI(App):
                                 for msg in node_output["messages"]:
                                     if hasattr(msg, "name"):
                                         tool_name = msg.name
-                                        chat_log.write(f"[dim]  ✓ {tool_name} completed[/dim]\n")
+
+                                        # Show completion with context for router agent tools
+                                        if tool_name.startswith("route_to_"):
+                                            agent_name_map = {
+                                                "route_to_quill": "Quill (Fundamental Analysis)",
+                                                "route_to_macro_lens": "Macro Lens (Market Timing)",
+                                                "route_to_risk_shield": "Risk Shield (Portfolio Risk)",
+                                                "route_to_screen_forge": "Screen Forge (Stock Screening)",
+                                                "route_to_earnings_whisperer": "Earnings Whisperer (Earnings Analysis)",
+                                                "route_to_news_sentry": "News Sentry (Event Monitoring)",
+                                                "route_to_tax_scout": "Tax Scout (Tax Optimization)",
+                                                "route_to_hedge_smith": "Hedge Smith (Options Strategies)",
+                                                "route_to_portfolio": "Portfolio (General Analysis)",
+                                                "route_to_research": "Research (Macro Data)",
+                                            }
+                                            agent_display = agent_name_map.get(tool_name, tool_name)
+                                            chat_log.write(f"[dim]  ✓ {agent_display} completed[/dim]\n")
+                                        else:
+                                            chat_log.write(f"[dim]  ✓ {tool_name} completed[/dim]\n")
 
                             # Show agent making tool calls
                             elif node_name == "agent" and "messages" in node_output:
@@ -413,16 +431,42 @@ class ChatUI(App):
                                                 tool_name = tool_call.get("name", "unknown")
                                                 tool_args = tool_call.get("args", {})
 
-                                                # Format args for display
-                                                args_preview = ", ".join(
-                                                    f"{k}={str(v)[:30]}" for k, v in list(tool_args.items())[:3]
-                                                )
-                                                if len(tool_args) > 3:
-                                                    args_preview += "..."
+                                                # Enhanced display for router agent tools
+                                                if tool_name.startswith("route_to_"):
+                                                    agent_info = {
+                                                        "route_to_quill": ("Quill", "fundamental analysis, valuation, investment thesis"),
+                                                        "route_to_macro_lens": ("Macro Lens", "market timing, sector allocation, economic regime"),
+                                                        "route_to_risk_shield": ("Risk Shield", "portfolio risk, VAR, drawdown analysis"),
+                                                        "route_to_screen_forge": ("Screen Forge", "stock screening, factor discovery"),
+                                                        "route_to_earnings_whisperer": ("Earnings Whisperer", "earnings analysis, surprises"),
+                                                        "route_to_news_sentry": ("News Sentry", "event monitoring, insider trading"),
+                                                        "route_to_tax_scout": ("Tax Scout", "tax optimization, loss harvesting"),
+                                                        "route_to_hedge_smith": ("Hedge Smith", "options strategies, portfolio protection"),
+                                                        "route_to_portfolio": ("Portfolio", "general portfolio analysis"),
+                                                        "route_to_research": ("Research", "macroeconomic indicators"),
+                                                    }
+                                                    agent_name, capabilities = agent_info.get(tool_name, (tool_name, ""))
+                                                    query_preview = tool_args.get("query", "")[:40]
+                                                    chat_log.write(
+                                                        f"[dim]  → Calling {tool_name}[/dim]\n"
+                                                    )
+                                                    chat_log.write(
+                                                        f"[dim]     {agent_name} analyzing: {query_preview}...[/dim]\n"
+                                                    )
+                                                    chat_log.write(
+                                                        f"[dim]     Running specialist tools ({capabilities})...[/dim]\n"
+                                                    )
+                                                else:
+                                                    # Format args for display (for regular tools)
+                                                    args_preview = ", ".join(
+                                                        f"{k}={str(v)[:30]}" for k, v in list(tool_args.items())[:3]
+                                                    )
+                                                    if len(tool_args) > 3:
+                                                        args_preview += "..."
 
-                                                chat_log.write(
-                                                    f"[dim]  → Calling {tool_name}({args_preview})[/dim]\n"
-                                                )
+                                                    chat_log.write(
+                                                        f"[dim]  → Calling {tool_name}({args_preview})[/dim]\n"
+                                                    )
 
                     # Handle complete state values
                     elif event_type == "values":
