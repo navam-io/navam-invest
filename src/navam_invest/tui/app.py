@@ -21,6 +21,7 @@ from navam_invest.agents.news_sentry import create_news_sentry_agent
 from navam_invest.agents.risk_shield import create_risk_shield_agent
 from navam_invest.agents.tax_scout import create_tax_scout_agent
 from navam_invest.agents.hedge_smith import create_hedge_smith_agent
+from navam_invest.agents.router import create_router_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
@@ -187,8 +188,10 @@ class ChatUI(App):
         self.risk_shield_agent: Optional[object] = None
         self.tax_scout_agent: Optional[object] = None
         self.hedge_smith_agent: Optional[object] = None
+        self.router_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
+        self.router_mode: bool = True  # True = automatic routing, False = manual agent selection
         self.agents_initialized: bool = False
 
     def compose(self) -> ComposeResult:
@@ -213,28 +216,30 @@ class ChatUI(App):
         chat_log.write(
             Markdown(
                 "# Welcome to Navam Invest\n\n"
-                "Your AI-powered investment advisor. Ask me about stocks, "
-                "economic indicators, or portfolio analysis.\n\n"
-                "**Commands:**\n"
-                "- `/portfolio` - Switch to portfolio analysis agent\n"
-                "- `/research` - Switch to market research agent\n"
-                "- `/quill` - Switch to Quill equity research agent\n"
-                "- `/screen` - Switch to Screen Forge screening agent\n"
-                "- `/macro` - Switch to Macro Lens market strategist\n"
-                "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
-                "- `/news` - Switch to News Sentry event monitoring agent\n"
-                "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
-                "- `/tax` - Switch to Tax Scout tax optimization agent\n"
-                "- `/hedge` - Switch to Hedge Smith options strategies agent\n"
+                "Your AI-powered investment advisor with **automatic intent-based routing**. "
+                "Simply ask your question naturally - no need to select an agent!\n\n"
+                "**💡 How it works:**\n"
+                "- Just type your investment question (e.g., \"Should I invest in AAPL?\")\n"
+                "- Router automatically selects the right specialist agent(s)\n"
+                "- Get coordinated analysis from multiple agents when needed\n\n"
+                "**🎯 Manual Agent Commands** (for power users):\n"
+                "- `/portfolio` - Portfolio analysis agent\n"
+                "- `/quill` - Equity research agent\n"
+                "- `/screen` - Stock screening agent\n"
+                "- `/macro` - Market strategist agent\n"
+                "- `/earnings` - Earnings analyst agent\n"
+                "- `/news` - Event monitoring agent\n"
+                "- `/risk` - Risk manager agent\n"
+                "- `/tax` - Tax optimization agent\n"
+                "- `/hedge` - Options strategies agent\n"
+                "- `/research` - Macro research agent\n\n"
+                "**⚙️ Other Commands:**\n"
+                "- `/router on|off` - Toggle automatic routing\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
-                "- `/examples` - Show example prompts for current agent\n"
-                "- `/clear` - Clear chat history\n"
-                "- `/quit` - Exit the application\n"
+                "- `/examples` - Show example prompts\n"
                 "- `/help` - Show all commands\n\n"
-                "**Keyboard Shortcuts:**\n"
-                "- `Ctrl+C` - Clear chat\n"
-                "- `Ctrl+Q` - Quit\n\n"
-                "**Tip:** Type `/examples` to see what you can ask!\n"
+                "**Keyboard Shortcuts:** `Ctrl+C` Clear | `Ctrl+Q` Quit\n\n"
+                "**Tip:** Just ask naturally - \"Find undervalued tech stocks\" or \"Analyze TSLA earnings\"!\n"
             )
         )
 
@@ -250,10 +255,12 @@ class ChatUI(App):
             self.risk_shield_agent = await create_risk_shield_agent()
             self.tax_scout_agent = await create_tax_scout_agent()
             self.hedge_smith_agent = await create_hedge_smith_agent()
+            self.router_agent = await create_router_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
-            self.sub_title = f"Agent: {self.current_agent.title()} | Ready"
+            self.sub_title = "Router: Active | Ready"
             chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout, Hedge Smith)[/green]")
+            chat_log.write("[green]✓ Router agent initialized - automatic intent-based routing enabled![/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -314,51 +321,59 @@ class ChatUI(App):
             chat_log.write(f"\n[bold cyan]You:[/bold cyan] {text}\n")
 
             # Get agent response
-            # Select agent based on current mode
-            if self.current_agent == "portfolio":
-                agent = self.portfolio_agent
-                agent_name = "Portfolio Analyst"
-                report_type = "portfolio"
-            elif self.current_agent == "research":
-                agent = self.research_agent
-                agent_name = "Market Researcher"
-                report_type = "research"
-            elif self.current_agent == "quill":
-                agent = self.quill_agent
-                agent_name = "Quill (Equity Research)"
-                report_type = "equity_research"
-            elif self.current_agent == "screen":
-                agent = self.screen_forge_agent
-                agent_name = "Screen Forge (Equity Screening)"
-                report_type = "screening"
-            elif self.current_agent == "macro":
-                agent = self.macro_lens_agent
-                agent_name = "Macro Lens (Market Strategist)"
-                report_type = "macro_analysis"
-            elif self.current_agent == "earnings":
-                agent = self.earnings_whisperer_agent
-                agent_name = "Earnings Whisperer"
-                report_type = "earnings"
-            elif self.current_agent == "news":
-                agent = self.news_sentry_agent
-                agent_name = "News Sentry"
-                report_type = "news_monitoring"
-            elif self.current_agent == "risk":
-                agent = self.risk_shield_agent
-                agent_name = "Risk Shield Manager"
-                report_type = "risk_analysis"
-            elif self.current_agent == "tax":
-                agent = self.tax_scout_agent
-                agent_name = "Tax Scout"
-                report_type = "tax_optimization"
-            elif self.current_agent == "hedge":
-                agent = self.hedge_smith_agent
-                agent_name = "Hedge Smith"
-                report_type = "options_strategies"
+            # Route through router if router_mode=True, otherwise use manual agent selection
+            if self.router_mode:
+                # Automatic intent-based routing
+                agent = self.router_agent
+                agent_name = "Router (Analyzing Intent)"
+                report_type = "router_analysis"
+                chat_log.write("[dim]🔀 Router analyzing your query to select appropriate agent(s)...[/dim]\n")
             else:
-                agent = self.portfolio_agent
-                agent_name = "Portfolio Analyst"
-                report_type = "portfolio"
+                # Manual agent selection
+                if self.current_agent == "portfolio":
+                    agent = self.portfolio_agent
+                    agent_name = "Portfolio Analyst"
+                    report_type = "portfolio"
+                elif self.current_agent == "research":
+                    agent = self.research_agent
+                    agent_name = "Market Researcher"
+                    report_type = "research"
+                elif self.current_agent == "quill":
+                    agent = self.quill_agent
+                    agent_name = "Quill (Equity Research)"
+                    report_type = "equity_research"
+                elif self.current_agent == "screen":
+                    agent = self.screen_forge_agent
+                    agent_name = "Screen Forge (Equity Screening)"
+                    report_type = "screening"
+                elif self.current_agent == "macro":
+                    agent = self.macro_lens_agent
+                    agent_name = "Macro Lens (Market Strategist)"
+                    report_type = "macro_analysis"
+                elif self.current_agent == "earnings":
+                    agent = self.earnings_whisperer_agent
+                    agent_name = "Earnings Whisperer"
+                    report_type = "earnings"
+                elif self.current_agent == "news":
+                    agent = self.news_sentry_agent
+                    agent_name = "News Sentry"
+                    report_type = "news_monitoring"
+                elif self.current_agent == "risk":
+                    agent = self.risk_shield_agent
+                    agent_name = "Risk Shield Manager"
+                    report_type = "risk_analysis"
+                elif self.current_agent == "tax":
+                    agent = self.tax_scout_agent
+                    agent_name = "Tax Scout"
+                    report_type = "tax_optimization"
+                elif self.current_agent == "hedge":
+                    agent = self.hedge_smith_agent
+                    agent_name = "Hedge Smith"
+                    report_type = "options_strategies"
+                else:
+                    agent = self.portfolio_agent
+                    agent_name = "Portfolio Analyst"
+                    report_type = "portfolio"
 
             if not agent:
                 chat_log.write("[red]Error: Agent not initialized[/red]")
@@ -447,21 +462,24 @@ class ChatUI(App):
             input_widget.disabled = False
             input_widget.placeholder = original_placeholder
 
-            # Update status to Ready with proper agent name
-            agent_display_names = {
-                "portfolio": "Portfolio",
-                "research": "Research",
-                "quill": "Quill",
-                "screen": "Screen Forge",
-                "macro": "Macro Lens",
-                "earnings": "Earnings Whisperer",
-                "news": "News Sentry",
-                "risk": "Risk Shield",
-                "tax": "Tax Scout",
-                "hedge": "Hedge Smith"
-            }
-            agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
-            self.sub_title = f"Agent: {agent_name} | Ready"
+            # Update status to Ready with proper mode indicator
+            if self.router_mode:
+                self.sub_title = "Router: Active | Ready"
+            else:
+                agent_display_names = {
+                    "portfolio": "Portfolio",
+                    "research": "Research",
+                    "quill": "Quill",
+                    "screen": "Screen Forge",
+                    "macro": "Macro Lens",
+                    "earnings": "Earnings Whisperer",
+                    "news": "News Sentry",
+                    "risk": "Risk Shield",
+                    "tax": "Tax Scout",
+                    "hedge": "Hedge Smith"
+                }
+                agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
+                self.sub_title = f"Manual: {agent_name} | Ready"
 
             # Focus back on input for next query
             input_widget.focus()
@@ -619,68 +637,130 @@ class ChatUI(App):
             except Exception as e:
                 chat_log.write(f"\n[red]Error checking APIs: {str(e)}[/red]")
 
+        elif command.startswith("/router"):
+            # Handle router toggle command
+            parts = command.split()
+            if len(parts) == 1:
+                # Show current router status
+                status = "ON" if self.router_mode else "OFF"
+                chat_log.write(
+                    Markdown(
+                        f"\n**Router Status:** {status}\n\n"
+                        f"**Usage:**\n"
+                        f"- `/router on` - Enable automatic intent-based routing\n"
+                        f"- `/router off` - Disable automatic routing (manual agent selection)\n\n"
+                        f"When router is ON, your queries are automatically routed to the appropriate specialist agent(s).\n"
+                        f"When router is OFF, you must manually select agents using `/portfolio`, `/quill`, etc.\n"
+                    )
+                )
+            elif len(parts) == 2:
+                mode = parts[1].lower()
+                if mode == "on":
+                    self.router_mode = True
+                    self.sub_title = "Router: Active | Ready"
+                    chat_log.write("\n[green]✓ Router enabled - automatic intent-based routing activated![/green]\n")
+                    chat_log.write("[dim]Your queries will be automatically routed to the appropriate specialist agent(s).[/dim]\n")
+                elif mode == "off":
+                    self.router_mode = False
+                    agent_display_names = {
+                        "portfolio": "Portfolio",
+                        "research": "Research",
+                        "quill": "Quill",
+                        "screen": "Screen Forge",
+                        "macro": "Macro Lens",
+                        "earnings": "Earnings Whisperer",
+                        "news": "News Sentry",
+                        "risk": "Risk Shield",
+                        "tax": "Tax Scout",
+                        "hedge": "Hedge Smith"
+                    }
+                    agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
+                    self.sub_title = f"Manual: {agent_name} | Ready"
+                    chat_log.write("\n[green]✓ Router disabled - manual agent selection mode[/green]\n")
+                    chat_log.write(f"[dim]Currently using: {agent_name}. Use `/portfolio`, `/quill`, etc. to switch agents.[/dim]\n")
+                else:
+                    chat_log.write(f"\n[yellow]Invalid option: {mode}. Use 'on' or 'off'.[/yellow]\n")
+            else:
+                chat_log.write("\n[yellow]Usage: /router [on|off][/yellow]\n")
+
         elif command == "/help":
             chat_log.write(
                 Markdown(
-                    "\n**Available Commands:**\n"
-                    "- `/portfolio` - Switch to portfolio analysis agent\n"
-                    "- `/research` - Switch to market research agent\n"
-                    "- `/quill` - Switch to Quill equity research agent\n"
-                    "- `/screen` - Switch to Screen Forge screening agent\n"
-                    "- `/macro` - Switch to Macro Lens market strategist\n"
-                    "- `/earnings` - Switch to Earnings Whisperer earnings analyst\n"
-                    "- `/news` - Switch to News Sentry event monitoring agent\n"
-                    "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
-                    "- `/tax` - Switch to Tax Scout tax optimization agent\n"
-                    "- `/hedge` - Switch to Hedge Smith options strategies agent\n"
-                    "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
+                    "\n**Available Commands:**\n\n"
+                    "**Router Control:**\n"
+                    "- `/router on|off` - Toggle automatic intent-based routing (default: ON)\n\n"
+                    "**Manual Agent Selection** (disables router):\n"
+                    "- `/portfolio` - Portfolio analysis agent\n"
+                    "- `/research` - Market research agent\n"
+                    "- `/quill` - Quill equity research agent\n"
+                    "- `/screen` - Screen Forge screening agent\n"
+                    "- `/macro` - Macro Lens market strategist\n"
+                    "- `/earnings` - Earnings Whisperer earnings analyst\n"
+                    "- `/news` - News Sentry event monitoring agent\n"
+                    "- `/risk` - Risk Shield portfolio risk manager\n"
+                    "- `/tax` - Tax Scout tax optimization agent\n"
+                    "- `/hedge` - Hedge Smith options strategies agent\n\n"
+                    "**Multi-Agent Workflows:**\n"
+                    "- `/analyze <SYMBOL>` - Complete investment analysis (Quill + Macro Lens)\n\n"
+                    "**Utilities:**\n"
                     "- `/api` - Check API connectivity and status\n"
-                    "- `/examples` - Show example prompts for current agent\n"
+                    "- `/examples` - Show example prompts\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"
-                    "- `/help` - Show this help message\n"
+                    "- `/help` - Show this help message\n\n"
+                    "**💡 Tip:** With router ON (default), just ask naturally - no need to select agents!\n"
                 )
             )
         elif command == "/portfolio":
+            self.router_mode = False
             self.current_agent = "portfolio"
-            self.sub_title = "Agent: Portfolio | Ready"
-            chat_log.write("\n[green]✓ Switched to Portfolio Analysis agent[/green]\n")
+            self.sub_title = "Manual: Portfolio | Ready"
+            chat_log.write("\n[green]✓ Switched to Portfolio Analysis agent (manual mode)[/green]\n")
         elif command == "/research":
+            self.router_mode = False
             self.current_agent = "research"
-            self.sub_title = "Agent: Research | Ready"
-            chat_log.write("\n[green]✓ Switched to Market Research agent[/green]\n")
+            self.sub_title = "Manual: Research | Ready"
+            chat_log.write("\n[green]✓ Switched to Market Research agent (manual mode)[/green]\n")
         elif command == "/quill":
+            self.router_mode = False
             self.current_agent = "quill"
-            self.sub_title = "Agent: Quill | Ready"
-            chat_log.write("\n[green]✓ Switched to Quill (Equity Research) agent[/green]\n")
+            self.sub_title = "Manual: Quill | Ready"
+            chat_log.write("\n[green]✓ Switched to Quill (Equity Research) agent (manual mode)[/green]\n")
         elif command == "/screen":
+            self.router_mode = False
             self.current_agent = "screen"
-            self.sub_title = "Agent: Screen Forge | Ready"
-            chat_log.write("\n[green]✓ Switched to Screen Forge (Equity Screening) agent[/green]\n")
+            self.sub_title = "Manual: Screen Forge | Ready"
+            chat_log.write("\n[green]✓ Switched to Screen Forge (Equity Screening) agent (manual mode)[/green]\n")
         elif command == "/macro":
+            self.router_mode = False
             self.current_agent = "macro"
-            self.sub_title = "Agent: Macro Lens | Ready"
-            chat_log.write("\n[green]✓ Switched to Macro Lens (Market Strategist) agent[/green]\n")
+            self.sub_title = "Manual: Macro Lens | Ready"
+            chat_log.write("\n[green]✓ Switched to Macro Lens (Market Strategist) agent (manual mode)[/green]\n")
         elif command == "/earnings":
+            self.router_mode = False
             self.current_agent = "earnings"
-            self.sub_title = "Agent: Earnings Whisperer | Ready"
-            chat_log.write("\n[green]✓ Switched to Earnings Whisperer agent[/green]\n")
+            self.sub_title = "Manual: Earnings Whisperer | Ready"
+            chat_log.write("\n[green]✓ Switched to Earnings Whisperer agent (manual mode)[/green]\n")
         elif command == "/news":
+            self.router_mode = False
             self.current_agent = "news"
-            self.sub_title = "Agent: News Sentry | Ready"
-            chat_log.write("\n[green]✓ Switched to News Sentry (Event Monitoring) agent[/green]\n")
+            self.sub_title = "Manual: News Sentry | Ready"
+            chat_log.write("\n[green]✓ Switched to News Sentry (Event Monitoring) agent (manual mode)[/green]\n")
         elif command == "/risk":
+            self.router_mode = False
             self.current_agent = "risk"
-            self.sub_title = "Agent: Risk Shield | Ready"
-            chat_log.write("\n[green]✓ Switched to Risk Shield (Portfolio Risk Manager) agent[/green]\n")
+            self.sub_title = "Manual: Risk Shield | Ready"
+            chat_log.write("\n[green]✓ Switched to Risk Shield (Portfolio Risk Manager) agent (manual mode)[/green]\n")
         elif command == "/tax":
+            self.router_mode = False
             self.current_agent = "tax"
-            self.sub_title = "Agent: Tax Scout | Ready"
-            chat_log.write("\n[green]✓ Switched to Tax Scout (Tax Optimization) agent[/green]\n")
+            self.sub_title = "Manual: Tax Scout | Ready"
+            chat_log.write("\n[green]✓ Switched to Tax Scout (Tax Optimization) agent (manual mode)[/green]\n")
         elif command == "/hedge":
+            self.router_mode = False
             self.current_agent = "hedge"
-            self.sub_title = "Agent: Hedge Smith | Ready"
-            chat_log.write("\n[green]✓ Switched to Hedge Smith (Options Strategies) agent[/green]\n")
+            self.sub_title = "Manual: Hedge Smith | Ready"
+            chat_log.write("\n[green]✓ Switched to Hedge Smith (Options Strategies) agent (manual mode)[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
