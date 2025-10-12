@@ -26,7 +26,7 @@ Built on [LangGraph](https://langchain-ai.github.io/langgraph/) • Powered by [
 
 **Replace $1,000-$10,000/year wealth management fees with AI agents that research, analyze, and explain investment decisions in plain English.**
 
-Navam Invest is an **open-source AI investment advisory platform** designed for retail investors managing $50K-$1M portfolios. Instead of paying 1% AUM fees, you get a **team of 9 specialized AI agents** that collaborate through multi-agent workflows—all running locally with your API keys, using free public data.
+Navam Invest is an **open-source AI investment advisory platform** designed for retail investors managing $50K-$1M portfolios. Instead of paying 1% AUM fees, you get a **team of 10 specialized AI agents** that collaborate through multi-agent workflows—all running locally with your API keys, using free public data.
 
 ### Why Choose Navam Invest?
 
@@ -35,7 +35,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 <td width="50%">
 
 **🏦 Institutional Intelligence, Retail Access**
-- 9 specialized AI agents (equity research, earnings analysis, risk management, tax optimization)
+- 10 specialized AI agents (equity research, earnings analysis, risk management, tax optimization, options strategies)
 - Multi-agent workflows that combine bottom-up + top-down analysis
 - Same frameworks used by professional analysts
 
@@ -73,7 +73,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 
 ## ✨ Key Features
 
-### 🤖 9 Specialized AI Agents
+### 🤖 10 Specialized AI Agents
 
 Each agent is purpose-built with curated tools and expert system prompts:
 
@@ -86,6 +86,7 @@ Each agent is purpose-built with curated tools and expert system prompts:
 | **[News Sentry](#-news-sentry---real-time-event-monitor)** | Real-time event detection | 13 | "Alert me to material 8-K filings and insider trades" |
 | **[Risk Shield](#-risk-shield---portfolio-risk-manager)** | Portfolio risk management | 18 | "Calculate VAR and analyze concentration risks" |
 | **[Tax Scout](#-tax-scout---tax-optimization-specialist)** | Tax-loss harvesting | 12 | "Identify tax-loss harvesting opportunities" |
+| **[Hedge Smith](#-hedge-smith---options-strategist)** | Options strategies | 13 | "Design a protective collar for my AAPL position" |
 | **Atlas** | Strategic asset allocation | 12 | "Create an IPS for $200K portfolio" |
 | **Portfolio/Research** | Legacy general-purpose | 24/10 | Backward compatibility (will be phased out) |
 
@@ -211,6 +212,9 @@ navam invest
 
 > /tax
 > Identify tax-loss harvesting opportunities before year-end
+
+> /hedge
+> Design a protective collar for my 500 AAPL shares at $200
 ```
 
 **🎓 New to Navam Invest?** Check the [Getting Started Guide](docs/user-guide/getting-started.md) for detailed walkthroughs.
@@ -446,6 +450,41 @@ Analyze my portfolio for tax optimization:
 
 </details>
 
+### 🎯 Hedge Smith - Options Strategist
+
+**Options strategies for portfolio protection & yield enhancement**
+
+<details>
+<summary><b>View Capabilities & Examples</b></summary>
+
+**What Hedge Smith Does**:
+- 🛡️ **Protective Collars**: Simultaneous OTM put purchase + OTM call sale for downside protection with capped upside
+- 💰 **Covered Calls**: Sell call options against existing holdings to generate premium income
+- 📉 **Protective Puts**: Portfolio insurance through put purchases with cost/benefit optimization
+- 💵 **Cash-Secured Puts**: Generate income while waiting to acquire stock at lower price
+- 🎯 **Strike Selection**: Optimal strike selection (5-10% OTM for protection, 10-20% for income)
+- 📅 **Expiration Optimization**: 30-45 days for theta decay, 60-90 days for protection
+- 📊 **Options Greeks**: Delta, gamma, theta, vega, IV percentile analysis
+- ⚖️ **Risk/Reward Profiling**: Max profit, max loss, breakeven, probability estimates
+- 💡 **Strategy Design**: Detailed trade specifications with example implementations
+
+**Tools**: 13 specialized tools for options chain data, market data, fundamentals, volatility
+
+**Example Query**:
+```
+/hedge
+I hold 500 shares of AAPL at $180 cost basis, currently $200.
+Design a protective collar strategy to:
+- Lock in most of my $20/share gain ($10,000 total)
+- Allow modest upside to $210
+- Minimize net cost (or generate credit)
+- 45-day expiration
+```
+
+**Expected Output**: Complete collar strategy specification with specific strikes, premiums, Greeks, risk/reward analysis, and exit strategy.
+
+</details>
+
 ### 🗺️ Atlas - Investment Strategist
 
 **Strategic asset allocation & portfolio construction**
@@ -597,7 +636,7 @@ in downturn.
 
 - 🚀 **[Getting Started](docs/user-guide/getting-started.md)** - Installation, setup, first queries, troubleshooting
 - ❓ **[FAQ](docs/faq.md)** - 100+ answered questions covering all features
-- 🤖 **[Agents Guide](docs/user-guide/agents.md)** - Complete reference for all 9 specialized agents
+- 🤖 **[Agents Guide](docs/user-guide/agents.md)** - Complete reference for all 10 specialized agents
 - 🔀 **[Multi-Agent Workflows](docs/user-guide/multi-agent-workflows.md)** - Agent collaboration patterns
 - 🛠️ **[API Tools](docs/user-guide/api-tools.md)** - Data sources and tool capabilities
 
@@ -624,18 +663,19 @@ in downturn.
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.34 (In Development)
+### Current Release: v0.1.35 (In Development)
 
 **Latest Features**:
-- ✅ **Tax Scout Agent**: Tax-loss harvesting, wash-sale compliance, year-end planning
+- ✅ **Hedge Smith Agent**: Options strategies (collars, covered calls, puts), Greeks analysis, strike/expiration optimization
+- ✅ **Tax Scout Agent**: Tax-loss harvesting, wash-sale compliance, year-end planning (v0.1.34)
 - ✅ **Risk Shield Agent**: Portfolio risk management, VAR, drawdown analysis (v0.1.33)
 - ✅ **News Sentry Agent**: Real-time 8-K monitoring, insider tracking, breaking news (v0.1.32)
 - ✅ **Enhanced Documentation**: Reorganized docs with FAQ, getting started guide
 - ✅ **Smart Input Management**: Auto-disable during processing, clear status feedback
 - ✅ **Auto-Save Reports**: All responses >200 chars saved to `reports/`
 
-**Planned for v0.1.35** (Q1 2025):
-- [ ] **Hedge Smith Agent**: Options strategies, protective puts, covered calls
+**Planned for v0.1.36** (Q1 2025):
+- [ ] **Prompt Routing**: Automatic agent selection based on user intent (no manual /command switching)
 - [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls
 - [ ] **Enhanced Workflows**: Parallel agent execution, conditional branching
 
@@ -650,6 +690,19 @@ in downturn.
 - [ ] **Python SDK**: Programmatic API for third-party integrations
 
 ### Recent Releases
+
+<details>
+<summary><b>v0.1.34 (Oct 12, 2025) - Tax Scout Agent</b></summary>
+
+- ✅ Tax-loss harvesting opportunity identification
+- ✅ Wash-sale rule compliance monitoring (30-day windows)
+- ✅ Year-end tax planning strategies
+- ✅ 12 specialized tools for tax optimization
+- ✅ TUI integration with `/tax` command
+
+[Full Release Notes](backlog/release-0.1.34.md)
+
+</details>
 
 <details>
 <summary><b>v0.1.33 (Oct 9, 2025) - Risk Shield Agent</b></summary>
