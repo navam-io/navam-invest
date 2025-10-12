@@ -411,6 +411,28 @@ def get_tools_for_agent(agent_name: str) -> List[BaseTool]:
             "get_analyst_recommendations",
             "get_company_news",
         ],
+        # Hedge Smith (Options Strategies): Portfolio protection and yield enhancement
+        "hedge_smith": [
+            # Options chain data for strike selection and strategy design
+            "get_options_chain",
+            # Portfolio holdings to design protective strategies
+            "read_local_file",
+            "list_local_files",
+            # Current market data for underlying stocks (Yahoo Finance)
+            "get_quote",
+            "get_historical_data",
+            "get_stock_price",
+            # Company fundamentals for underlying analysis
+            "get_company_info",
+            "get_financials",
+            "get_stock_overview",
+            # Volatility and beta for risk assessment
+            "get_market_indices",
+            # Dividend information (affects options pricing and strategy selection)
+            "get_dividends",
+            # Analyst recommendations for sentiment (affects IV and strategy timing)
+            "get_analyst_recommendations",
+        ],
         # Portfolio (Generalist - Legacy): Broad portfolio analysis
         "portfolio": [
             # Market data

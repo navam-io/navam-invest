@@ -43,10 +43,14 @@ Based on the completed agent refactoring plan and Yahoo Finance/EDGAR integratio
   - Year-end tax planning
   - TUI command: `/tax`
 
-- [ ] **Hedge Smith** - Options strategies for portfolio protection
+- [x] **Hedge Smith** - Options strategies for portfolio protection → Completed in release-0.1.35.md
   - Leverages Yahoo Finance options chain (`get_options_chain`)
-  - Protective collar strategies
-  - Covered call yield enhancement
+  - Protective collar strategies (simultaneous put + call for downside protection)
+  - Covered call yield enhancement (generate income on existing holdings)
+  - Put protection analysis (portfolio insurance)
+  - Strike selection and expiration optimization
+  - Options Greeks analysis (delta, gamma, theta, vega, IV)
+  - TUI command: `/hedge`
 
 #### Future Multi-Agent Workflows (Phase 3C)
 

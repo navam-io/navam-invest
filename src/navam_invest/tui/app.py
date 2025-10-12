@@ -20,6 +20,7 @@ from navam_invest.agents.earnings_whisperer import create_earnings_whisperer_age
 from navam_invest.agents.news_sentry import create_news_sentry_agent
 from navam_invest.agents.risk_shield import create_risk_shield_agent
 from navam_invest.agents.tax_scout import create_tax_scout_agent
+from navam_invest.agents.hedge_smith import create_hedge_smith_agent
 from navam_invest.workflows import create_investment_analysis_workflow
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
@@ -124,6 +125,17 @@ TAX_SCOUT_EXAMPLES = [
     "Plan year-end tax moves to minimize my 2025 tax liability",
 ]
 
+HEDGE_SMITH_EXAMPLES = [
+    "Design a protective collar for my 500 AAPL shares at $200",
+    "What covered call strategy can generate 2-3% monthly income on MSFT?",
+    "I need downside protection on NVDA - suggest a put buying strategy",
+    "How can I use options to acquire GOOGL at a lower price?",
+    "Analyze options chain for TSLA - which strikes have best risk/reward?",
+    "Create a collar strategy to lock in gains on my tech portfolio",
+    "What's the cost of insuring my 1000 shares of AMZN with puts?",
+    "Design a covered call strategy for META - optimize strike and expiration",
+]
+
 WORKFLOW_EXAMPLES = [
     "/analyze AAPL - Complete investment analysis (fundamental + macro)",
     "/analyze MSFT - Should I invest? Get both bottom-up and top-down view",
@@ -174,6 +186,7 @@ class ChatUI(App):
         self.news_sentry_agent: Optional[object] = None
         self.risk_shield_agent: Optional[object] = None
         self.tax_scout_agent: Optional[object] = None
+        self.hedge_smith_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.agents_initialized: bool = False
@@ -212,6 +225,7 @@ class ChatUI(App):
                 "- `/news` - Switch to News Sentry event monitoring agent\n"
                 "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
                 "- `/tax` - Switch to Tax Scout tax optimization agent\n"
+                "- `/hedge` - Switch to Hedge Smith options strategies agent\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                 "- `/examples` - Show example prompts for current agent\n"
                 "- `/clear` - Clear chat history\n"
@@ -235,10 +249,11 @@ class ChatUI(App):
             self.news_sentry_agent = await create_news_sentry_agent()
             self.risk_shield_agent = await create_risk_shield_agent()
             self.tax_scout_agent = await create_tax_scout_agent()
+            self.hedge_smith_agent = await create_hedge_smith_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.agents_initialized = True
             self.sub_title = f"Agent: {self.current_agent.title()} | Ready"
-            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout)[/green]")
+            chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout, Hedge Smith)[/green]")
             chat_log.write("[green]✓ Multi-agent workflow ready (Investment Analysis)[/green]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -336,6 +351,10 @@ class ChatUI(App):
                 agent = self.tax_scout_agent
                 agent_name = "Tax Scout"
                 report_type = "tax_optimization"
+            elif self.current_agent == "hedge":
+                agent = self.hedge_smith_agent
+                agent_name = "Hedge Smith"
+                report_type = "options_strategies"
             else:
                 agent = self.portfolio_agent
                 agent_name = "Portfolio Analyst"
@@ -438,7 +457,8 @@ class ChatUI(App):
                 "earnings": "Earnings Whisperer",
                 "news": "News Sentry",
                 "risk": "Risk Shield",
-                "tax": "Tax Scout"
+                "tax": "Tax Scout",
+                "hedge": "Hedge Smith"
             }
             agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
             self.sub_title = f"Agent: {agent_name} | Ready"
@@ -612,6 +632,7 @@ class ChatUI(App):
                     "- `/news` - Switch to News Sentry event monitoring agent\n"
                     "- `/risk` - Switch to Risk Shield portfolio risk manager\n"
                     "- `/tax` - Switch to Tax Scout tax optimization agent\n"
+                    "- `/hedge` - Switch to Hedge Smith options strategies agent\n"
                     "- `/analyze <SYMBOL>` - Multi-agent investment analysis\n"
                     "- `/api` - Check API connectivity and status\n"
                     "- `/examples` - Show example prompts for current agent\n"
@@ -656,6 +677,10 @@ class ChatUI(App):
             self.current_agent = "tax"
             self.sub_title = "Agent: Tax Scout | Ready"
             chat_log.write("\n[green]✓ Switched to Tax Scout (Tax Optimization) agent[/green]\n")
+        elif command == "/hedge":
+            self.current_agent = "hedge"
+            self.sub_title = "Agent: Hedge Smith | Ready"
+            chat_log.write("\n[green]✓ Switched to Hedge Smith (Options Strategies) agent[/green]\n")
         elif command == "/examples":
             # Show examples for current agent
             if self.current_agent == "portfolio":
@@ -685,6 +710,9 @@ class ChatUI(App):
             elif self.current_agent == "tax":
                 examples = TAX_SCOUT_EXAMPLES
                 agent_name = "Tax Scout (Tax Optimization)"
+            elif self.current_agent == "hedge":
+                examples = HEDGE_SMITH_EXAMPLES
+                agent_name = "Hedge Smith (Options Strategies)"
             else:
                 examples = PORTFOLIO_EXAMPLES
                 agent_name = "Portfolio Analysis"
