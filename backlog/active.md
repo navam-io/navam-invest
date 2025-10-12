@@ -161,7 +161,7 @@ Always explain which agent(s) you're using and why, to maintain transparency.
 - [x] `tests/test_router.py` - Comprehensive router testing (16 tests, all passing) ✅ COMPLETED
 
 **Files to Modify:**
-- [ ] `src/navam_invest/tui/app.py` - Integrate router as default entry point
+- [x] `src/navam_invest/tui/app.py` - Integrate router as default entry point ✅ COMPLETED (Phase 1b)
 - [ ] `src/navam_invest/tools/__init__.py` - Add agent tool wrappers if needed
 
 **Implementation Steps:**
@@ -180,18 +180,20 @@ Always explain which agent(s) you're using and why, to maintain transparency.
    - Test intent classification accuracy (20 test cases)
    - Test error handling (agent failures, timeouts)
 
-3. **TUI Integration** (`app.py`)
-   - Add router agent initialization in `on_mount()`
-   - Modify `on_input_submitted()` to route through router by default
-   - Preserve `/command` syntax for manual agent selection
-   - Add routing transparency in status bar (show active agent)
-   - Display "Routing to: [Agent Name]..." during agent selection
-   - Show multi-agent coordination progress
+3. **TUI Integration** (`app.py`) ✅ COMPLETED
+   - ✅ Add router agent initialization in `on_mount()`
+   - ✅ Modify `on_input_submitted()` to route through router by default
+   - ✅ Preserve `/command` syntax for manual agent selection
+   - ✅ Add routing transparency in status bar (show active agent)
+   - ✅ Implement `/router on|off` command for toggle
+   - ✅ Manual agent commands disable router mode automatically
+   - ✅ Update welcome message to emphasize automatic routing
+   - ✅ Update `/help` command with router control section
 
-4. **Status Bar Enhancement**
-   - Change from "Agent: [Current] | Ready" to "Router: Active | Ready"
-   - When routing, show: "Router: → Quill + Macro Lens | Processing"
-   - When manual `/command` used, show: "Manual: Quill | Ready"
+4. **Status Bar Enhancement** ✅ COMPLETED
+   - ✅ "Router: Active | Ready" when router_mode=True
+   - ✅ "Manual: [Agent] | Ready" when router_mode=False
+   - ✅ Shows routing intent during processing with "🔀 Router analyzing..."
 
 **Example TUI Flow:**
 ```

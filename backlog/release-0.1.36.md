@@ -90,13 +90,15 @@ User: "Should I invest in AAPL?"
 - [x] Test agent instance caching (2 tests)
 - [x] Test router agent structure (1 test)
 
-**TUI Integration (Phase 1)**:
-- [ ] Add router agent initialization in `app.py::on_mount()`
-- [ ] Modify `on_input_submitted()` to route through router by default
-- [ ] Preserve `/command` syntax for manual agent selection
-- [ ] Add routing transparency in status bar (show active agent)
-- [ ] Display "Routing to: [Agent Name]..." during agent selection
-- [ ] Show multi-agent coordination progress
+**TUI Integration (Phase 1)**: ✅ COMPLETED
+- [x] Add router agent initialization in `app.py::on_mount()`
+- [x] Modify `on_input_submitted()` to route through router by default
+- [x] Preserve `/command` syntax for manual agent selection
+- [x] Add routing transparency in status bar (show active agent)
+- [x] Implement `/router on|off` command for toggle
+- [x] Manual agent commands disable router mode automatically
+- [x] Update welcome message to emphasize automatic routing
+- [x] Update `/help` command with router control section
 
 **Documentation Updates**:
 - [ ] Update `docs/user-guide/getting-started.md` - New UX flow with router
