@@ -4,20 +4,19 @@ Specialized agent for tax-efficient portfolio management, including tax-loss
 harvesting opportunities, wash-sale compliance, and year-end tax planning.
 """
 
-import os
-from typing import Annotated
+from typing import Annotated, TypedDict
 
-from langchain.chat_models import init_chat_model
-from langchain_core.messages import add_messages
-from langgraph.graph import START, StateGraph
-from langgraph.prebuilt import create_react_agent
-from typing_extensions import TypedDict
+from langchain_anthropic import ChatAnthropic
+from langchain_core.messages import HumanMessage
+from langgraph.graph import StateGraph, START, END, add_messages
+from langgraph.prebuilt import ToolNode
 
+from navam_invest.config.settings import get_settings
 from navam_invest.tools import bind_api_keys_to_tools, get_tools_for_agent
 
 
 class TaxScoutState(TypedDict):
-    """State for Tax Scout agent."""
+    """State for Tax Scout tax optimization agent."""
 
     messages: Annotated[list, add_messages]
 
@@ -33,33 +32,37 @@ async def create_tax_scout_agent() -> StateGraph:
     - Capital gains/loss analysis (short-term vs long-term)
     - Cost basis tracking and lot selection optimization
 
-    The agent uses historical price data, portfolio holdings, and market data
-    to provide actionable tax optimization strategies.
-
     Returns:
-        Compiled LangGraph agent ready for invocation
+        Compiled LangGraph agent for tax optimization
     """
-    # Initialize LLM
-    llm = init_chat_model(
-        model=os.getenv("LLM_MODEL", "anthropic:claude-3-7-sonnet-20250219"),
-        temperature=0,
+    settings = get_settings()
+
+    # Initialize model
+    llm = ChatAnthropic(
+        model=settings.anthropic_model,
+        api_key=settings.anthropic_api_key,
+        temperature=settings.temperature,
+        max_tokens=8192,
     )
 
-    # Get Tax Scout tools
+    # Get Tax Scout-specific tools
     tools = get_tools_for_agent("tax_scout")
 
-    # Bind API keys to tools
-    tools = bind_api_keys_to_tools(
+    # Securely bind API keys to tools
+    tools_with_keys = bind_api_keys_to_tools(
         tools,
-        alpha_vantage_key=os.getenv("ALPHA_VANTAGE_API_KEY", ""),
-        finnhub_key=os.getenv("FINNHUB_API_KEY", ""),
-        tiingo_key=os.getenv("TIINGO_API_KEY", ""),
-        fred_key=os.getenv("FRED_API_KEY", ""),
-        newsapi_key=os.getenv("NEWSAPI_API_KEY", ""),
+        alpha_vantage_key=settings.alpha_vantage_api_key or "",
+        tiingo_key=settings.tiingo_api_key or "",
+        fred_key=settings.fred_api_key or "",
     )
 
-    # System prompt for Tax Scout
-    system_prompt = """You are Tax Scout, a specialized tax optimization advisor for retail investors.
+    llm_with_tools = llm.bind_tools(tools_with_keys)
+
+    # Define agent node with specialized tax optimization prompt
+    async def call_model(state: TaxScoutState) -> dict:
+        """Call the LLM with tax optimization tools."""
+        system_msg = HumanMessage(
+            content="""You are Tax Scout, a specialized tax optimization advisor for retail investors.
 
 Your expertise includes:
 
@@ -112,8 +115,33 @@ guidance is educational and not formal tax advice.
 
 Focus on practical, implementable strategies that help retail investors minimize taxes
 while maintaining their investment strategy and risk profile."""
+        )
 
-    # Create ReAct agent
-    agent = create_react_agent(llm, tools, state_modifier=system_prompt)
+        messages = [system_msg] + state["messages"]
+        response = await llm_with_tools.ainvoke(messages)
+        return {"messages": [response]}
 
-    return agent
+    # Build graph
+    workflow = StateGraph(TaxScoutState)
+
+    # Add nodes
+    workflow.add_node("agent", call_model)
+    workflow.add_node("tools", ToolNode(tools_with_keys))
+
+    # Add edges
+    workflow.add_edge(START, "agent")
+
+    # Conditional edge: if there are tool calls, go to tools; otherwise end
+    def should_continue(state: TaxScoutState) -> str:
+        messages = state["messages"]
+        last_message = messages[-1]
+        if hasattr(last_message, "tool_calls") and last_message.tool_calls:
+            return "tools"
+        return END
+
+    workflow.add_conditional_edges(
+        "agent", should_continue, {"tools": "tools", END: END}
+    )
+    workflow.add_edge("tools", "agent")
+
+    return workflow.compile()
