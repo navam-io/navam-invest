@@ -5,17 +5,44 @@ IN DEVELOPMENT
 
 ## Features
 
+### ✅ Completed Features
+
+**Extended `/analyze` Workflow** - Comprehensive 5-Agent Investment Analysis
+
+The `/analyze` workflow has been extended from 2 agents to 5 agents, providing comprehensive investment analysis that integrates fundamental, event, macro, risk, and tax perspectives.
+
+**Workflow Sequence**:
+1. **Quill (Equity Research)** - Bottom-up fundamental analysis with valuation and investment thesis
+2. **News Sentry (Event Monitor)** - Material events, insider trading, recent news that could impact the thesis
+3. **Macro Lens (Market Strategist)** - Top-down macro validation and timing assessment
+4. **Risk Shield (Risk Manager)** - Portfolio fit, concentration risk, volatility analysis
+5. **Tax Scout (Tax Advisor)** - Tax implications, wash-sale checks, timing optimization
+6. **Synthesis** - Combined recommendation integrating all five perspectives
+
+**Key Features**:
+- Sequential execution with state accumulation (each agent sees prior analyses)
+- Context-aware system prompts that reference previous agent outputs
+- Tool execution loops for each agent with proper routing
+- Comprehensive final recommendation synthesizing all perspectives
+- LangGraph StateGraph implementation with proper state management
+
+**Implementation Details**:
+- Extended `InvestmentAnalysisState` TypedDict with 3 new fields: `news_events`, `risk_assessment`, `tax_implications`
+- Added 3 new agent node functions with specialized system prompts
+- Added 3 new tool nodes for News Sentry, Risk Shield, and Tax Scout
+- Added conditional edge functions for tool routing
+- Updated synthesis function to incorporate all 5 agent analyses
+- Modified workflow graph with sequential edges connecting all agents
+
+**Files Modified**:
+- `src/navam_invest/workflows/investment_analysis.py` - Complete 5-agent workflow (435 lines)
+- `docs/faq.md` - Updated workflow documentation to reflect 5-agent sequence
+
 ### 🚧 Planned Features
 
 **Enhanced Multi-Agent Workflows** - Extended agent coordination and new workflow patterns
 
-Building on the router foundation from v0.1.36, this release extends multi-agent collaboration patterns and introduces new systematic workflows for common investment tasks.
-
-**Extended `/analyze` Workflow**:
-- Add News Sentry for material events and insider trading alerts
-- Add Risk Shield for portfolio fit and concentration risk analysis
-- Add Tax Scout for tax implications of buying/selling positions
-- Complete bottom-up → top-down → risk → news → tax pipeline
+Building on the router foundation from v0.1.36, this release continues to extend multi-agent collaboration patterns and introduces new systematic workflows for common investment tasks.
 
 **New Workflow: `/discover`** - Systematic Idea Generation:
 - Screen Forge identifies candidates matching investment criteria
@@ -52,11 +79,14 @@ Building on the router foundation from v0.1.36, this release extends multi-agent
 - [ ] Add workflow progress visualization in TUI
 - [ ] Build workflow templates for common investment tasks
 
-**Extended `/analyze` Workflow** (Planned):
-- [ ] Integrate News Sentry for material event detection
-- [ ] Integrate Risk Shield for portfolio risk assessment
-- [ ] Integrate Tax Scout for tax implications analysis
-- [ ] Add workflow result synthesis across all agents
+**Extended `/analyze` Workflow**: ✅ COMPLETED
+- [x] Integrate News Sentry for material event detection
+- [x] Integrate Risk Shield for portfolio risk assessment
+- [x] Integrate Tax Scout for tax implications analysis
+- [x] Add workflow result synthesis across all agents
+- [x] Implement sequential execution with state accumulation pattern
+- [x] Create context-aware system prompts for each agent
+- [x] Add tool execution loops and conditional routing
 
 **New Workflows** (Planned):
 - [ ] Implement `/discover` systematic idea generation workflow

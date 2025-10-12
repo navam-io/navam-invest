@@ -496,12 +496,12 @@ Quill (Equity Research):
 **Multi-agent workflows are triggered by specific commands**:
 
 **Currently Available**:
-- `/analyze <SYMBOL>` - Investment Analysis Workflow (Quill → Macro Lens → Synthesis)
+- `/analyze <SYMBOL>` - Comprehensive Investment Analysis Workflow (5 agents)
 
 **Future Workflows** (planned):
-- `/screen-analyze` - Screen Forge → Quill deep-dive pipeline
-- `/tax-rebalance` - Tax Scout → Rebalance Bot coordination
-- `/risk-check` - Risk Shield comprehensive portfolio review
+- `/discover` - Systematic idea generation (Screen Forge → Quill → Risk Shield)
+- `/optimize-tax` - Tax-loss harvesting workflow (Tax Scout → Hedge Smith)
+- `/protect` - Portfolio hedging workflow (Risk Shield → Hedge Smith)
 
 **Single-agent mode is default** - multi-agents only activate when explicitly requested.
 
@@ -509,10 +509,13 @@ Quill (Equity Research):
 
 **Not yet.** In v0.1.x, workflows are **pre-configured** with fixed agent sequences.
 
-**Current `/analyze` Workflow**:
-1. **Quill** → Bottom-up fundamental analysis
-2. **Macro Lens** → Top-down macro validation
-3. **Synthesis** → Combined recommendation
+**Current `/analyze` Workflow** (NEW in v0.1.37 - 5 agents):
+1. **Quill** → Bottom-up fundamental analysis (valuation, financials, thesis)
+2. **News Sentry** → Material events, insider trading, recent news
+3. **Macro Lens** → Top-down macro validation and timing assessment
+4. **Risk Shield** → Portfolio fit, concentration risk, volatility analysis
+5. **Tax Scout** → Tax implications, wash-sale checks, timing optimization
+6. **Synthesis** → Combined recommendation integrating all perspectives
 
 **Future** (v0.2.0+):
 - Custom workflow builder
