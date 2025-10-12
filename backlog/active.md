@@ -162,6 +162,7 @@ Always explain which agent(s) you're using and why, to maintain transparency.
 
 **Files to Modify:**
 - [x] `src/navam_invest/tui/app.py` - Integrate router as default entry point ✅ COMPLETED (Phase 1b)
+- [x] `src/navam_invest/agents/router.py` - Enable progressive disclosure of sub-agent tool calls ✅ COMPLETED (Phase 1c)
 - [ ] `src/navam_invest/tools/__init__.py` - Add agent tool wrappers if needed
 
 **Implementation Steps:**
@@ -194,6 +195,15 @@ Always explain which agent(s) you're using and why, to maintain transparency.
    - ✅ "Router: Active | Ready" when router_mode=True
    - ✅ "Manual: [Agent] | Ready" when router_mode=False
    - ✅ Shows routing intent during processing with "🔀 Router analyzing..."
+
+5. **Progressive Disclosure Enhancement** (`router.py`, `app.py`) ✅ COMPLETED (Phase 1c)
+   - ✅ Created `_stream_agent_with_tool_log()` helper function
+   - ✅ Refactored all 10 router tools to stream sub-agent execution
+   - ✅ Collect tool call information during streaming
+   - ✅ Return formatted strings with `[TOOL CALLS]` + `[ANALYSIS]` sections
+   - ✅ TUI parses ToolMessage content to extract and display sub-agent tool calls
+   - ✅ Display tool names and arguments with proper indentation (6 spaces)
+   - ✅ Users now see full transparency: router tools → sub-agent tools → results
 
 **Example TUI Flow:**
 ```
