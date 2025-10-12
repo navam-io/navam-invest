@@ -134,12 +134,46 @@ async def route_to_quill(query: str) -> str:
         query: User's investment analysis question about a specific stock
 
     Returns:
-        Quill's fundamental analysis and investment thesis
+        Quill's fundamental analysis and investment thesis (with tool call log)
     """
     try:
         agent = await _get_quill_agent()
-        result = await agent.ainvoke({"messages": [HumanMessage(content=query)]})
-        return result["messages"][-1].content
+
+        # Stream agent execution to collect tool calls
+        tool_calls_log = []
+        final_response = ""
+
+        async for event in agent.astream(
+            {"messages": [HumanMessage(content=query)]},
+            stream_mode=["values", "updates"]
+        ):
+            if isinstance(event, tuple) and len(event) == 2:
+                event_type, event_data = event
+
+                # Collect tool call information
+                if event_type == "updates":
+                    for node_name, node_output in event_data.items():
+                        if node_name == "agent" and "messages" in node_output:
+                            for msg in node_output["messages"]:
+                                if hasattr(msg, "tool_calls") and msg.tool_calls:
+                                    for tool_call in msg.tool_calls:
+                                        tool_name = tool_call.get("name", "unknown")
+                                        tool_args = tool_call.get("args", {})
+                                        tool_calls_log.append(f"→ {tool_name}({tool_args})")
+
+                # Capture final response
+                elif event_type == "values":
+                    if "messages" in event_data and event_data["messages"]:
+                        last_msg = event_data["messages"][-1]
+                        if hasattr(last_msg, "content") and last_msg.content:
+                            final_response = last_msg.content
+
+        # Return response with tool call log prefix
+        if tool_calls_log:
+            log_str = "\n".join(tool_calls_log)
+            return f"[TOOL CALLS]\n{log_str}\n\n[ANALYSIS]\n{final_response}"
+        return final_response
+
     except Exception as e:
         return f"Error: Quill agent failed - {str(e)}"
 
