@@ -1,5 +1,8 @@
 # Private
 user/
+reports/
+refer/
+backlog/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
