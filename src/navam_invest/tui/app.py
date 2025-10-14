@@ -10,6 +10,7 @@ from rich.table import Table
 from textual.app import App, ComposeResult
 from textual.containers import Container, Vertical
 from textual.widgets import Footer, Header, Input, RichLog
+from textual.worker import Worker, WorkerState
 
 from navam_invest.agents.portfolio import create_portfolio_agent
 from navam_invest.agents.research import create_research_agent
@@ -174,6 +175,7 @@ class ChatUI(App):
     BINDINGS = [
         ("ctrl+q", "quit", "Quit"),
         ("ctrl+c", "clear", "Clear"),
+        ("escape", "cancel", "Cancel"),
     ]
 
     def __init__(self) -> None:
@@ -196,6 +198,8 @@ class ChatUI(App):
         self.agents_initialized: bool = False
         self.streaming_queue: Optional[asyncio.Queue] = None  # Queue for sub-agent tool call streaming
         self.streaming_task: Optional[asyncio.Task] = None  # Background task for queue consumption
+        self.agent_worker: Optional[Worker] = None  # Worker for agent execution
+        self.cancellation_requested: bool = False  # Flag to track cancellation request
 
     def compose(self) -> ComposeResult:
         """Compose the UI."""
@@ -297,7 +301,7 @@ class ChatUI(App):
                 "- `/discover [CRITERIA]` - Systematic idea generation workflow\n"
                 "- `/examples` - Show example prompts\n"
                 "- `/help` - Show all commands\n\n"
-                "**Keyboard Shortcuts:** `Ctrl+C` Clear | `Ctrl+Q` Quit\n\n"
+                "**Keyboard Shortcuts:** `ESC` Cancel | `Ctrl+C` Clear | `Ctrl+Q` Quit\n\n"
                 "**Tip:** Just ask naturally - \"Find undervalued tech stocks\" or \"Analyze TSLA earnings\"!\n"
             )
         )
@@ -353,6 +357,152 @@ class ChatUI(App):
                 )
             )
 
+    async def _run_agent_stream(
+        self,
+        agent: object,
+        message: str,
+        agent_name: str,
+        chat_log: RichLog,
+    ) -> tuple[str, bool]:
+        """Run agent streaming in background (worker-compatible).
+
+        Returns:
+            tuple of (agent_response, was_cancelled)
+        """
+        agent_response = ""
+        tool_calls_shown = set()
+        was_cancelled = False
+
+        try:
+            # Create the stream
+            stream = agent.astream(
+                {"messages": [HumanMessage(content=message)]},
+                stream_mode=["values", "updates"]
+            )
+
+            # Iterate with cancellation awareness
+            async for event in stream:
+                # Check for cancellation FIRST (before processing)
+                if self.cancellation_requested:
+                    was_cancelled = True
+                    break
+
+                # Yield control to event loop periodically
+                await asyncio.sleep(0)
+
+                # Parse the event tuple
+                if isinstance(event, tuple) and len(event) == 2:
+                    event_type, event_data = event
+
+                    # Handle node updates (shows which node executed)
+                    if event_type == "updates":
+                        for node_name, node_output in event_data.items():
+                            # Show tool execution completion
+                            if node_name == "tools" and "messages" in node_output:
+                                for msg in node_output["messages"]:
+                                    if hasattr(msg, "name"):
+                                        tool_name = msg.name
+
+                                        # Show completion with context for router agent tools
+                                        if tool_name.startswith("route_to_"):
+                                            agent_name_map = {
+                                                "route_to_quill": "Quill (Fundamental Analysis)",
+                                                "route_to_macro_lens": "Macro Lens (Market Timing)",
+                                                "route_to_risk_shield": "Risk Shield (Portfolio Risk)",
+                                                "route_to_screen_forge": "Screen Forge (Stock Screening)",
+                                                "route_to_earnings_whisperer": "Earnings Whisperer (Earnings Analysis)",
+                                                "route_to_news_sentry": "News Sentry (Event Monitoring)",
+                                                "route_to_tax_scout": "Tax Scout (Tax Optimization)",
+                                                "route_to_hedge_smith": "Hedge Smith (Options Strategies)",
+                                                "route_to_portfolio": "Portfolio (General Analysis)",
+                                                "route_to_research": "Research (Macro Data)",
+                                            }
+                                            agent_display = agent_name_map.get(tool_name, tool_name)
+                                            chat_log.write(f"[dim]  ✓ {agent_display} completed[/dim]\n")
+                                        else:
+                                            chat_log.write(f"[dim]  ✓ {tool_name} completed[/dim]\n")
+
+                            # Show agent making tool calls
+                            elif node_name == "agent" and "messages" in node_output:
+                                for msg in node_output["messages"]:
+                                    if hasattr(msg, "tool_calls") and msg.tool_calls:
+                                        for tool_call in msg.tool_calls:
+                                            call_id = tool_call.get("id", "")
+                                            if call_id not in tool_calls_shown:
+                                                tool_calls_shown.add(call_id)
+                                                tool_name = tool_call.get("name", "unknown")
+                                                tool_args = tool_call.get("args", {})
+
+                                                # Enhanced display for router agent tools
+                                                if tool_name.startswith("route_to_"):
+                                                    agent_info = {
+                                                        "route_to_quill": ("Quill", "fundamental analysis, valuation, investment thesis"),
+                                                        "route_to_macro_lens": ("Macro Lens", "market timing, sector allocation, economic regime"),
+                                                        "route_to_risk_shield": ("Risk Shield", "portfolio risk, VAR, drawdown analysis"),
+                                                        "route_to_screen_forge": ("Screen Forge", "stock screening, factor discovery"),
+                                                        "route_to_earnings_whisperer": ("Earnings Whisperer", "earnings analysis, surprises"),
+                                                        "route_to_news_sentry": ("News Sentry", "event monitoring, insider trading"),
+                                                        "route_to_tax_scout": ("Tax Scout", "tax optimization, loss harvesting"),
+                                                        "route_to_hedge_smith": ("Hedge Smith", "options strategies, portfolio protection"),
+                                                        "route_to_portfolio": ("Portfolio", "general portfolio analysis"),
+                                                        "route_to_research": ("Research", "macroeconomic indicators"),
+                                                    }
+                                                    agent_name, capabilities = agent_info.get(tool_name, (tool_name, ""))
+                                                    query_preview = tool_args.get("query", "")[:40]
+                                                    chat_log.write(
+                                                        f"[dim]  → Calling {tool_name}[/dim]\n"
+                                                    )
+                                                    chat_log.write(
+                                                        f"[dim]     {agent_name} analyzing: {query_preview}...[/dim]\n"
+                                                    )
+                                                    chat_log.write(
+                                                        f"[dim]     Running specialist tools ({capabilities})...[/dim]\n"
+                                                    )
+                                                else:
+                                                    # Format args for display (for regular tools)
+                                                    args_preview = ", ".join(
+                                                        f"{k}={str(v)[:30]}" for k, v in list(tool_args.items())[:3]
+                                                    )
+                                                    if len(tool_args) > 3:
+                                                        args_preview += "..."
+
+                                                    chat_log.write(
+                                                        f"[dim]  → Calling {tool_name}({args_preview})[/dim]\n"
+                                                    )
+
+                    # Handle complete state values
+                    elif event_type == "values":
+                        if "messages" in event_data and event_data["messages"]:
+                            last_msg = event_data["messages"][-1]
+                            if hasattr(last_msg, "content") and last_msg.content:
+                                # Show final response only
+                                if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+                                    agent_response = last_msg.content
+                                    chat_log.write(Markdown(agent_response))
+
+        except asyncio.CancelledError:
+            # Worker was cancelled - clean up the stream
+            was_cancelled = True
+            # Try to close the stream gracefully
+            try:
+                await stream.aclose()
+            except:
+                pass
+            # DON'T re-raise - return the result instead
+            return agent_response, was_cancelled
+        except Exception as e:
+            chat_log.write(f"\n[red]Error: {str(e)}[/red]")
+            raise
+        finally:
+            # Ensure stream is closed
+            try:
+                if 'stream' in locals():
+                    await stream.aclose()
+            except:
+                pass
+
+        return agent_response, was_cancelled
+
     async def on_input_submitted(self, event: Input.Submitted) -> None:
         """Handle user input submission."""
         text = event.value.strip()
@@ -371,7 +521,7 @@ class ChatUI(App):
         input_widget.value = ""
         input_widget.disabled = True
         original_placeholder = input_widget.placeholder
-        input_widget.placeholder = "⏳ Processing your request..."
+        input_widget.placeholder = "⏳ Processing... (Press ESC to cancel)"
 
         # Update footer status
         self.sub_title = "Processing..."
@@ -450,112 +600,60 @@ class ChatUI(App):
             if self.router_mode:
                 self.streaming_task = asyncio.create_task(self._consume_streaming_events(chat_log))
 
-            # Stream response with detailed progress
-            agent_response = ""
-            tool_calls_shown = set()
-            async for event in agent.astream(
-                {"messages": [HumanMessage(content=text)]},
-                stream_mode=["values", "updates"]
-            ):
-                # Parse the event tuple
-                if isinstance(event, tuple) and len(event) == 2:
-                    event_type, event_data = event
+            # Reset cancellation flag
+            self.cancellation_requested = False
 
-                    # Handle node updates (shows which node executed)
-                    if event_type == "updates":
-                        for node_name, node_output in event_data.items():
-                            # Show tool execution completion
-                            if node_name == "tools" and "messages" in node_output:
-                                for msg in node_output["messages"]:
-                                    if hasattr(msg, "name"):
-                                        tool_name = msg.name
+            # Store context for worker completion handler
+            self._current_text = text
+            self._current_report_type = report_type
 
-                                        # Show completion with context for router agent tools
-                                        if tool_name.startswith("route_to_"):
-                                            agent_name_map = {
-                                                "route_to_quill": "Quill (Fundamental Analysis)",
-                                                "route_to_macro_lens": "Macro Lens (Market Timing)",
-                                                "route_to_risk_shield": "Risk Shield (Portfolio Risk)",
-                                                "route_to_screen_forge": "Screen Forge (Stock Screening)",
-                                                "route_to_earnings_whisperer": "Earnings Whisperer (Earnings Analysis)",
-                                                "route_to_news_sentry": "News Sentry (Event Monitoring)",
-                                                "route_to_tax_scout": "Tax Scout (Tax Optimization)",
-                                                "route_to_hedge_smith": "Hedge Smith (Options Strategies)",
-                                                "route_to_portfolio": "Portfolio (General Analysis)",
-                                                "route_to_research": "Research (Macro Data)",
-                                            }
-                                            agent_display = agent_name_map.get(tool_name, tool_name)
+            # Run agent in worker (non-blocking)
+            self.agent_worker = self.run_worker(
+                self._run_agent_stream(agent, text, agent_name, chat_log),
+                name="agent_execution",
+                group="agent",
+                exclusive=True,
+            )
 
-                                            # Note: Sub-agent tool calls are now streamed in real-time via background consumer
-                                            # No need to parse [TOOL CALLS] from message content anymore
+            # **KEY FIX**: Don't await worker.wait() - it blocks!
+            # Worker runs in background, on_worker_state_changed handles completion
 
-                                            chat_log.write(f"[dim]  ✓ {agent_display} completed[/dim]\n")
-                                        else:
-                                            chat_log.write(f"[dim]  ✓ {tool_name} completed[/dim]\n")
+        except Exception as e:
+            chat_log.write(f"\n[red]Error: {str(e)}[/red]")
+            # Re-enable input on error
+            input_widget.disabled = False
+            input_widget.placeholder = original_placeholder
+            if self.router_mode:
+                self.sub_title = "Router: Active | Ready"
 
-                            # Show agent making tool calls
-                            elif node_name == "agent" and "messages" in node_output:
-                                for msg in node_output["messages"]:
-                                    if hasattr(msg, "tool_calls") and msg.tool_calls:
-                                        for tool_call in msg.tool_calls:
-                                            call_id = tool_call.get("id", "")
-                                            if call_id not in tool_calls_shown:
-                                                tool_calls_shown.add(call_id)
-                                                tool_name = tool_call.get("name", "unknown")
-                                                tool_args = tool_call.get("args", {})
+    def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
+        """Handle worker state changes (completion, cancellation, errors)."""
+        # Only handle our agent execution worker
+        if event.worker.name != "agent_execution":
+            return
 
-                                                # Enhanced display for router agent tools
-                                                if tool_name.startswith("route_to_"):
-                                                    agent_info = {
-                                                        "route_to_quill": ("Quill", "fundamental analysis, valuation, investment thesis"),
-                                                        "route_to_macro_lens": ("Macro Lens", "market timing, sector allocation, economic regime"),
-                                                        "route_to_risk_shield": ("Risk Shield", "portfolio risk, VAR, drawdown analysis"),
-                                                        "route_to_screen_forge": ("Screen Forge", "stock screening, factor discovery"),
-                                                        "route_to_earnings_whisperer": ("Earnings Whisperer", "earnings analysis, surprises"),
-                                                        "route_to_news_sentry": ("News Sentry", "event monitoring, insider trading"),
-                                                        "route_to_tax_scout": ("Tax Scout", "tax optimization, loss harvesting"),
-                                                        "route_to_hedge_smith": ("Hedge Smith", "options strategies, portfolio protection"),
-                                                        "route_to_portfolio": ("Portfolio", "general portfolio analysis"),
-                                                        "route_to_research": ("Research", "macroeconomic indicators"),
-                                                    }
-                                                    agent_name, capabilities = agent_info.get(tool_name, (tool_name, ""))
-                                                    query_preview = tool_args.get("query", "")[:40]
-                                                    chat_log.write(
-                                                        f"[dim]  → Calling {tool_name}[/dim]\n"
-                                                    )
-                                                    chat_log.write(
-                                                        f"[dim]     {agent_name} analyzing: {query_preview}...[/dim]\n"
-                                                    )
-                                                    chat_log.write(
-                                                        f"[dim]     Running specialist tools ({capabilities})...[/dim]\n"
-                                                    )
-                                                else:
-                                                    # Format args for display (for regular tools)
-                                                    args_preview = ", ".join(
-                                                        f"{k}={str(v)[:30]}" for k, v in list(tool_args.items())[:3]
-                                                    )
-                                                    if len(tool_args) > 3:
-                                                        args_preview += "..."
+        # Get UI widgets
+        try:
+            input_widget = self.query_one("#user-input", Input)
+            chat_log = self.query_one("#chat-log", RichLog)
+        except Exception:
+            return  # Widget not available
 
-                                                    chat_log.write(
-                                                        f"[dim]  → Calling {tool_name}({args_preview})[/dim]\n"
-                                                    )
+        # Worker finished (success or cancellation)
+        if event.state == WorkerState.SUCCESS:
+            agent_response, was_cancelled = event.worker.result
 
-                    # Handle complete state values
-                    elif event_type == "values":
-                        if "messages" in event_data and event_data["messages"]:
-                            last_msg = event_data["messages"][-1]
-                            if hasattr(last_msg, "content") and last_msg.content:
-                                # Show final response only
-                                if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
-                                    agent_response = last_msg.content
-                                    chat_log.write(Markdown(agent_response))
+            if was_cancelled:
+                chat_log.write("\n[yellow]🛑 Agent execution cancelled by user[/yellow]\n")
+                agent_response = ""  # Don't save cancelled responses
 
-            # Save agent response as report if it's substantial (>200 chars)
-            if agent_response and len(agent_response) > 200:
+            # Save agent response as report if it's substantial (>200 chars) and wasn't cancelled
+            if agent_response and len(agent_response) > 200 and not was_cancelled:
                 try:
                     # Extract context from user message (e.g., stock symbols)
                     import re
+                    text = getattr(self, "_current_text", "")
+                    report_type = getattr(self, "_current_report_type", "general")
                     symbols = re.findall(r'\b[A-Z]{2,5}\b', text.upper())
 
                     context = {"query": text[:50]}
@@ -571,22 +669,14 @@ class ChatUI(App):
                 except Exception as save_error:
                     chat_log.write(f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n")
 
-        except Exception as e:
-            chat_log.write(f"\n[red]Error: {str(e)}[/red]")
-
-        finally:
             # Stop streaming consumer task if running
             if self.streaming_task and not self.streaming_task.done():
                 self.streaming_task.cancel()
-                try:
-                    await self.streaming_task
-                except asyncio.CancelledError:
-                    pass
                 self.streaming_task = None
 
-            # Always re-enable input and restore placeholder
+            # Always re-enable input
             input_widget.disabled = False
-            input_widget.placeholder = original_placeholder
+            input_widget.placeholder = "Ask about stocks or economic indicators (/examples for ideas, /help for commands)..."
 
             # Update status to Ready with proper mode indicator
             if self.router_mode:
@@ -609,6 +699,26 @@ class ChatUI(App):
 
             # Focus back on input for next query
             input_widget.focus()
+
+        # Handle worker errors
+        elif event.state == WorkerState.ERROR:
+            chat_log.write(f"\n[red]Worker error: {event.worker.error}[/red]\n")
+
+            # Cleanup and re-enable input
+            if self.streaming_task and not self.streaming_task.done():
+                self.streaming_task.cancel()
+                self.streaming_task = None
+
+            input_widget.disabled = False
+            input_widget.placeholder = "Ask about stocks or economic indicators (/examples for ideas, /help for commands)..."
+            if self.router_mode:
+                self.sub_title = "Router: Active | Ready"
+            input_widget.focus()
+
+        # Handle worker cancelled
+        elif event.state == WorkerState.CANCELLED:
+            # Cleanup already happened via SUCCESS path (was_cancelled=True)
+            pass
 
     async def _handle_command(self, command: str, chat_log: RichLog) -> None:
         """Handle slash commands."""
@@ -1037,6 +1147,18 @@ class ChatUI(App):
             self.exit()
         else:
             chat_log.write(f"\n[yellow]Unknown command: {command}[/yellow]\n")
+
+    def action_cancel(self) -> None:
+        """Cancel the currently running agent execution (ESC key)."""
+        if self.agent_worker and not self.agent_worker.is_finished:
+            self.cancellation_requested = True
+            try:
+                chat_log = self.query_one("#chat-log", RichLog)
+                chat_log.write("\n[yellow]⚠️  Cancellation requested - stopping agent...[/yellow]\n")
+            except Exception:
+                pass
+            # Cancel the worker
+            self.agent_worker.cancel()
 
     def action_clear(self) -> None:
         """Clear the chat log."""
