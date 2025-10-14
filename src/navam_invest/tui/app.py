@@ -26,6 +26,7 @@ from navam_invest.agents.router import create_router_agent, set_streaming_queue
 from navam_invest.workflows import (
     create_investment_analysis_workflow,
     create_idea_discovery_workflow,
+    create_portfolio_protection_workflow,
     create_tax_optimization_workflow,
 )
 from navam_invest.config.settings import ConfigurationError
@@ -197,6 +198,7 @@ class ChatUI(App):
         self.router_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.idea_discovery_workflow: Optional[object] = None
+        self.portfolio_protection_workflow: Optional[object] = None
         self.tax_optimization_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.router_mode: bool = True  # True = automatic routing, False = manual agent selection
@@ -304,6 +306,7 @@ class ChatUI(App):
                 "- `/router on|off` - Toggle automatic routing\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis workflow\n"
                 "- `/discover [CRITERIA]` - Systematic idea generation workflow\n"
+                "- `/protect [PORTFOLIO]` - Portfolio hedging workflow\n"
                 "- `/optimize-tax [PORTFOLIO]` - Tax-loss harvesting workflow\n"
                 "- `/examples` - Show example prompts\n"
                 "- `/help` - Show all commands\n\n"
@@ -331,12 +334,13 @@ class ChatUI(App):
             self.router_agent = await create_router_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.idea_discovery_workflow = await create_idea_discovery_workflow()
+            self.portfolio_protection_workflow = await create_portfolio_protection_workflow()
             self.tax_optimization_workflow = await create_tax_optimization_workflow()
             self.agents_initialized = True
             self.sub_title = "Router: Active | Ready"
             chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout, Hedge Smith)[/green]")
             chat_log.write("[green]✓ Router agent initialized - automatic intent-based routing enabled![/green]")
-            chat_log.write("[green]✓ Multi-agent workflows ready (Investment Analysis, Idea Discovery, Tax Optimization)[/green]")
+            chat_log.write("[green]✓ Multi-agent workflows ready (Investment Analysis, Idea Discovery, Portfolio Protection, Tax Optimization)[/green]")
             chat_log.write("[dim]✓ Progressive streaming enabled for sub-agent tool calls[/dim]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -425,7 +429,16 @@ class ChatUI(App):
                                             if call_id not in tool_calls_shown:
                                                 tool_calls_shown.add(call_id)
                                                 tool_name = tool_call.get("name", "unknown")
-                                                chat_log.write(f"[dim]    → {tool_name}[/dim]\n")
+                                                tool_args = tool_call.get("args", {})
+
+                                                # Format args for display
+                                                args_preview = ", ".join(
+                                                    f"{k}={str(v)[:30]}" for k, v in list(tool_args.items())[:3]
+                                                )
+                                                if len(tool_args) > 3:
+                                                    args_preview += "..."
+
+                                                chat_log.write(f"[dim]    → {tool_name}({args_preview})[/dim]\n")
 
                     # Handle final values
                     elif event_type == "values":
@@ -632,11 +645,23 @@ class ChatUI(App):
         # Update footer status
         self.sub_title = "Processing..."
 
+        # Track whether we spawned a worker (worker-based commands need cleanup via on_worker_state_changed)
+        spawned_worker = False
+
         try:
             # Handle commands
             if text.startswith("/"):
                 await self._handle_command(text, chat_log)
-                return
+                # Commands like /help, /router, /examples, /api don't spawn workers
+                # Only workflow commands (/optimize-tax, /protect) spawn workers via _handle_command
+                # Check if a worker was spawned (it will be set in self.agent_worker)
+                spawned_worker = (self.agent_worker is not None and not self.agent_worker.is_finished)
+                if not spawned_worker:
+                    # Simple command - re-enable input immediately
+                    return
+                else:
+                    # Worker-based command - cleanup will happen via on_worker_state_changed
+                    return
 
             # Display user message
             chat_log.write(f"\n[bold cyan]You:[/bold cyan] {text}\n")
@@ -723,6 +748,7 @@ class ChatUI(App):
 
             # **KEY FIX**: Don't await worker.wait() - it blocks!
             # Worker runs in background, on_worker_state_changed handles completion
+            spawned_worker = True  # Agent execution always spawns a worker
 
         except Exception as e:
             chat_log.write(f"\n[red]Error: {str(e)}[/red]")
@@ -731,6 +757,30 @@ class ChatUI(App):
             input_widget.placeholder = original_placeholder
             if self.router_mode:
                 self.sub_title = "Router: Active | Ready"
+        finally:
+            # Re-enable input ONLY for non-worker commands (simple commands like /help, /router, etc.)
+            # Worker-based commands will be re-enabled via on_worker_state_changed
+            if not spawned_worker:
+                input_widget.disabled = False
+                input_widget.placeholder = original_placeholder
+                if self.router_mode:
+                    self.sub_title = "Router: Active | Ready"
+                else:
+                    agent_display_names = {
+                        "portfolio": "Portfolio",
+                        "research": "Research",
+                        "quill": "Quill",
+                        "screen": "Screen Forge",
+                        "macro": "Macro Lens",
+                        "earnings": "Earnings Whisperer",
+                        "news": "News Sentry",
+                        "risk": "Risk Shield",
+                        "tax": "Tax Scout",
+                        "hedge": "Hedge Smith"
+                    }
+                    agent_name = agent_display_names.get(self.current_agent, self.current_agent.title())
+                    self.sub_title = f"Manual: {agent_name} | Ready"
+                input_widget.focus()
 
     def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
         """Handle worker state changes (completion, cancellation, errors)."""
@@ -776,6 +826,25 @@ class ChatUI(App):
                         report_path = save_agent_report(
                             content=f"# Tax Optimization Strategy\n\n## Portfolio Context\n{portfolio_context}\n\n## Tax-Loss Opportunities\n{tax_loss_opportunities}\n\n## Replacement Strategies\n{replacement_strategies}\n\n## Final Action Plan\n{final_plan}",
                             report_type="tax_optimization",
+                            context={"portfolio": portfolio_context[:50]},
+                        )
+                        chat_log.write(f"\n[dim]📄 Report saved to: {report_path}[/dim]\n")
+
+                    elif workflow_type == "portfolio_protection":
+                        portfolio_context = workflow_context
+                        risk_assessment = result.get("risk_assessment", "")
+                        hedging_strategies = result.get("hedging_strategies", "")
+
+                        # Get final plan from last message
+                        final_plan = ""
+                        if "messages" in result and result["messages"]:
+                            last_msg = result["messages"][-1]
+                            if hasattr(last_msg, "content"):
+                                final_plan = last_msg.content
+
+                        report_path = save_agent_report(
+                            content=f"# Portfolio Protection Strategy\n\n## Portfolio Context\n{portfolio_context}\n\n## Risk Assessment\n{risk_assessment}\n\n## Hedging Strategies\n{hedging_strategies}\n\n## Final Protection Plan\n{final_plan}",
+                            report_type="portfolio_protection",
                             context={"portfolio": portfolio_context[:50]},
                         )
                         chat_log.write(f"\n[dim]📄 Report saved to: {report_path}[/dim]\n")
@@ -1090,6 +1159,58 @@ class ChatUI(App):
                 exclusive=True,
             )
 
+        elif command.startswith("/protect"):
+            # Extract optional portfolio context from command
+            parts = command.split(maxsplit=1)
+            portfolio_context = parts[1] if len(parts) > 1 else "Analyze my portfolio for hedging opportunities"
+
+            chat_log.write(f"\n[bold cyan]You:[/bold cyan] Protect portfolio\n")
+            if len(parts) > 1:
+                chat_log.write(f"[dim]Portfolio: {portfolio_context}[/dim]\n")
+            chat_log.write(f"[bold green]Portfolio Protection Workflow:[/bold green] Starting risk assessment and hedging analysis...\n")
+
+            # Prepare workflow state
+            initial_state = {
+                "messages": [HumanMessage(content=portfolio_context)],
+                "portfolio_context": portfolio_context,
+                "risk_assessment": "",
+                "hedging_strategies": "",
+            }
+
+            # Node status messages
+            node_messages = {
+                "risk_shield": "🛡️ Risk Shield analyzing portfolio exposures...",
+                "hedge_smith": "⚔️ Hedge Smith designing protective strategies...",
+                "synthesize": "🎯 Synthesizing final protection plan...",
+            }
+
+            # Disable input and show processing state
+            input_widget = self.query_one("#user-input", Input)
+            input_widget.disabled = True
+            input_widget.placeholder = "⏳ Processing... (Press ESC to cancel)"
+            self.sub_title = "Processing..."
+
+            # Reset cancellation flag
+            self.cancellation_requested = False
+
+            # Store context for completion handler
+            self._current_workflow_type = "portfolio_protection"
+            self._current_workflow_context = portfolio_context
+
+            # Run workflow in worker (non-blocking)
+            self.agent_worker = self.run_worker(
+                self._run_workflow_stream(
+                    self.portfolio_protection_workflow,
+                    initial_state,
+                    "Portfolio Protection",
+                    chat_log,
+                    node_messages,
+                ),
+                name="workflow_execution",
+                group="workflow",
+                exclusive=True,
+            )
+
         elif command == "/api":
             chat_log.write("\n[bold cyan]Checking API Status...[/bold cyan]\n")
             chat_log.write("[dim]Testing connectivity to all configured APIs...\n\n[/dim]")
@@ -1216,6 +1337,7 @@ class ChatUI(App):
                     "**Multi-Agent Workflows:**\n"
                     "- `/analyze <SYMBOL>` - Complete investment analysis (Quill + Macro Lens + News Sentry + Risk Shield + Tax Scout)\n"
                     "- `/discover [CRITERIA]` - Systematic idea generation (Screen Forge + Quill + Risk Shield)\n"
+                    "- `/protect [PORTFOLIO]` - Portfolio hedging workflow (Risk Shield + Hedge Smith)\n"
                     "- `/optimize-tax [PORTFOLIO]` - Tax-loss harvesting workflow (Tax Scout + Hedge Smith)\n\n"
                     "**Utilities:**\n"
                     "- `/api` - Check API connectivity and status\n"

@@ -257,7 +257,14 @@ Chat: [Quill] Analyzing TSLA fundamentals...
   - ✅ TUI integration complete (`/optimize-tax` command handler + initialization)
   - ✅ Help and welcome messages updated
   - ✅ Progressive streaming support for all 2 agents + synthesis
-- `/protect` - Portfolio hedging workflow (Risk Shield → Hedge Smith for protection strategies)
+- ✅ `/protect` - Portfolio hedging workflow (Risk Shield → Hedge Smith for protection strategies) - **COMPLETED**
+  - ✅ Workflow implementation complete (`portfolio_protection.py` - 515 lines)
+  - ✅ Export in workflows `__init__.py`
+  - ✅ FAQ documentation updated
+  - ✅ TUI integration complete (`/protect` command handler + initialization)
+  - ✅ Help and welcome messages updated
+  - ✅ Progressive streaming support for all 2 agents + synthesis
+  - ✅ Report saving with risk assessment and hedging strategies
 
 #### Phase 3: API Caching Layer (v0.1.38)
 

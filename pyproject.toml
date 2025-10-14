@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "navam-invest"
-version = "0.1.40"
+version = "0.1.41"
 description = "AI agents and tools for the retail investor"
 readme = "README.md"
 requires-python = ">=3.9"

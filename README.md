@@ -162,6 +162,18 @@ Each agent is purpose-built with curated tools and expert system prompts:
 #    → Immediate actions, year-end optimization, compliance checklist
 ```
 
+#### `/protect` - Portfolio Hedging (2 Agents) **NEW in v0.1.40!**
+```bash
+/protect I hold 1000 NVDA shares at $120 average cost, currently $500
+
+# 1. Risk Shield analyzes portfolio exposures
+#    → Concentration risk, drawdown analysis, VAR calculation, correlation
+# 2. Hedge Smith designs protective strategies
+#    → Protective puts, collars, index hedges, tail risk protection
+# 3. Final synthesis provides hedging plan
+#    → Strategy selection, cost-benefit analysis, implementation steps
+```
+
 **Result**: Institutional-quality investment analysis in seconds, not hours.
 
 ### 📊 Free & Premium Data Sources
@@ -275,7 +287,10 @@ navam invest
 # Systematic 3-agent idea generation workflow
 
 > /optimize-tax I hold GOOGL at $150, now $120
-# Tax-loss harvesting with replacement strategies (NEW!)
+# Tax-loss harvesting with replacement strategies
+
+> /protect I hold 1000 NVDA shares, worried about correction
+# Portfolio hedging with protective options strategies (NEW!)
 
 # Or use manual commands for specific agents (power users)
 > /quill
@@ -803,19 +818,29 @@ FINAL TAX OPTIMIZATION PLAN
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.38 (Oct 14, 2025)
+### Current Release: v0.1.40 (Oct 14, 2025)
 
 **Latest Features**:
+- ✅ **`/protect` Workflow**: Portfolio hedging with Risk Shield + Hedge Smith collaboration
+- ✅ **Input Locking Fix**: Resolved issue where `/help` and other simple commands locked the input
+- ✅ **Tool Arguments Display**: Workflow tool calls now show full arguments (matching agent execution display)
+- ✅ **Worker-based Workflows**: All multi-agent workflows use non-blocking execution
+
+**In Development** (v0.1.41):
+- 🚧 **API Caching Layer**: DuckDB-based caching to reduce API calls and improve performance
+- 🚧 **Workflow Progress Visualization**: Enhanced TUI display for multi-agent workflows
+
+### Recent Releases
+
+**v0.1.39** (Oct 14, 2025):
+- ✅ **`/optimize-tax` Workflow**: Tax-loss harvesting with replacement strategies (Tax Scout + Hedge Smith)
+- ✅ **Worker-based Workflows**: Non-blocking execution for all multi-agent workflows
+
+**v0.1.38** (Oct 14, 2025):
 - ✅ **ESC Cancellation**: Cancel long-running agent operations anytime
 - ✅ **Non-blocking TUI**: Scroll and interact while agents work
 - ✅ **Worker-based Execution**: Textual worker pattern for responsive UI
 - ✅ **Graceful Stream Cleanup**: Proper async stream handling on cancellation
-
-**In Development** (v0.1.39):
-- 🚧 **`/optimize-tax` Workflow**: Tax-loss harvesting with replacement strategies (Tax Scout + Hedge Smith)
-- 🚧 **Worker-based Workflows**: Non-blocking execution for all multi-agent workflows
-
-### Recent Releases
 
 **v0.1.37** (Oct 12, 2025):
 - ✅ **Extended `/analyze` Workflow**: 5-agent comprehensive analysis (Quill + News Sentry + Macro Lens + Risk Shield + Tax Scout)
@@ -843,10 +868,10 @@ FINAL TAX OPTIMIZATION PLAN
 
 ### Planned Features
 
-**v0.1.39+** (Q4 2025):
-- [ ] **`/protect` Workflow**: Portfolio hedging (Risk Shield + Hedge Smith)
+**v0.1.41+** (Q4 2025):
 - [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls
 - [ ] **Workflow Progress Visualization**: Enhanced TUI display for multi-agent workflows
+- [ ] **Async Tool Execution**: Parallel tool calls for faster agent responses
 
 **v0.2.0+** (Q1 2026):
 - [ ] **Backtesting Engine**: Test investment strategies on historical data
