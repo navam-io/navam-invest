@@ -1211,7 +1211,35 @@ class ChatUI(App):
                 exclusive=True,
             )
 
-        elif command == "/cache":
+        elif command.startswith("/cache"):
+            parts = command.split()
+
+            # Handle /cache clear subcommand
+            if len(parts) == 2 and parts[1].lower() == "clear":
+                chat_log.write("\n[bold cyan]Clear Cache[/bold cyan]\n")
+                chat_log.write("[dim]Clearing all cached API responses...\n\n[/dim]")
+
+                try:
+                    from navam_invest.cache import get_cache_manager
+
+                    cache = get_cache_manager()
+                    count = cache.invalidate()  # Clear all cache entries
+
+                    chat_log.write(
+                        Markdown(
+                            f"\n✅ **Cache cleared successfully!**\n\n"
+                            f"- Removed {count:,} cached API responses\n"
+                            f"- Statistics have been reset\n\n"
+                            f"**Note:** The cache will be rebuilt as you make new API requests.\n\n"
+                            f"💡 **Tip:** Use `/cache` to view performance metrics after making some queries.\n"
+                        )
+                    )
+                except Exception as e:
+                    chat_log.write(f"\n[red]Error clearing cache: {str(e)}[/red]")
+
+                return
+
+            # Handle /cache (show statistics) - default behavior
             chat_log.write("\n[bold cyan]Cache Statistics[/bold cyan]\n")
             chat_log.write("[dim]Fetching cache performance metrics...\n\n[/dim]")
 
@@ -1414,6 +1442,8 @@ class ChatUI(App):
                     "- `/optimize-tax [PORTFOLIO]` - Tax-loss harvesting workflow (Tax Scout + Hedge Smith)\n\n"
                     "**Utilities:**\n"
                     "- `/api` - Check API connectivity and status\n"
+                    "- `/cache` - View API cache statistics and performance metrics\n"
+                    "- `/cache clear` - Clear all cached API responses\n"
                     "- `/examples` - Show example prompts\n"
                     "- `/clear` - Clear chat history\n"
                     "- `/quit` - Exit the application\n"
