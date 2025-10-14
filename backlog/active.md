@@ -250,7 +250,13 @@ Chat: [Quill] Analyzing TSLA fundamentals...
   - ✅ TUI integration complete (`/discover` command handler + initialization)
   - ✅ Help and welcome messages updated
   - ✅ Progressive streaming support for all 3 agents
-- `/optimize-tax` - Tax-loss harvesting workflow (Tax Scout → Hedge Smith for replacement positions)
+- ✅ `/optimize-tax` - Tax-loss harvesting workflow (Tax Scout → Hedge Smith for replacement positions) - **COMPLETED**
+  - ✅ Workflow implementation complete (`tax_optimization.py` - 380 lines)
+  - ✅ Export in workflows `__init__.py`
+  - ✅ FAQ documentation updated
+  - ✅ TUI integration complete (`/optimize-tax` command handler + initialization)
+  - ✅ Help and welcome messages updated
+  - ✅ Progressive streaming support for all 2 agents + synthesis
 - `/protect` - Portfolio hedging workflow (Risk Shield → Hedge Smith for protection strategies)
 
 #### Phase 3: API Caching Layer (v0.1.38)

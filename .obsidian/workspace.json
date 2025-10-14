@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "reports/in_router_analysis_20251012_110609.md",
+                "file": "reports/report_tax_optimization_20251014_123710.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "in_router_analysis_20251012_110609"
+              "title": "report_tax_optimization_20251014_123710"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "reports/in_router_analysis_20251012_110609.md",
+                "file": "reports/report_tax_optimization_20251014_123710.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for in_router_analysis_20251012_110609"
+              "title": "Backlinks for report_tax_optimization_20251014_123710"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "reports/in_router_analysis_20251012_110609.md",
+                "file": "reports/report_tax_optimization_20251014_123710.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from in_router_analysis_20251012_110609"
+              "title": "Outgoing links from report_tax_optimization_20251014_123710"
             }
           },
           {
@@ -142,13 +142,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "reports/in_router_analysis_20251012_110609.md",
+                "file": "reports/report_tax_optimization_20251014_123710.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of in_router_analysis_20251012_110609"
+              "title": "Outline of report_tax_optimization_20251014_123710"
             }
           }
         ]
@@ -171,18 +171,23 @@
   },
   "active": "18c555c4dc8b6e35",
   "lastOpenFiles": [
-    "src/navam_invest/tui/app.py.tmp.82440.1760462302462",
-    "src/navam_invest/tui/app.py.tmp.82440.1760462294245",
+    "backlog/release-0.1.40.md",
+    "backlog/release-0.1.39.md.tmp.82440.1760472127704",
+    "dist/navam_invest-0.1.39-py3-none-any.whl",
+    "dist/navam_invest-0.1.39.tar.gz",
+    "src/navam_invest/tui/app.py.tmp.82440.1760471187727",
+    "reports/report_tax_optimization_20251014_124429.md",
+    "reports/tax_tax_optimization_20251012_081555.md",
+    "reports/in_router_analysis_20251012_110609.md",
+    "reports/report_tax_optimization_20251014_123710.md",
+    "backlog/active.md.tmp.82440.1760470453311",
+    "src/navam_invest/workflows/__pycache__/tax_optimization.cpython-313.pyc",
+    "src/navam_invest/tui/app.py.tmp.82440.1760469977386",
+    "src/navam_invest/tui/app.py.tmp.82440.1760469933873",
+    "src/navam_invest/tui/app.py.tmp.82440.1760469921928",
+    "src/navam_invest/workflows/__init__.py.tmp.82440.1760469880055",
+    "backlog/release-0.1.39.md",
     "ESC_CANCEL_IMPLEMENTATION.md",
-    "src/navam_invest/tui/app.py.tmp.82440.1760461823464",
-    "__pycache__/test_esc_worker.cpython-313.pyc",
-    "__pycache__",
-    "test_esc_worker.py",
-    "src/navam_invest/tui/app.py.tmp.82440.1760461749706",
-    "src/navam_invest/tui/app.py.tmp.82440.1760461743338",
-    "src/navam_invest/tui/app.py.tmp.82440.1760461685520",
-    "src/navam_invest/tui/app.py.tmp.82440.1760461677165",
-    "src/navam_invest/tui/app.py.tmp.82440.1760461670218",
     "reports/report_idea_discovery_20251014_100315.md",
     "backlog/release-0.1.38.md",
     "reports/report_idea_discovery_20251012_124200.md",
@@ -191,21 +196,16 @@
     "reports/in_router_analysis_20251012_113524.md",
     "reports/in_router_analysis_20251012_112312.md",
     "reports/in_router_analysis_20251012_111352.md",
-    "reports/in_router_analysis_20251012_110609.md",
     "backlog/release-0.1.36.md",
     "backlog/pivot.md",
     "reports/to_options_strategies_20251012_093543.md",
     "reports/my_tax_optimization_20251011_115116.md",
     "backlog/wishlist.md",
     "backlog/release-0.1.35.md",
-    "reports/tax_tax_optimization_20251012_081555.md",
     "reports/where_portfolio_20251011_111542.md",
     "backlog/release-0.1.34.md",
     "backlog/release-0.1.33.md",
     "docs/CLAUDE_MD_UPDATES.md",
-    "docs/REORGANIZATION_SUMMARY.md",
-    "DOCUMENTATION_REORGANIZATION.md",
-    "docs/README.md",
-    "docs/faq.md"
+    "docs/REORGANIZATION_SUMMARY.md"
   ]
 }

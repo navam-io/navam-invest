@@ -23,7 +23,11 @@ from navam_invest.agents.risk_shield import create_risk_shield_agent
 from navam_invest.agents.tax_scout import create_tax_scout_agent
 from navam_invest.agents.hedge_smith import create_hedge_smith_agent
 from navam_invest.agents.router import create_router_agent, set_streaming_queue
-from navam_invest.workflows import create_investment_analysis_workflow, create_idea_discovery_workflow
+from navam_invest.workflows import (
+    create_investment_analysis_workflow,
+    create_idea_discovery_workflow,
+    create_tax_optimization_workflow,
+)
 from navam_invest.config.settings import ConfigurationError
 from navam_invest.utils import check_all_apis, save_investment_report, save_agent_report
 
@@ -193,6 +197,7 @@ class ChatUI(App):
         self.router_agent: Optional[object] = None
         self.investment_workflow: Optional[object] = None
         self.idea_discovery_workflow: Optional[object] = None
+        self.tax_optimization_workflow: Optional[object] = None
         self.current_agent: str = "portfolio"
         self.router_mode: bool = True  # True = automatic routing, False = manual agent selection
         self.agents_initialized: bool = False
@@ -299,6 +304,7 @@ class ChatUI(App):
                 "- `/router on|off` - Toggle automatic routing\n"
                 "- `/analyze <SYMBOL>` - Multi-agent investment analysis workflow\n"
                 "- `/discover [CRITERIA]` - Systematic idea generation workflow\n"
+                "- `/optimize-tax [PORTFOLIO]` - Tax-loss harvesting workflow\n"
                 "- `/examples` - Show example prompts\n"
                 "- `/help` - Show all commands\n\n"
                 "**Keyboard Shortcuts:** `ESC` Cancel | `Ctrl+C` Clear | `Ctrl+Q` Quit\n\n"
@@ -325,11 +331,12 @@ class ChatUI(App):
             self.router_agent = await create_router_agent()
             self.investment_workflow = await create_investment_analysis_workflow()
             self.idea_discovery_workflow = await create_idea_discovery_workflow()
+            self.tax_optimization_workflow = await create_tax_optimization_workflow()
             self.agents_initialized = True
             self.sub_title = "Router: Active | Ready"
             chat_log.write("[green]✓ Agents initialized successfully (Portfolio, Research, Quill, Screen Forge, Macro Lens, Earnings Whisperer, News Sentry, Risk Shield, Tax Scout, Hedge Smith)[/green]")
             chat_log.write("[green]✓ Router agent initialized - automatic intent-based routing enabled![/green]")
-            chat_log.write("[green]✓ Multi-agent workflows ready (Investment Analysis, Idea Discovery)[/green]")
+            chat_log.write("[green]✓ Multi-agent workflows ready (Investment Analysis, Idea Discovery, Tax Optimization)[/green]")
             chat_log.write("[dim]✓ Progressive streaming enabled for sub-agent tool calls[/dim]")
         except ConfigurationError as e:
             self.agents_initialized = False
@@ -356,6 +363,105 @@ class ChatUI(App):
                     f"Press `Ctrl+Q` to quit."
                 )
             )
+
+    async def _run_workflow_stream(
+        self,
+        workflow: object,
+        initial_state: dict,
+        workflow_name: str,
+        chat_log: RichLog,
+        node_messages: dict[str, str],
+    ) -> tuple[dict, bool]:
+        """Run workflow streaming in background (worker-compatible).
+
+        Args:
+            workflow: The LangGraph workflow to run
+            initial_state: Initial state dictionary for the workflow
+            workflow_name: Name of the workflow for logging
+            chat_log: RichLog widget for output
+            node_messages: Dict mapping node names to status messages
+
+        Returns:
+            tuple of (workflow_state, was_cancelled)
+        """
+        workflow_state = {}
+        tool_calls_shown = set()
+        was_cancelled = False
+
+        try:
+            # Create the stream
+            stream = workflow.astream(
+                initial_state,
+                stream_mode=["values", "updates"]
+            )
+
+            # Iterate with cancellation awareness
+            async for event in stream:
+                # Check for cancellation FIRST (before processing)
+                if self.cancellation_requested:
+                    was_cancelled = True
+                    break
+
+                # Yield control to event loop periodically
+                await asyncio.sleep(0)
+
+                # Parse the event tuple
+                if isinstance(event, tuple) and len(event) == 2:
+                    event_type, event_data = event
+
+                    # Handle node updates
+                    if event_type == "updates":
+                        for node_name, node_output in event_data.items():
+                            # Show which agent/node is working
+                            if node_name in node_messages:
+                                chat_log.write(f"[dim]  {node_messages[node_name]}[/dim]\n")
+
+                            # Show tool calls
+                            if "messages" in node_output:
+                                for msg in node_output["messages"]:
+                                    if hasattr(msg, "tool_calls") and msg.tool_calls:
+                                        for tool_call in msg.tool_calls:
+                                            call_id = tool_call.get("id", "")
+                                            if call_id not in tool_calls_shown:
+                                                tool_calls_shown.add(call_id)
+                                                tool_name = tool_call.get("name", "unknown")
+                                                chat_log.write(f"[dim]    → {tool_name}[/dim]\n")
+
+                    # Handle final values
+                    elif event_type == "values":
+                        # Capture entire state
+                        workflow_state = event_data
+
+                        # Show final content if available
+                        if "messages" in event_data and event_data["messages"]:
+                            last_msg = event_data["messages"][-1]
+                            if hasattr(last_msg, "content") and last_msg.content:
+                                # Show final output
+                                if not hasattr(last_msg, "tool_calls") or not last_msg.tool_calls:
+                                    chat_log.write(Markdown(last_msg.content))
+
+        except asyncio.CancelledError:
+            # Worker was cancelled - clean up the stream
+            was_cancelled = True
+            # Try to close the stream gracefully
+            try:
+                await stream.aclose()
+            except:
+                pass
+            # DON'T re-raise - return the result instead
+            return workflow_state, was_cancelled
+        except Exception as e:
+            chat_log.write(f"\n[red]Error: {str(e)}[/red]")
+            raise
+        finally:
+            # Ensure stream is closed
+            try:
+                if 'stream' in locals():
+                    await stream.aclose()
+            except:
+                pass
+
+        return workflow_state, was_cancelled
 
     async def _run_agent_stream(
         self,
@@ -628,8 +734,8 @@ class ChatUI(App):
 
     def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
         """Handle worker state changes (completion, cancellation, errors)."""
-        # Only handle our agent execution worker
-        if event.worker.name != "agent_execution":
+        # Only handle our agent/workflow execution workers
+        if event.worker.name not in ["agent_execution", "workflow_execution"]:
             return
 
         # Get UI widgets
@@ -641,14 +747,43 @@ class ChatUI(App):
 
         # Worker finished (success or cancellation)
         if event.state == WorkerState.SUCCESS:
-            agent_response, was_cancelled = event.worker.result
+            result, was_cancelled = event.worker.result
 
             if was_cancelled:
-                chat_log.write("\n[yellow]🛑 Agent execution cancelled by user[/yellow]\n")
-                agent_response = ""  # Don't save cancelled responses
+                chat_log.write("\n[yellow]🛑 Execution cancelled by user[/yellow]\n")
+                result = None  # Don't save cancelled responses
 
-            # Save agent response as report if it's substantial (>200 chars) and wasn't cancelled
-            if agent_response and len(agent_response) > 200 and not was_cancelled:
+            # Handle workflow results (dict) vs agent results (str)
+            if event.worker.name == "workflow_execution" and result and not was_cancelled:
+                # Workflow execution - save workflow-specific report
+                workflow_type = getattr(self, "_current_workflow_type", "workflow")
+                workflow_context = getattr(self, "_current_workflow_context", "")
+
+                try:
+                    # Extract state data for report
+                    if workflow_type == "tax_optimization":
+                        portfolio_context = workflow_context
+                        tax_loss_opportunities = result.get("tax_loss_opportunities", "")
+                        replacement_strategies = result.get("replacement_strategies", "")
+
+                        # Get final plan from last message
+                        final_plan = ""
+                        if "messages" in result and result["messages"]:
+                            last_msg = result["messages"][-1]
+                            if hasattr(last_msg, "content"):
+                                final_plan = last_msg.content
+
+                        report_path = save_agent_report(
+                            content=f"# Tax Optimization Strategy\n\n## Portfolio Context\n{portfolio_context}\n\n## Tax-Loss Opportunities\n{tax_loss_opportunities}\n\n## Replacement Strategies\n{replacement_strategies}\n\n## Final Action Plan\n{final_plan}",
+                            report_type="tax_optimization",
+                            context={"portfolio": portfolio_context[:50]},
+                        )
+                        chat_log.write(f"\n[dim]📄 Report saved to: {report_path}[/dim]\n")
+                except Exception as save_error:
+                    chat_log.write(f"\n[dim yellow]⚠️  Could not save report: {str(save_error)}[/dim]\n")
+
+            elif event.worker.name == "agent_execution" and result and len(result) > 200 and not was_cancelled:
+                # Agent execution - save agent response report
                 try:
                     # Extract context from user message (e.g., stock symbols)
                     import re
@@ -661,7 +796,7 @@ class ChatUI(App):
                         context["symbol"] = symbols[0]
 
                     report_path = save_agent_report(
-                        content=agent_response,
+                        content=result,
                         report_type=report_type,
                         context=context,
                     )
@@ -903,6 +1038,58 @@ class ChatUI(App):
             except Exception as e:
                 chat_log.write(f"\n[red]Error running workflow: {str(e)}[/red]")
 
+        elif command.startswith("/optimize-tax"):
+            # Extract optional portfolio context from command
+            parts = command.split(maxsplit=1)
+            portfolio_context = parts[1] if len(parts) > 1 else "Analyze my portfolio for tax-loss harvesting opportunities"
+
+            chat_log.write(f"\n[bold cyan]You:[/bold cyan] Optimize tax strategy\n")
+            if len(parts) > 1:
+                chat_log.write(f"[dim]Portfolio: {portfolio_context}[/dim]\n")
+            chat_log.write(f"[bold green]Tax Optimization Workflow:[/bold green] Starting tax-loss harvesting analysis...\n")
+
+            # Prepare workflow state
+            initial_state = {
+                "messages": [HumanMessage(content=portfolio_context)],
+                "portfolio_context": portfolio_context,
+                "tax_loss_opportunities": "",
+                "replacement_strategies": "",
+            }
+
+            # Node status messages
+            node_messages = {
+                "tax_scout": "💰 Tax Scout identifying loss harvesting opportunities...",
+                "hedge_smith": "🛡️ Hedge Smith designing replacement strategies...",
+                "synthesize": "🎯 Synthesizing final tax optimization plan...",
+            }
+
+            # Disable input and show processing state
+            input_widget = self.query_one("#user-input", Input)
+            input_widget.disabled = True
+            input_widget.placeholder = "⏳ Processing... (Press ESC to cancel)"
+            self.sub_title = "Processing..."
+
+            # Reset cancellation flag
+            self.cancellation_requested = False
+
+            # Store context for completion handler
+            self._current_workflow_type = "tax_optimization"
+            self._current_workflow_context = portfolio_context
+
+            # Run workflow in worker (non-blocking)
+            self.agent_worker = self.run_worker(
+                self._run_workflow_stream(
+                    self.tax_optimization_workflow,
+                    initial_state,
+                    "Tax Optimization",
+                    chat_log,
+                    node_messages,
+                ),
+                name="workflow_execution",
+                group="workflow",
+                exclusive=True,
+            )
+
         elif command == "/api":
             chat_log.write("\n[bold cyan]Checking API Status...[/bold cyan]\n")
             chat_log.write("[dim]Testing connectivity to all configured APIs...\n\n[/dim]")
@@ -1028,7 +1215,8 @@ class ChatUI(App):
                     "- `/hedge` - Hedge Smith options strategies agent\n\n"
                     "**Multi-Agent Workflows:**\n"
                     "- `/analyze <SYMBOL>` - Complete investment analysis (Quill + Macro Lens + News Sentry + Risk Shield + Tax Scout)\n"
-                    "- `/discover [CRITERIA]` - Systematic idea generation (Screen Forge + Quill + Risk Shield)\n\n"
+                    "- `/discover [CRITERIA]` - Systematic idea generation (Screen Forge + Quill + Risk Shield)\n"
+                    "- `/optimize-tax [PORTFOLIO]` - Tax-loss harvesting workflow (Tax Scout + Hedge Smith)\n\n"
                     "**Utilities:**\n"
                     "- `/api` - Check API connectivity and status\n"
                     "- `/examples` - Show example prompts\n"

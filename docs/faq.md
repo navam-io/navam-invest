@@ -498,9 +498,9 @@ Quill (Equity Research):
 **Currently Available**:
 - `/analyze <SYMBOL>` - Comprehensive Investment Analysis Workflow (5 agents)
 - `/discover [CRITERIA]` - Systematic Idea Discovery Workflow (3 agents)
+- `/optimize-tax [PORTFOLIO]` - Tax-Loss Harvesting Workflow (2 agents) - NEW in v0.1.39
 
 **Future Workflows** (planned):
-- `/optimize-tax` - Tax-loss harvesting workflow (Tax Scout → Hedge Smith)
 - `/protect` - Portfolio hedging workflow (Risk Shield → Hedge Smith)
 
 **Single-agent mode is default** - multi-agents only activate when explicitly requested.

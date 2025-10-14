@@ -63,7 +63,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 **⚡ Production-Ready Today**
 - Interactive terminal UI (TUI) with real-time agent streaming
 - 32 tools across 9 APIs (3 require zero setup)
-- Auto-save reports, multi-agent orchestration
+- Auto-save reports, multi-agent orchestration, ESC cancellation
 
 </td>
 </tr>
@@ -73,7 +73,7 @@ Navam Invest is an **open-source AI investment advisory platform** designed for 
 
 ## ✨ Key Features
 
-### 🔀 Automatic Intent-Based Routing (NEW in v0.1.36)
+### 🔀 Automatic Intent-Based Routing (v0.1.36+)
 
 **No more manual agent switching!** Just ask your question naturally:
 
@@ -114,7 +114,7 @@ Each agent is purpose-built with curated tools and expert system prompts:
 | **Atlas** | Strategic asset allocation | 12 | "Create an IPS for $200K portfolio" |
 | **Portfolio/Research** | Legacy general-purpose | 24/10 | Backward compatibility |
 
-### 🔀 Multi-Agent Workflows (NEW in v0.1.37)
+### 🔀 Multi-Agent Workflows
 
 **Agents don't just answer questions—they collaborate in sophisticated workflows:**
 
@@ -136,7 +136,7 @@ Each agent is purpose-built with curated tools and expert system prompts:
 #    → BUY/HOLD/SELL with confidence level and reasoning
 ```
 
-#### `/discover` - Systematic Idea Generation (3 Agents) **NEW!**
+#### `/discover` - Systematic Idea Generation (3 Agents)
 ```bash
 /discover quality growth stocks with strong margins
 
@@ -148,6 +148,18 @@ Each agent is purpose-built with curated tools and expert system prompts:
 #    → Position sizing, concentration analysis
 # 4. Final synthesis ranks candidates
 #    → Actionable recommendations with entry points
+```
+
+#### `/optimize-tax` - Tax-Loss Harvesting (2 Agents) **NEW in v0.1.39!**
+```bash
+/optimize-tax I hold GOOGL at $150, now $120 and ETHUSD at $2500, now $1800
+
+# 1. Tax Scout identifies tax-loss harvesting opportunities
+#    → Unrealized losses >5%, wash-sale compliance, tax savings
+# 2. Hedge Smith designs replacement strategies
+#    → Sector ETF substitutes, synthetic long options, correlation analysis
+# 3. Final synthesis provides actionable tax plan
+#    → Immediate actions, year-end optimization, compliance checklist
 ```
 
 **Result**: Institutional-quality investment analysis in seconds, not hours.
@@ -174,14 +186,16 @@ Each agent is purpose-built with curated tools and expert system prompts:
 
 **Built with Textual framework** for a responsive, beautiful CLI experience:
 
-- ✅ **Progressive streaming**: Watch sub-agent tool calls appear in real-time (NEW in v0.1.36)
+- ✅ **Progressive streaming**: Watch sub-agent tool calls appear in real-time
 - ✅ **Real-time reasoning**: See agents think and make decisions live
+- ✅ **ESC cancellation**: Cancel long-running operations anytime (NEW in v0.1.38)
+- ✅ **Non-blocking execution**: Scroll and interact while agents work
 - ✅ **Smart input management**: Auto-disabled during processing (no duplicate queries)
 - ✅ **Tool execution tracking**: See exactly which data sources agents are calling
 - ✅ **Multi-agent progress**: Visual workflow transitions with status updates
 - ✅ **Markdown rendering**: Tables, code blocks, syntax highlighting
 - ✅ **Auto-save reports**: All responses >200 chars saved to `reports/` directory
-- ✅ **Keyboard shortcuts**: `Ctrl+C` (clear), `Ctrl+Q` (quit)
+- ✅ **Keyboard shortcuts**: `ESC` (cancel), `Ctrl+C` (clear), `Ctrl+Q` (quit)
 
 ---
 
@@ -259,6 +273,9 @@ navam invest
 
 > /discover dividend stocks with P/E under 20
 # Systematic 3-agent idea generation workflow
+
+> /optimize-tax I hold GOOGL at $150, now $120
+# Tax-loss harvesting with replacement strategies (NEW!)
 
 # Or use manual commands for specific agents (power users)
 > /quill
@@ -495,6 +512,9 @@ navam invest
 # Manual mode
 > /tax
 > Identify tax-loss harvesting opportunities with >5% unrealized losses, check wash-sale violations
+
+# NEW: Use /optimize-tax workflow for full analysis
+> /optimize-tax I hold GOOGL at $150, now $120
 ```
 
 **Expected Output**: TLH opportunities table with tax savings estimates, wash-sale violations, replacement candidates, and year-end action plan.
@@ -528,6 +548,10 @@ navam invest
 # Manual mode
 > /hedge
 > I hold 500 shares of AAPL at $180 cost, currently $200. Design a protective collar for 45-day expiration.
+
+# NEW: Use /optimize-tax workflow for tax-loss replacement strategies
+> /optimize-tax I hold GOOGL at $150, now $120
+# Hedge Smith suggests sector ETF or synthetic long options
 ```
 
 **Expected Output**: Complete strategy specification with specific strikes, premiums, Greeks, risk/reward analysis, and exit strategy.
@@ -588,72 +612,7 @@ Quill (Equity Research):
 - Revenue +15% YoY, 42% gross margin, $87B FCF
 - Exceptional profitability (42% ROE)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-NEWS SENTRY: EVENT MONITORING
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-News Sentry (Event Monitor):
-  → Calling route_to_news_sentry
-     News Sentry analyzing: Material events for Microsoft...
-     Running specialist tools (8-K monitoring, insider trades)...
-      → get_latest_8k({'symbol': 'MSFT'})
-      → get_insider_transactions({'symbol': 'MSFT'})
-  ✓ News Sentry (Event Monitoring) completed
-
-**Material Events**: NEUTRAL
-- No significant 8-K filings in last 30 days
-- Routine insider sales by executives (tax-related)
-- No unusual insider buying activity
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-MACRO LENS: TIMING VALIDATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Macro Lens (Market Strategist):
-  → Calling route_to_macro_lens
-     Macro Lens analyzing: What is the current market environment...
-     Running specialist tools (market timing, sector allocation, economic regime)...
-      → get_key_macro_indicators()
-      → get_treasury_yield_curve()
-      → get_market_indices()
-  ✓ Macro Lens (Market Timing) completed
-
-**Macro Context**: LATE EXPANSION with CAUTION
-- GDP +2.4%, CPI +3.1%, Unemployment 3.7%
-- 10Y-2Y inverted -0.54% (recession warning)
-- S&P 500 +12% YTD, Nasdaq -8% from highs, VIX 14.2
-- Late expansion phase suggests staged entry
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RISK SHIELD: EXPOSURE ASSESSMENT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Risk Shield (Portfolio Risk):
-  → Calling route_to_risk_shield
-     Risk Shield analyzing: What are the key risk considerations...
-     Running specialist tools (portfolio risk, VAR, drawdown analysis)...
-      → get_volatility_metrics({'symbol': 'MSFT'})
-      → calculate_portfolio_beta({'symbol': 'MSFT'})
-  ✓ Risk Shield (Portfolio Risk) completed
-
-**Risk Profile**: MODERATE
-- Beta: 0.95 (slightly less volatile than market)
-- Defensive characteristics (enterprise subscriptions)
-- Position sizing: Recommend 5-10% of portfolio max
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TAX SCOUT: TAX IMPLICATIONS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Tax Scout (Tax Optimization):
-  → Calling route_to_tax_scout
-     Tax Scout analyzing: Tax considerations for purchase...
-  ✓ Tax Scout (Tax Optimization) completed
-
-**Tax Considerations**: NO ISSUES
-- No wash-sale concerns (new purchase)
-- Consider tax-advantaged accounts for large positions
-- Hold >1 year for long-term capital gains treatment
+[... similar sections for News Sentry, Macro Lens, Risk Shield, Tax Scout ...]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 FINAL SYNTHESIS
@@ -682,14 +641,6 @@ Dollar-cost average over 3-6 months:
 - Tranche 2: 30% if MSFT dips below $390 (-7% from current)
 - Tranche 3: 30% if macro deteriorates (recession confirmed)
 
-Microsoft's defensive characteristics position it to outperform
-cyclical tech peers in downturn.
-
-**Risk Warnings**:
-1. Azure growth deceleration below 25% YoY would weaken thesis
-2. Recession could compress P/E to 24-26x (15-20% downside)
-3. If yield curve steepens rapidly, pause accumulation
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📄 Report saved to: reports/MSFT_analysis_20251012_143022.md
@@ -697,125 +648,122 @@ cyclical tech peers in downturn.
 
 </details>
 
-### Systematic Idea Generation
+### Tax-Loss Harvesting Workflow (NEW!)
 
-**Command**: `/discover [CRITERIA]` **NEW in v0.1.37!**
+**Command**: `/optimize-tax [PORTFOLIO]`
 
 **What Happens**:
 
-1. **Screen Forge** identifies 10-15 candidates using factor-based screening
-2. **Quill** performs deep fundamental analysis on top 3-5 picks
-3. **Risk Shield** assesses portfolio fit and position sizing for each
-4. **Synthesis** ranks candidates with actionable recommendations
+1. **Tax Scout** identifies tax-loss harvesting opportunities with wash-sale compliance
+2. **Hedge Smith** designs replacement strategies to maintain exposure
+3. **Synthesis** provides actionable tax optimization plan
 
 <details>
-<summary><b>Example: Discover Dividend Stocks (click to expand)</b></summary>
+<summary><b>Example: Tax Optimization for GOOGL + ETHUSD (click to expand)</b></summary>
 
 ```
-You: /discover dividend stocks with P/E under 20 and yield over 3%
+You: /optimize-tax I hold GOOGL at $150, now $120 and ETHUSD at $2500, now $1800
 
-Idea Discovery Workflow: Starting systematic screening...
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-SCREEN FORGE: CANDIDATE IDENTIFICATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Screen Forge (Equity Screener):
-  🔍 Screen Forge identifying candidates...
-    → get_stock_screener
-    → get_dividend_stocks
-    → get_financial_ratios
-
-**Screening Results**: 12 CANDIDATES IDENTIFIED
-
-| Symbol | Price | P/E | Yield | Payout | Score |
-|--------|-------|-----|-------|--------|-------|
-| VZ     | $38.50 | 8.2x | 6.8% | 54% | 8.5 |
-| MO     | $43.20 | 9.1x | 7.9% | 78% | 8.2 |
-| T      | $16.80 | 7.5x | 6.2% | 55% | 8.0 |
-| ABBV   | $172.50 | 15.3x | 3.8% | 45% | 7.8 |
-| PFE    | $28.40 | 11.2x | 5.9% | 65% | 7.5 |
+Tax Optimization Workflow: Starting tax-loss harvesting analysis...
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-QUILL: FUNDAMENTAL ANALYSIS (TOP 3)
+TAX SCOUT: TAX-LOSS IDENTIFICATION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Quill (Equity Research):
-  📊 Quill analyzing top picks...
-    → Analyzing VZ, MO, T
+Tax Scout (Tax Optimization):
+  💰 Tax Scout identifying loss harvesting opportunities...
+    → get_quote
+    → check_wash_sale_window
 
-**Top Pick #1: Verizon (VZ)**
-- **Valuation**: Attractive at 8.2x P/E (telecom avg: 12x)
-- **Dividend Safety**: Strong (54% payout, $8B annual FCF)
-- **Business Quality**: Infrastructure moat, recession-resistant
-- **5-Year Returns**: Total return 45% (35% from dividends)
-- **Rating**: BUY
+**TAX-LOSS HARVESTING OPPORTUNITIES**:
 
-**Top Pick #2: Altria (MO)**
-- **Valuation**: Cheap at 9.1x P/E
-- **Dividend Safety**: Moderate risk (78% payout)
-- **Business Quality**: Declining smoker base, regulatory risk
-- **5-Year Returns**: Total return 38% (mostly dividends)
-- **Rating**: HOLD (monitor payout sustainability)
+1. GOOGL - Alphabet Inc.
+   Current Price: $120.00 | Cost Basis: $150.00 | Unrealized Loss: -$30.00 (-20%)
+   Holding Period: 180 days (Long-term capital loss)
+   Wash-Sale Risk: None (no recent purchases)
+   Tax Savings Estimate: $6,000 (assuming 20% LTCG bracket)
+   Maintain Exposure? YES (core tech holding)
 
-**Top Pick #3: AT&T (T)**
-- **Valuation**: Very cheap at 7.5x P/E
-- **Dividend Safety**: Stable (55% payout, post-cut)
-- **Business Quality**: Fiber buildout improving outlook
-- **5-Year Returns**: Total return 28% (post-dividend cut recovery)
-- **Rating**: HOLD (improving fundamentals)
+2. ETHUSD - Ethereum
+   Current Price: $1,800 | Cost Basis: $2,500 | Unrealized Loss: -$700 (-28%)
+   Holding Period: 45 days (Short-term capital loss)
+   Wash-Sale Risk: None
+   Tax Savings Estimate: $259 (assuming 37% ordinary income bracket)
+   Maintain Exposure? YES (crypto allocation)
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-RISK SHIELD: PORTFOLIO FIT ASSESSMENT
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+**RECOMMENDED ACTIONS**:
+- Immediate harvest: GOOGL (significant long-term loss, no wash-sale risk)
+- Immediate harvest: ETHUSD (crypto exempt from wash-sale = harvest with zero cost)
 
-Risk Shield (Risk Manager):
-  🛡️ Risk Shield assessing portfolio fit...
-    → calculate_correlation
-    → assess_sector_concentration
-
-**Position Sizing Recommendations**:
-- **VZ**: 5-7% allocation (defensive core holding)
-- **MO**: 2-3% allocation (higher risk, satellite position)
-- **T**: 3-5% allocation (value/turnaround play)
-
-**Concentration Risk**: MODERATE
-- 10-15% combined telecom exposure acceptable
-- Provides defensive characteristics, recession hedge
-- Low correlation with tech-heavy portfolios
+**POSITIONS REQUIRING REPLACEMENT STRATEGY**:
+- GOOGL: Maintain tech exposure, need 31-day substitute
+- ETHUSD: Can rebuy immediately (crypto exempt), but consider strategy
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FINAL RECOMMENDATIONS
+HEDGE SMITH: REPLACEMENT STRATEGIES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🎯 **RANKED INVESTMENT IDEAS**
+Hedge Smith (Options Strategist):
+  🛡️ Hedge Smith designing replacement strategies...
+    → get_options_chain
+    → get_sector_etf_alternatives
 
-**#1 BEST: Verizon (VZ) - BUY**
-- Entry: $38-40 range
-- Target yield: 6.5-7.0%
-- Position size: 5-7% of portfolio
-- Thesis: Infrastructure moat + recession-resistant + attractive valuation
+**REPLACEMENT STRATEGY: GOOGL**
 
-**#2 HOLD: Altria (MO) - Monitor**
-- Entry: Below $42 (current $43.20)
-- Target yield: 8%+
-- Position size: 2-3% maximum (satellite)
-- Thesis: High yield but declining business, payout risk
+Option 1: Sector ETF Substitute (RECOMMENDED)
+- Ticker: XLK - Technology Select Sector SPDR ETF
+- Correlation: 0.75 (wash-sale compliant)
+- Investment: $120 × shares (match original position size)
+- Hold for: 31+ days, then repurchase GOOGL if desired
+- Tracking: Expected 75% correlation during hold period
 
-**#3 HOLD: AT&T (T) - Turnaround Play**
-- Entry: $15-17 range
-- Target yield: 6-7%
-- Position size: 3-5%
-- Thesis: Post-cut stabilization, fiber buildout upside
+Option 2: Synthetic Long (Options)
+- Buy 1 call contract @ $120 strike, 60-day expiration
+- Sell 1 put contract @ $120 strike, 60-day expiration
+- Net cost: ~$2.50 per share ($250 per contract)
+- Delta: ~1.0 (matches stock exposure)
+- Expiration: Allows repurchase of stock after 31 days
 
-**Action Steps**:
-1. Start with VZ (5% allocation) for defensive income core
-2. Watch for MO dip below $42 for small satellite position
-3. Monitor AT&T fiber subscriber growth for entry signal
+**RECOMMENDATION**: Sector ETF substitute (XLK) for simplicity
+
+**REPLACEMENT STRATEGY: ETHUSD**
+
+Option 1: Execute sell + immediate rebuy (RECOMMENDED)
+- Crypto exempt from wash-sale rules (IRS Notice 2014-21)
+- Harvest loss: -$700 tax deduction
+- Rebuy immediately: Maintain same exposure with zero gap
+- Tax Benefit: Pure tax savings with no disruption
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FINAL TAX OPTIMIZATION PLAN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 **IMMEDIATE ACTIONS** (Execute today):
+
+1. Sell GOOGL @ market
+   → Replace with XLK (Tech ETF) for 31+ days
+   → Tax savings: $6,000 | Hold ETF 31+ days
+
+2. Sell ETHUSD @ market
+   → Rebuy immediately (crypto exempt from wash-sale)
+   → Tax savings: $259 | Maintain same exposure
+
+**TOTAL TAX IMPACT**:
+- Total harvestable losses: -$6,259
+- Estimated tax savings: $6,259
+- Cost of replacement: $0 (ETF fees negligible, crypto rebuy instant)
+- Net tax benefit: $6,259
+
+**COMPLIANCE CHECKLIST**:
+- [ ] Confirm no GOOGL purchases in last 30 days (review transaction history)
+- [ ] Select replacement security (XLK or 31-day cash hold)
+- [ ] Maintain similar portfolio allocation and risk profile
+- [ ] Document cost basis and trade dates for tax reporting
+- [ ] Set 31-day calendar reminder to avoid repurchase violations
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📄 Report saved to: reports/report_idea_discovery_20251012_145200.md
+📄 Report saved to: reports/report_tax_optimization_20251014_123710.md
 ```
 
 </details>
@@ -855,97 +803,58 @@ FINAL RECOMMENDATIONS
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.37 (In Development)
+### Current Release: v0.1.38 (Oct 14, 2025)
 
 **Latest Features**:
-- ✅ **Extended `/analyze` Workflow**: 5-agent comprehensive analysis (Quill + News Sentry + Macro Lens + Risk Shield + Tax Scout)
-- ✅ **`/discover` Workflow**: NEW systematic idea generation (Screen Forge + Quill + Risk Shield)
-- ✅ **Progressive Streaming**: Real-time display of sub-agent tool calls as they execute
-- ✅ **State Accumulation**: Each agent receives context from previous agents
-- ✅ **Workflow Synthesis**: Comprehensive recommendations integrating all perspectives
+- ✅ **ESC Cancellation**: Cancel long-running agent operations anytime
+- ✅ **Non-blocking TUI**: Scroll and interact while agents work
+- ✅ **Worker-based Execution**: Textual worker pattern for responsive UI
+- ✅ **Graceful Stream Cleanup**: Proper async stream handling on cancellation
 
-**Recently Completed** (v0.1.36):
+**In Development** (v0.1.39):
+- 🚧 **`/optimize-tax` Workflow**: Tax-loss harvesting with replacement strategies (Tax Scout + Hedge Smith)
+- 🚧 **Worker-based Workflows**: Non-blocking execution for all multi-agent workflows
+
+### Recent Releases
+
+**v0.1.37** (Oct 12, 2025):
+- ✅ **Extended `/analyze` Workflow**: 5-agent comprehensive analysis (Quill + News Sentry + Macro Lens + Risk Shield + Tax Scout)
+- ✅ **`/discover` Workflow**: Systematic idea generation (Screen Forge + Quill + Risk Shield)
+- ✅ **Progressive Streaming**: Real-time display of sub-agent tool calls
+- ✅ **State Accumulation**: Each agent receives context from previous agents
+
+**v0.1.36** (Oct 11, 2025):
 - ✅ **Automatic Intent-Based Routing**: No more manual agent switching—just ask naturally
 - ✅ **Router Agent**: LangGraph tool-calling supervisor coordinating 10 specialist agents
 - ✅ **Enhanced Transparency**: Watch router analyze intent and select appropriate agents
 - ✅ **Backward Compatible**: All `/command` syntax still works for power users
 
-**Earlier Releases**:
-- ✅ **Hedge Smith Agent**: Options strategies (collars, covered calls, puts), Greeks analysis (v0.1.35)
-- ✅ **Tax Scout Agent**: Tax-loss harvesting, wash-sale compliance, year-end planning (v0.1.34)
-- ✅ **Risk Shield Agent**: Portfolio risk management, VAR, drawdown analysis (v0.1.33)
-- ✅ **News Sentry Agent**: Real-time 8-K monitoring, insider tracking, breaking news (v0.1.32)
+**v0.1.35** (Oct 10, 2025):
+- ✅ **Hedge Smith Agent**: Options strategies (collars, covered calls, puts), Greeks analysis
 
-**Planned for v0.1.38** (Q1 2025):
-- [ ] **New Workflows**: `/optimize-tax` (Tax Scout + Hedge Smith), `/protect` (Risk Shield + Hedge Smith)
-- [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls and improve performance
+**v0.1.34** (Oct 9, 2025):
+- ✅ **Tax Scout Agent**: Tax-loss harvesting, wash-sale compliance, year-end planning
+
+**v0.1.33** (Oct 8, 2025):
+- ✅ **Risk Shield Agent**: Portfolio risk management, VAR, drawdown analysis
+
+**v0.1.32** (Oct 7, 2025):
+- ✅ **News Sentry Agent**: Real-time 8-K monitoring, insider tracking, breaking news
+
+### Planned Features
+
+**v0.1.39+** (Q4 2025):
+- [ ] **`/protect` Workflow**: Portfolio hedging (Risk Shield + Hedge Smith)
+- [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls
 - [ ] **Workflow Progress Visualization**: Enhanced TUI display for multi-agent workflows
 
-### Future Releases
-
-**v0.2.0+** (Q2 2025):
+**v0.2.0+** (Q1 2026):
 - [ ] **Backtesting Engine**: Test investment strategies on historical data
 - [ ] **Web UI**: Browser-based interface (in addition to TUI)
 - [ ] **State Persistence**: PostgreSQL checkpointer for LangGraph
 - [ ] **Cloud Deployment**: LangGraph Cloud integration
 - [ ] **Custom Agents**: User-defined agent templates and tools
 - [ ] **Python SDK**: Programmatic API for third-party integrations
-
-### Recent Releases
-
-<details>
-<summary><b>v0.1.36 (Oct 15, 2025) - Router Agent & Progressive Streaming</b></summary>
-
-- ✅ Automatic intent-based routing eliminates manual agent switching
-- ✅ Router supervisor agent coordinates 10 specialist agents
-- ✅ Progressive streaming shows real-time sub-agent tool calls
-- ✅ AsyncIO queue-based streaming architecture
-- ✅ Enhanced transparency with router reasoning display
-- ✅ Backward compatible with manual `/command` syntax
-- ✅ 16 comprehensive tests (all passing)
-
-[Full Release Notes](backlog/release-0.1.36.md)
-
-</details>
-
-<details>
-<summary><b>v0.1.35 (Oct 13, 2025) - Hedge Smith Agent</b></summary>
-
-- ✅ Options strategies for portfolio protection and yield enhancement
-- ✅ Protective collars, covered calls, protective puts, cash-secured puts
-- ✅ Greeks analysis (delta, gamma, theta, vega, IV)
-- ✅ Strike selection and expiration optimization
-- ✅ 13 specialized tools for options analysis
-- ✅ TUI integration with `/hedge` command
-
-[Full Release Notes](backlog/release-0.1.35.md)
-
-</details>
-
-<details>
-<summary><b>v0.1.34 (Oct 12, 2025) - Tax Scout Agent</b></summary>
-
-- ✅ Tax-loss harvesting opportunity identification
-- ✅ Wash-sale rule compliance monitoring (30-day windows)
-- ✅ Year-end tax planning strategies
-- ✅ 12 specialized tools for tax optimization
-- ✅ TUI integration with `/tax` command
-
-[Full Release Notes](backlog/release-0.1.34.md)
-
-</details>
-
-<details>
-<summary><b>v0.1.33 (Oct 9, 2025) - Risk Shield Agent</b></summary>
-
-- ✅ Portfolio risk management (VAR, drawdown, concentration)
-- ✅ 18 specialized tools across market data and macro indicators
-- ✅ Comprehensive system prompt with risk assessment frameworks
-- ✅ TUI integration with `/risk` command
-
-[Full Release Notes](backlog/release-0.1.33.md)
-
-</details>
 
 ---
 
