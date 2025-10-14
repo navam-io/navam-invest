@@ -1,23 +1,52 @@
 # Release 0.1.38
 
 ## Status
-IN DEVELOPMENT
+RELEASED - 2025-10-14
 
 ## Features
 
-### 🚧 Planned Features
+### ✅ Implemented Features
+
+**ESC Key Cancellation for Agent Execution** - Non-blocking TUI improvements
+
+Resolved critical UX issue where the TUI became completely unresponsive during agent execution. Users can now:
+- Press ESC to cancel long-running agent operations
+- Scroll the chat log while agent is processing
+- Maintain full UI responsiveness during execution
+
+**Technical Implementation:**
+- Refactored agent execution to use Textual's worker pattern
+- Worker runs in background without blocking event loop
+- `on_worker_state_changed()` handles completion asynchronously
+- Proper cleanup of async streams on cancellation
+- Graceful cancellation without UI freeze
+
+**Key Changes:**
+- `src/navam_invest/tui/app.py` - Worker-based execution (~+536 lines)
+- Added `ESC_CANCEL_IMPLEMENTATION.md` - Technical documentation
+- Added test examples: `test_esc_worker.py`, `test_esc_cancel.py`
+
+**User Experience Improvements:**
+- ESC key binding visible in footer: "ESC Cancel | Ctrl+C Clear | Ctrl+Q Quit"
+- Cancellation feedback: "⚠️ Cancellation requested - stopping agent..."
+- Completion message: "🛑 Agent execution cancelled by user"
+- Placeholder shows: "⏳ Processing... (Press ESC to cancel)"
+
+---
+
+### 🚧 Planned Features (Moved to v0.1.39)
 
 **New Multi-Agent Workflows** - Extended workflow patterns for tax optimization and portfolio protection
 
-Building on the successful `/analyze` and `/discover` workflows from v0.1.37, this release introduces two new systematic workflows for common investment tasks.
+Building on the successful `/analyze` and `/discover` workflows from v0.1.37, future releases will introduce systematic workflows for common investment tasks.
 
-**New Workflow: `/optimize-tax`** - Tax-Loss Harvesting:
+**Future Workflow: `/optimize-tax`** - Tax-Loss Harvesting:
 - Tax Scout identifies tax-loss harvesting opportunities
 - Hedge Smith suggests replacement positions to maintain exposure
 - Rebalance Bot executes tax-efficient rebalancing
 - Complete tax optimization pipeline with wash-sale compliance
 
-**New Workflow: `/protect`** - Portfolio Hedging:
+**Future Workflow: `/protect`** - Portfolio Hedging:
 - Risk Shield analyzes portfolio exposures and vulnerabilities
 - Hedge Smith designs protective options strategies
 - Atlas evaluates hedging cost vs portfolio protection
@@ -38,39 +67,34 @@ Building on the successful `/analyze` and `/discover` workflows from v0.1.37, th
 
 ## Technical Improvements
 
-**New Workflows**:
+**TUI Enhancements (Completed)**:
+- [x] Non-blocking agent execution using Textual workers
+- [x] ESC key cancellation support
+- [x] Responsive UI during agent processing
+- [x] Proper async stream cleanup
+- [x] Worker state change handlers
+
+**Documentation Updates (Completed)**:
+- [x] Created `ESC_CANCEL_IMPLEMENTATION.md` - Technical implementation guide
+- [x] Created test examples demonstrating worker pattern
+
+**Future Enhancements (Moved to v0.1.39)**:
 - [ ] Implement `/optimize-tax` tax-loss harvesting workflow
 - [ ] Implement `/protect` portfolio hedging workflow
-- [ ] Add workflow documentation in FAQ
-
-**Performance Optimization**:
 - [ ] Implement DuckDB-based caching layer
-- [ ] Add cache invalidation logic
-- [ ] Configure per-source TTL settings
-- [ ] Add cache statistics tracking
-
-**TUI Enhancements**:
 - [ ] Enhanced workflow progress visualization
-- [ ] Multi-agent status indicators
-- [ ] Better error recovery UI
-- [ ] Partial completion handling
-
-**Documentation Updates**:
-- [ ] Update `docs/user-guide/multi-agent-workflows.md` - New workflows
-- [ ] Update `docs/user-guide/getting-started.md` - Workflow examples
-- [ ] Create `docs/architecture/workflows.md` - Workflow design patterns
-- [ ] Update `README.md` - New workflow capabilities
+- [ ] Update workflow documentation in FAQ
 
 ---
 
 ## Breaking Changes
 
-None planned for this release.
+None.
 
 ---
 
 ## Release Date
-TBD
+2025-10-14
 
 ## PyPI Package
-TBD
+https://pypi.org/project/navam-invest/0.1.38/
