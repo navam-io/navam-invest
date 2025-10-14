@@ -1211,6 +1211,79 @@ class ChatUI(App):
                 exclusive=True,
             )
 
+        elif command == "/cache":
+            chat_log.write("\n[bold cyan]Cache Statistics[/bold cyan]\n")
+            chat_log.write("[dim]Fetching cache performance metrics...\n\n[/dim]")
+
+            try:
+                from navam_invest.cache import get_cache_manager
+
+                # Get cache statistics
+                cache = get_cache_manager()
+                stats = cache.get_statistics(days=7)
+
+                # Create Rich table for cache statistics
+                table = Table(
+                    title="API Cache Performance (Last 7 Days)",
+                    show_header=True,
+                    header_style="bold magenta",
+                    show_lines=True,
+                )
+                table.add_column("Source", style="cyan", width=15)
+                table.add_column("Tool", style="green", width=25)
+                table.add_column("Hits", justify="right", width=10)
+                table.add_column("Misses", justify="right", width=10)
+                table.add_column("Hit Rate", justify="right", width=12)
+
+                # Add rows from statistics
+                for tool_stat in stats["by_tool"]:
+                    source = tool_stat["source"]
+                    tool_name = tool_stat["tool_name"]
+                    hits = tool_stat["hits"]
+                    misses = tool_stat["misses"]
+                    hit_rate = tool_stat.get("hit_rate", 0)
+
+                    # Color code hit rate
+                    if hit_rate >= 75:
+                        hit_rate_str = f"[green]{hit_rate:.1f}%[/green]"
+                    elif hit_rate >= 50:
+                        hit_rate_str = f"[yellow]{hit_rate:.1f}%[/yellow]"
+                    else:
+                        hit_rate_str = f"[red]{hit_rate:.1f}%[/red]"
+
+                    table.add_row(
+                        source,
+                        tool_name,
+                        f"{hits:,}",
+                        f"{misses:,}",
+                        hit_rate_str,
+                    )
+
+                # Display table
+                chat_log.write(table)
+
+                # Add summary
+                chat_log.write(
+                    Markdown(
+                        f"\n**Summary:**\n"
+                        f"- Total cache entries: {stats['cache_size']:,}\n"
+                        f"- Total hits: {stats['total_hits']:,}\n"
+                        f"- Total misses: {stats['total_misses']:,}\n"
+                        f"- Overall hit rate: {stats['overall_hit_rate']:.1f}%\n\n"
+                        f"**Cache Location:** `~/.navam-invest/cache/api_cache.duckdb`\n\n"
+                        f"**Cache TTL Strategy:**\n"
+                        f"- Real-time data (Yahoo, Finnhub): 60 seconds\n"
+                        f"- Market data (Alpha Vantage, Tiingo): 5 minutes\n"
+                        f"- Fundamental data (FMP, SEC EDGAR): 1 hour\n"
+                        f"- Economic data (FRED, Treasury): 24 hours\n"
+                        f"- News (NewsAPI): 5 minutes\n\n"
+                        f"💡 **Tip:** Higher hit rates mean fewer API calls and faster responses!\n"
+                    )
+                )
+
+            except Exception as e:
+                chat_log.write(f"\n[red]Error fetching cache statistics: {str(e)}[/red]")
+
         elif command == "/api":
             chat_log.write("\n[bold cyan]Checking API Status...[/bold cyan]\n")
             chat_log.write("[dim]Testing connectivity to all configured APIs...\n\n[/dim]")
