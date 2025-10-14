@@ -37,6 +37,7 @@ dependencies = [
     "pydantic-settings>=2.0.0",
     "python-dotenv>=1.0.0",
     "yfinance>=0.2.49",
+    "duckdb>=1.0.0",
 ]
 
 [project.optional-dependencies]
