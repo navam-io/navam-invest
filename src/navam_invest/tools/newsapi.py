@@ -10,6 +10,8 @@ from typing import Any, Dict, Optional
 import httpx
 from langchain_core.tools import tool
 
+from navam_invest.cache import cached
+
 
 async def _fetch_newsapi(endpoint: str, api_key: str, **params: Any) -> Dict[str, Any]:
     """Fetch data from NewsAPI.org.
@@ -37,6 +39,54 @@ async def _fetch_newsapi(endpoint: str, api_key: str, **params: Any) -> Dict[str
         return data
 
 
+@cached(source="newsapi")
+async def _search_market_news_cached(
+    query: str, api_key: str, from_date: Optional[str] = None, limit: int = 5
+) -> str:
+    """Cached implementation of search_market_news."""
+    # Limit to reasonable values for free tier
+    limit = min(limit, 20)
+
+    params: Dict[str, Any] = {
+        "q": query,
+        "language": "en",
+        "sortBy": "relevancy",
+        "pageSize": limit,
+    }
+
+    if from_date:
+        params["from"] = from_date
+
+    data = await _fetch_newsapi("everything", api_key, **params)
+
+    if data.get("status") != "ok":
+        error_msg = data.get("message", "Unknown error")
+        return f"Error: {error_msg}"
+
+    articles = data.get("articles", [])
+    if not articles:
+        return f"No news articles found for query: {query}"
+
+    # Format results
+    result_lines = [f"**News for '{query}'** ({len(articles)} articles)\n"]
+
+    for i, article in enumerate(articles, 1):
+        title = article.get("title", "No title")
+        source = article.get("source", {}).get("name", "Unknown")
+        published = article.get("publishedAt", "")[:10]  # YYYY-MM-DD
+        description = article.get("description", "No description")
+        url = article.get("url", "")
+
+        result_lines.append(
+            f"{i}. **{title}**\n"
+            f"   Source: {source} | Date: {published}\n"
+            f"   {description[:200]}...\n"
+            f"   URL: {url}\n"
+        )
+
+    return "\n".join(result_lines)
+
+
 @tool
 async def search_market_news(
     query: str, api_key: str, from_date: Optional[str] = None, limit: int = 5
@@ -61,52 +111,51 @@ async def search_market_news(
         search_market_news("Federal Reserve interest rates", from_date="2025-01-01")
     """
     try:
-        # Limit to reasonable values for free tier
-        limit = min(limit, 20)
-
-        params: Dict[str, Any] = {
-            "q": query,
-            "language": "en",
-            "sortBy": "relevancy",
-            "pageSize": limit,
-        }
-
-        if from_date:
-            params["from"] = from_date
-
-        data = await _fetch_newsapi("everything", api_key, **params)
-
-        if data.get("status") != "ok":
-            error_msg = data.get("message", "Unknown error")
-            return f"Error: {error_msg}"
-
-        articles = data.get("articles", [])
-        if not articles:
-            return f"No news articles found for query: {query}"
-
-        # Format results
-        result_lines = [f"**News for '{query}'** ({len(articles)} articles)\n"]
-
-        for i, article in enumerate(articles, 1):
-            title = article.get("title", "No title")
-            source = article.get("source", {}).get("name", "Unknown")
-            published = article.get("publishedAt", "")[:10]  # YYYY-MM-DD
-            description = article.get("description", "No description")
-            url = article.get("url", "")
-
-            result_lines.append(
-                f"{i}. **{title}**\n"
-                f"   Source: {source} | Date: {published}\n"
-                f"   {description[:200]}...\n"
-                f"   URL: {url}\n"
-            )
-
-        return "\n".join(result_lines)
-
+        return await _search_market_news_cached(query, api_key, from_date, limit)
     except httpx.HTTPStatusError as e:
         return f"HTTP error fetching news: {e.response.status_code} - {e.response.text}"
     except Exception as e:
         return f"Error fetching news for '{query}': {str(e)}"
+
+
+@cached(source="newsapi")
+async def _get_top_financial_headlines_cached(
+    api_key: str, category: str = "business", country: str = "us", limit: int = 5
+) -> str:
+    """Cached implementation of get_top_financial_headlines."""
+    # Limit to reasonable values for free tier
+    limit = min(limit, 20)
+
+    params = {"category": category, "country": country, "pageSize": limit}
+
+    data = await _fetch_newsapi("top-headlines", api_key, **params)
+
+    if data.get("status") != "ok":
+        error_msg = data.get("message", "Unknown error")
+        return f"Error: {error_msg}"
+
+    articles = data.get("articles", [])
+    if not articles:
+        return f"No top headlines found for {category} in {country.upper()}"
+
+    # Format results
+    result_lines = [
+        f"**Top {category.title()} Headlines - {country.upper()}** ({len(articles)} articles)\n"
+    ]
+
+    for i, article in enumerate(articles, 1):
+        title = article.get("title", "No title")
+        source = article.get("source", {}).get("name", "Unknown")
+        published = article.get("publishedAt", "")[:10]  # YYYY-MM-DD
+        description = article.get("description", "No description")
+
+        result_lines.append(
+            f"{i}. **{title}**\n"
+            f"   Source: {source} | Date: {published}\n"
+            f"   {description[:200] if description else 'No description'}...\n"
+        )
+
+    return "\n".join(result_lines)
 
 
 @tool
@@ -135,44 +184,56 @@ async def get_top_financial_headlines(
         get_top_financial_headlines(category="technology", country="us")
     """
     try:
-        # Limit to reasonable values for free tier
-        limit = min(limit, 20)
-
-        params = {"category": category, "country": country, "pageSize": limit}
-
-        data = await _fetch_newsapi("top-headlines", api_key, **params)
-
-        if data.get("status") != "ok":
-            error_msg = data.get("message", "Unknown error")
-            return f"Error: {error_msg}"
-
-        articles = data.get("articles", [])
-        if not articles:
-            return f"No top headlines found for {category} in {country.upper()}"
-
-        # Format results
-        result_lines = [
-            f"**Top {category.title()} Headlines - {country.upper()}** ({len(articles)} articles)\n"
-        ]
-
-        for i, article in enumerate(articles, 1):
-            title = article.get("title", "No title")
-            source = article.get("source", {}).get("name", "Unknown")
-            published = article.get("publishedAt", "")[:10]  # YYYY-MM-DD
-            description = article.get("description", "No description")
-
-            result_lines.append(
-                f"{i}. **{title}**\n"
-                f"   Source: {source} | Date: {published}\n"
-                f"   {description[:200] if description else 'No description'}...\n"
-            )
-
-        return "\n".join(result_lines)
-
+        return await _get_top_financial_headlines_cached(api_key, category, country, limit)
     except httpx.HTTPStatusError as e:
         return f"HTTP error fetching headlines: {e.response.status_code} - {e.response.text}"
     except Exception as e:
         return f"Error fetching top headlines: {str(e)}"
+
+
+@cached(source="newsapi")
+async def _get_company_news_cached(company_name: str, api_key: str, limit: int = 5) -> str:
+    """Cached implementation of get_company_news."""
+    # Limit to reasonable values for free tier
+    limit = min(limit, 20)
+
+    params = {
+        "q": company_name,
+        "language": "en",
+        "sortBy": "publishedAt",  # Most recent first
+        "pageSize": limit,
+    }
+
+    data = await _fetch_newsapi("everything", api_key, **params)
+
+    if data.get("status") != "ok":
+        error_msg = data.get("message", "Unknown error")
+        return f"Error: {error_msg}"
+
+    articles = data.get("articles", [])
+    if not articles:
+        return f"No recent news found for company: {company_name}"
+
+    # Format results
+    result_lines = [
+        f"**Recent News for {company_name}** ({len(articles)} articles)\n"
+    ]
+
+    for i, article in enumerate(articles, 1):
+        title = article.get("title", "No title")
+        source = article.get("source", {}).get("name", "Unknown")
+        published = article.get("publishedAt", "")[:10]  # YYYY-MM-DD
+        description = article.get("description", "No description")
+        url = article.get("url", "")
+
+        result_lines.append(
+            f"{i}. **{title}**\n"
+            f"   Source: {source} | Date: {published}\n"
+            f"   {description[:200] if description else 'No description'}...\n"
+            f"   URL: {url}\n"
+        )
+
+    return "\n".join(result_lines)
 
 
 @tool
@@ -197,48 +258,9 @@ async def get_company_news(company_name: str, api_key: str, limit: int = 5) -> s
         get_company_news("Tesla", limit=10)
     """
     try:
-        # Limit to reasonable values for free tier
-        limit = min(limit, 20)
-
-        params = {
-            "q": company_name,
-            "language": "en",
-            "sortBy": "publishedAt",  # Most recent first
-            "pageSize": limit,
-        }
-
-        data = await _fetch_newsapi("everything", api_key, **params)
-
-        if data.get("status") != "ok":
-            error_msg = data.get("message", "Unknown error")
-            return f"Error: {error_msg}"
-
-        articles = data.get("articles", [])
-        if not articles:
-            return f"No recent news found for company: {company_name}"
-
-        # Format results
-        result_lines = [
-            f"**Recent News for {company_name}** ({len(articles)} articles)\n"
-        ]
-
-        for i, article in enumerate(articles, 1):
-            title = article.get("title", "No title")
-            source = article.get("source", {}).get("name", "Unknown")
-            published = article.get("publishedAt", "")[:10]  # YYYY-MM-DD
-            description = article.get("description", "No description")
-            url = article.get("url", "")
-
-            result_lines.append(
-                f"{i}. **{title}**\n"
-                f"   Source: {source} | Date: {published}\n"
-                f"   {description[:200] if description else 'No description'}...\n"
-                f"   URL: {url}\n"
-            )
-
-        return "\n".join(result_lines)
-
+        return await _get_company_news_cached(company_name, api_key, limit)
     except httpx.HTTPStatusError as e:
         return f"HTTP error fetching company news: {e.response.status_code} - {e.response.text}"
     except Exception as e:
         return f"Error fetching news for {company_name}: {str(e)}"
+

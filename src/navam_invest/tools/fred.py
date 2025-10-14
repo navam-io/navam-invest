@@ -5,6 +5,8 @@ from typing import Any, Dict, Optional
 import httpx
 from langchain_core.tools import tool
 
+from navam_invest.cache import cached
+
 
 async def _fetch_fred(
     endpoint: str, api_key: str, **params: Any
@@ -16,6 +18,43 @@ async def _fetch_fred(
         response = await client.get(url, params=params_with_key, timeout=30.0)
         response.raise_for_status()
         return response.json()
+
+
+@cached(source="fred")
+async def _get_economic_indicator_cached(series_id: str, api_key: str) -> str:
+    """Cached implementation of get_economic_indicator."""
+    # Get series info
+    series_info = await _fetch_fred("series", api_key, series_id=series_id)
+
+    if "seriess" not in series_info or not series_info["seriess"]:
+        return f"No series found for ID {series_id}"
+
+    series = series_info["seriess"][0]
+    title = series.get("title", "Unknown")
+    units = series.get("units", "")
+
+    # Get latest observation
+    observations = await _fetch_fred(
+        "series/observations",
+        api_key,
+        series_id=series_id,
+        sort_order="desc",
+        limit=1,
+    )
+
+    if "observations" not in observations or not observations["observations"]:
+        return f"No data available for {title}"
+
+    latest = observations["observations"][0]
+    date = latest.get("date", "N/A")
+    value = latest.get("value", "N/A")
+
+    return (
+        f"**{title}**\n"
+        f"Series ID: {series_id}\n"
+        f"Latest Value: {value} {units}\n"
+        f"Date: {date}"
+    )
 
 
 @tool
@@ -30,52 +69,14 @@ async def get_economic_indicator(series_id: str, api_key: str) -> str:
         Formatted string with indicator name and latest value
     """
     try:
-        # Get series info
-        series_info = await _fetch_fred("series", api_key, series_id=series_id)
-
-        if "seriess" not in series_info or not series_info["seriess"]:
-            return f"No series found for ID {series_id}"
-
-        series = series_info["seriess"][0]
-        title = series.get("title", "Unknown")
-        units = series.get("units", "")
-
-        # Get latest observation
-        observations = await _fetch_fred(
-            "series/observations",
-            api_key,
-            series_id=series_id,
-            sort_order="desc",
-            limit=1,
-        )
-
-        if "observations" not in observations or not observations["observations"]:
-            return f"No data available for {title}"
-
-        latest = observations["observations"][0]
-        date = latest.get("date", "N/A")
-        value = latest.get("value", "N/A")
-
-        return (
-            f"**{title}**\n"
-            f"Series ID: {series_id}\n"
-            f"Latest Value: {value} {units}\n"
-            f"Date: {date}"
-        )
+        return await _get_economic_indicator_cached(series_id, api_key)
     except Exception as e:
         return f"Error fetching FRED data for {series_id}: {str(e)}"
 
 
-@tool
-async def get_key_macro_indicators(api_key: str) -> str:
-    """Get key macroeconomic indicators summary.
-
-    Args:
-        api_key: FRED API key
-
-    Returns:
-        Summary of key economic indicators
-    """
+@cached(source="fred")
+async def _get_key_macro_indicators_cached(api_key: str) -> str:
+    """Cached implementation of get_key_macro_indicators."""
     indicators = {
         "GDP": "GDP",
         "UNRATE": "Unemployment Rate",
@@ -103,3 +104,16 @@ async def get_key_macro_indicators(api_key: str) -> str:
             results.append(f"**{name}:** Data unavailable")
 
     return "**Key Economic Indicators**\n\n" + "\n".join(results)
+
+
+@tool
+async def get_key_macro_indicators(api_key: str) -> str:
+    """Get key macroeconomic indicators summary.
+
+    Args:
+        api_key: FRED API key
+
+    Returns:
+        Summary of key economic indicators
+    """
+    return await _get_key_macro_indicators_cached(api_key)

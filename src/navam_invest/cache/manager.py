@@ -523,11 +523,18 @@ def cached(source: str) -> Callable[[Callable[..., T]], Callable[..., T]]:
     """
     Decorator to cache function results with DuckDB backend.
 
+    Supports both synchronous and asynchronous functions.
+
     Usage:
         @cached(source="yahoo_finance")
         def get_quote(symbol: str) -> dict:
             # Expensive API call
             return api.get_quote(symbol)
+
+        @cached(source="fred")
+        async def get_indicator(series_id: str) -> dict:
+            # Async API call
+            return await api.get_indicator(series_id)
 
     Args:
         source: Data source name for TTL configuration
@@ -535,27 +542,54 @@ def cached(source: str) -> Callable[[Callable[..., T]], Callable[..., T]]:
     Returns:
         Decorated function with caching
     """
+    import asyncio
+    import inspect
 
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
-        @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> T:
-            cache = get_cache_manager()
-            tool_name = func.__name__
+        # Check if function is async
+        is_async = inspect.iscoroutinefunction(func)
 
-            # Try to get from cache
-            cached_response = cache.get(source, tool_name, args, kwargs)
+        if is_async:
+            @wraps(func)
+            async def async_wrapper(*args: Any, **kwargs: Any) -> T:
+                cache = get_cache_manager()
+                tool_name = func.__name__
 
-            if cached_response is not None:
-                return cast(T, cached_response)
+                # Try to get from cache
+                cached_response = cache.get(source, tool_name, args, kwargs)
 
-            # Cache miss - call original function
-            response = func(*args, **kwargs)
+                if cached_response is not None:
+                    return cast(T, cached_response)
 
-            # Store in cache
-            cache.set(source, tool_name, args, kwargs, response)
+                # Cache miss - call original async function
+                response = await func(*args, **kwargs)
 
-            return response
+                # Store in cache
+                cache.set(source, tool_name, args, kwargs, response)
 
-        return wrapper
+                return response
+
+            return cast(Callable[..., T], async_wrapper)
+        else:
+            @wraps(func)
+            def sync_wrapper(*args: Any, **kwargs: Any) -> T:
+                cache = get_cache_manager()
+                tool_name = func.__name__
+
+                # Try to get from cache
+                cached_response = cache.get(source, tool_name, args, kwargs)
+
+                if cached_response is not None:
+                    return cast(T, cached_response)
+
+                # Cache miss - call original function
+                response = func(*args, **kwargs)
+
+                # Store in cache
+                cache.set(source, tool_name, args, kwargs, response)
+
+                return response
+
+            return cast(Callable[..., T], sync_wrapper)
 
     return decorator
