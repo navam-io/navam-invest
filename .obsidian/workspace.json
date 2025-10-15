@@ -171,17 +171,19 @@
   },
   "active": "18c555c4dc8b6e35",
   "lastOpenFiles": [
+    "backlog/release-0.1.41.md.tmp.82440.1760487068445",
+    "backlog/release-0.1.41.md.tmp.82440.1760487060138",
+    "backlog/release-0.1.41.md.tmp.82440.1760487043571",
+    "src/navam_invest/tui/app.py.tmp.82440.1760487029933",
+    "src/navam_invest/cache/common_queries.py",
+    "backlog/release-0.1.41.md.tmp.82440.1760480762210",
+    "backlog/release-0.1.41.md.tmp.82440.1760480754556",
+    "src/navam_invest/tui/app.py.tmp.82440.1760480726934",
+    "reports/in_router_analysis_20251014_151939.md",
+    "reports/in_router_analysis_20251014_151624.md",
     "src/navam_invest/cache/__pycache__/manager.cpython-313.pyc",
     "src/navam_invest/cache/__pycache__/__init__.cpython-313.pyc",
     "src/navam_invest/cache/__pycache__",
-    "apply_cache_pattern.py",
-    "src/navam_invest/tools/finnhub.py.tmp.82440.1760479630275",
-    "src/navam_invest/tools/fred.py.tmp.82440.1760479516605",
-    "backlog/release-0.1.41.md.tmp.82440.1760479346561",
-    "src/navam_invest/tools/yahoo_finance.py.tmp.82440.1760479322875",
-    "src/navam_invest/tools/yahoo_finance.py.tmp.82440.1760479272256",
-    "src/navam_invest/tools/yahoo_finance.py.tmp.82440.1760479261015",
-    "src/navam_invest/tools/yahoo_finance.py.tmp.82440.1760479229919",
     "backlog/release-0.1.41.md",
     "reports/report_tax_optimization_20251014_123710.md",
     "reports/report_portfolio_protection_20251014_131722.md",
@@ -204,8 +206,6 @@
     "reports/to_options_strategies_20251012_093543.md",
     "reports/my_tax_optimization_20251011_115116.md",
     "backlog/wishlist.md",
-    "backlog/release-0.1.35.md",
-    "reports/where_portfolio_20251011_111542.md",
-    "backlog/release-0.1.34.md"
+    "backlog/release-0.1.35.md"
   ]
 }

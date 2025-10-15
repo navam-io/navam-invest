@@ -1214,6 +1214,49 @@ class ChatUI(App):
         elif command.startswith("/cache"):
             parts = command.split()
 
+            # Handle /cache warm subcommand
+            if len(parts) == 2 and parts[1].lower() == "warm":
+                chat_log.write("\n[bold cyan]Warm Cache[/bold cyan]\n")
+                chat_log.write("[dim]Pre-populating cache with common queries...\n\n[/dim]")
+
+                try:
+                    from navam_invest.cache import get_cache_manager
+                    from navam_invest.cache.common_queries import (
+                        get_common_queries,
+                        get_query_summary,
+                    )
+
+                    # Show what we're warming
+                    chat_log.write(Markdown(get_query_summary()))
+                    chat_log.write("[dim]Starting cache warming (this may take 30-60 seconds)...[/dim]\n")
+
+                    # Get cache manager and common queries
+                    cache = get_cache_manager()
+                    queries = get_common_queries()
+
+                    # Warm the cache
+                    stats = await cache.warm_cache(queries)
+
+                    # Display results
+                    chat_log.write(
+                        Markdown(
+                            f"\n✅ **Cache warming completed!**\n\n"
+                            f"- Total queries: {stats['total']:,}\n"
+                            f"- Already cached (skipped): {stats['cached']:,}\n"
+                            f"- Newly cached: {stats['warmed']:,}\n"
+                            f"- Failed: {stats['failed']:,}\n\n"
+                            f"**Benefits:**\n"
+                            f"- Faster initial queries for popular stocks and indicators\n"
+                            f"- Reduced API calls and rate limit pressure\n"
+                            f"- Better user experience with instant responses\n\n"
+                            f"💡 **Tip:** Run `/cache warm` after clearing cache or starting a new session.\n"
+                        )
+                    )
+                except Exception as e:
+                    chat_log.write(f"\n[red]Error warming cache: {str(e)}[/red]")
+
+                return
+
             # Handle /cache clear subcommand
             if len(parts) == 2 and parts[1].lower() == "clear":
                 chat_log.write("\n[bold cyan]Clear Cache[/bold cyan]\n")
@@ -1231,7 +1274,7 @@ class ChatUI(App):
                             f"- Removed {count:,} cached API responses\n"
                             f"- Statistics have been reset\n\n"
                             f"**Note:** The cache will be rebuilt as you make new API requests.\n\n"
-                            f"💡 **Tip:** Use `/cache` to view performance metrics after making some queries.\n"
+                            f"💡 **Tip:** Use `/cache warm` to pre-populate with common queries, or `/cache` to view performance metrics.\n"
                         )
                     )
                 except Exception as e:
@@ -1443,6 +1486,7 @@ class ChatUI(App):
                     "**Utilities:**\n"
                     "- `/api` - Check API connectivity and status\n"
                     "- `/cache` - View API cache statistics and performance metrics\n"
+                    "- `/cache warm` - Pre-populate cache with common queries (market indices, popular stocks)\n"
                     "- `/cache clear` - Clear all cached API responses\n"
                     "- `/examples` - Show example prompts\n"
                     "- `/clear` - Clear chat history\n"

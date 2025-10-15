@@ -481,6 +481,100 @@ class CacheManager:
                 "total_misses": 0,
             }
 
+    async def warm_cache(self, queries: list[dict[str, Any]]) -> dict[str, Any]:
+        """
+        Warm the cache by pre-populating it with common queries.
+
+        This method executes a list of common queries to populate the cache,
+        improving initial user experience by reducing API calls for frequently
+        accessed data.
+
+        Args:
+            queries: List of query dictionaries, each containing:
+                - source: Data source name (e.g., 'yahoo_finance')
+                - tool_name: Tool function name (e.g., 'get_quote')
+                - args: Tuple of positional arguments
+                - kwargs: Dict of keyword arguments
+                - func: Async function to call for cache miss
+
+        Returns:
+            Dictionary with warming statistics:
+                - total: Total queries attempted
+                - cached: Number already cached (skipped)
+                - warmed: Number newly cached
+                - failed: Number that failed
+
+        Example:
+            queries = [
+                {
+                    "source": "yahoo_finance",
+                    "tool_name": "get_quote",
+                    "args": ("AAPL",),
+                    "kwargs": {},
+                    "func": get_quote_cached
+                },
+                {
+                    "source": "treasury",
+                    "tool_name": "get_treasury_yield_curve",
+                    "args": (),
+                    "kwargs": {},
+                    "func": get_treasury_yield_curve_cached
+                }
+            ]
+            stats = await cache.warm_cache(queries)
+        """
+        import asyncio
+
+        stats = {
+            "total": len(queries),
+            "cached": 0,
+            "warmed": 0,
+            "failed": 0,
+        }
+
+        for query in queries:
+            source = query["source"]
+            tool_name = query["tool_name"]
+            args = query.get("args", ())
+            kwargs = query.get("kwargs", {})
+            func = query["func"]
+
+            try:
+                # Check if already cached
+                cached_response = self.get(source, tool_name, args, kwargs)
+
+                if cached_response is not None:
+                    stats["cached"] += 1
+                    logger.debug(
+                        f"Cache warm: {source}.{tool_name} already cached (skipped)"
+                    )
+                    continue
+
+                # Execute the function to populate cache
+                if asyncio.iscoroutinefunction(func):
+                    response = await func(*args, **kwargs)
+                else:
+                    response = func(*args, **kwargs)
+
+                # Store in cache
+                self.set(source, tool_name, args, kwargs, response)
+                stats["warmed"] += 1
+                logger.info(f"Cache warm: {source}.{tool_name} populated")
+
+            except Exception as e:
+                stats["failed"] += 1
+                logger.error(
+                    f"Cache warm failed for {source}.{tool_name}: {str(e)}",
+                    exc_info=True,
+                )
+
+        logger.info(
+            f"Cache warming complete: {stats['warmed']} warmed, "
+            f"{stats['cached']} already cached, {stats['failed']} failed"
+        )
+
+        return stats
+
     def close(self) -> None:
         """Close database connection."""
         if self.conn:
