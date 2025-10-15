@@ -13,7 +13,8 @@ from navam_invest.tools.yahoo_finance import (
     _get_company_info_cached,
 )
 from navam_invest.tools.treasury import _get_treasury_yield_curve_cached
-from navam_invest.tools.fred import _get_fred_series_cached
+from navam_invest.tools.fred import _get_economic_indicator_cached
+from navam_invest.config.settings import get_settings
 
 
 def get_common_queries() -> list[dict[str, Any]]:
@@ -24,6 +25,14 @@ def get_common_queries() -> list[dict[str, Any]]:
         List of query dictionaries for cache warming
     """
     queries = []
+
+    # Get settings for API keys
+    try:
+        settings = get_settings()
+        fred_api_key = settings.fred_api_key
+    except Exception:
+        # If settings fail, skip FRED queries
+        fred_api_key = None
 
     # 1. Major Market Indices - Most frequently accessed
     queries.append(
@@ -71,23 +80,24 @@ def get_common_queries() -> list[dict[str, Any]]:
         }
     )
 
-    # 4. Key Economic Indicators from FRED
-    fred_series = [
-        ("DGS10", "10-Year Treasury Rate"),  # 10-year treasury yield
-        ("UNRATE", "Unemployment Rate"),  # Unemployment rate
-        ("CPIAUCSL", "CPI"),  # Consumer Price Index
-        ("GDP", "GDP"),  # Gross Domestic Product
-    ]
-    for series_id, _ in fred_series:
-        queries.append(
-            {
-                "source": "fred",
-                "tool_name": "get_fred_series",
-                "args": (series_id,),
-                "kwargs": {},
-                "func": _get_fred_series_cached,
-            }
-        )
+    # 4. Key Economic Indicators from FRED (only if API key is configured)
+    if fred_api_key:
+        fred_series = [
+            ("DGS10", "10-Year Treasury Rate"),  # 10-year treasury yield
+            ("UNRATE", "Unemployment Rate"),  # Unemployment rate
+            ("CPIAUCSL", "CPI"),  # Consumer Price Index
+            ("GDP", "GDP"),  # Gross Domestic Product
+        ]
+        for series_id, _ in fred_series:
+            queries.append(
+                {
+                    "source": "fred",
+                    "tool_name": "get_economic_indicator",
+                    "args": (series_id, fred_api_key),
+                    "kwargs": {},
+                    "func": _get_economic_indicator_cached,
+                }
+            )
 
     return queries
 
