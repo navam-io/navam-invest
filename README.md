@@ -209,6 +209,26 @@ Each agent is purpose-built with curated tools and expert system prompts:
 - ✅ **Auto-save reports**: All responses >200 chars saved to `reports/` directory
 - ✅ **Keyboard shortcuts**: `ESC` (cancel), `Ctrl+C` (clear), `Ctrl+Q` (quit)
 
+### ⚡ Smart API Caching (NEW in v0.1.41)
+
+**DuckDB-powered caching layer** that dramatically reduces API calls and improves performance:
+
+- ✅ **42 cached tools** across 9 data sources (Yahoo, SEC, FRED, Treasury, Tiingo, Finnhub, etc.)
+- ✅ **Intelligent TTL**: Real-time (60s), fundamentals (1h), economic data (24h) expiration
+- ✅ **Cache warming**: Pre-populate with `/cache warm` (23 common queries: FAANG+ stocks, indices, GDP/CPI)
+- ✅ **Performance stats**: `/cache` shows hit rates, cache size, API savings by tool
+- ✅ **Manual control**: `/cache clear` to invalidate all entries
+- ✅ **Color-coded metrics**: Green (≥75% hit rate), yellow (≥50%), red (<50%)
+- ✅ **SHA256 keys**: Unique cache keys from function arguments
+- ✅ **Persistent storage**: `~/.navam-invest/cache/api_cache.duckdb`
+- ✅ **Zero configuration**: Works out-of-the-box, automatic cleanup
+
+**Expected Performance**:
+- 20-40% hit rates on economic indicators (FRED)
+- 40-70% hit rates on treasury data (yield curves)
+- 10-30% hit rates on equity data (depends on symbols queried)
+- Higher rates over time as you query the same stocks repeatedly
+
 ---
 
 ## 🚀 Quick Start
@@ -269,9 +289,15 @@ navam invest
 ```bash
 navam invest
 
+# NEW v0.1.41: Speed up queries with cache warming (optional)
+> /cache warm
+# Pre-populates cache with 23 common queries (FAANG+ stocks, indices, GDP/CPI)
+# Takes 30-60 seconds, but future queries are instant!
+
 # NEW: Just ask naturally - automatic routing!
 > Should I invest in Apple stock right now?
 # Router automatically selects Quill, Macro Lens, and Risk Shield
+# If AAPL was cached, fundamentals load INSTANTLY!
 
 > Find undervalued tech companies with strong earnings
 # Router automatically selects Screen Forge and Earnings Whisperer
@@ -290,7 +316,14 @@ navam invest
 # Tax-loss harvesting with replacement strategies
 
 > /protect I hold 1000 NVDA shares, worried about correction
-# Portfolio hedging with protective options strategies (NEW!)
+# Portfolio hedging with protective options strategies
+
+# Cache management commands (NEW v0.1.41)
+> /cache
+# View cache statistics: hit rates, cached tools, API savings
+
+> /cache clear
+# Clear all cached entries (useful before important analysis)
 
 # Or use manual commands for specific agents (power users)
 > /quill
@@ -818,17 +851,18 @@ FINAL TAX OPTIMIZATION PLAN
 
 ## 🗺️ Roadmap
 
-### Current Release: v0.1.40 (Oct 14, 2025)
+### Current Release: v0.1.41 (Oct 14, 2025)
 
 **Latest Features**:
-- ✅ **`/protect` Workflow**: Portfolio hedging with Risk Shield + Hedge Smith collaboration
-- ✅ **Input Locking Fix**: Resolved issue where `/help` and other simple commands locked the input
-- ✅ **Tool Arguments Display**: Workflow tool calls now show full arguments (matching agent execution display)
-- ✅ **Worker-based Workflows**: All multi-agent workflows use non-blocking execution
+- ✅ **API Caching Layer**: DuckDB-based caching with 42 cached tool functions across 9 data sources
+- ✅ **Cache Warming**: Pre-populate cache with `/cache warm` (23 common queries: indices, FAANG+, treasury, GDP/CPI)
+- ✅ **Cache Management**: `/cache` (statistics), `/cache clear` (invalidate), intelligent TTL per source
+- ✅ **Performance Boost**: Up to 75% hit rates on repeated queries, instant responses from cache
+- ✅ **Smart Caching**: Real-time data (60s TTL), fundamentals (1h), economic indicators (24h)
 
-**In Development** (v0.1.41):
-- 🚧 **API Caching Layer**: DuckDB-based caching to reduce API calls and improve performance
-- 🚧 **Workflow Progress Visualization**: Enhanced TUI display for multi-agent workflows
+**Previous Release** (v0.1.40):
+- ✅ **`/protect` Workflow**: Portfolio hedging with Risk Shield + Hedge Smith collaboration
+- ✅ **Worker-based Workflows**: Non-blocking execution for responsive TUI
 
 ### Recent Releases
 
@@ -868,10 +902,11 @@ FINAL TAX OPTIMIZATION PLAN
 
 ### Planned Features
 
-**v0.1.41+** (Q4 2025):
-- [ ] **API Caching Layer**: DuckDB-based caching to reduce API calls
-- [ ] **Workflow Progress Visualization**: Enhanced TUI display for multi-agent workflows
+**v0.1.42+** (Q4 2025):
+- [ ] **Workflow Progress Visualization**: Enhanced TUI display with agent status indicators
 - [ ] **Async Tool Execution**: Parallel tool calls for faster agent responses
+- [ ] **Cache Analytics**: Hit rate optimization and cache size management
+- [ ] **Portfolio State Persistence**: PostgreSQL checkpointer for cross-session portfolio tracking
 
 **v0.2.0+** (Q1 2026):
 - [ ] **Backtesting Engine**: Test investment strategies on historical data
