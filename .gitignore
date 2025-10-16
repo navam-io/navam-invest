@@ -3,6 +3,7 @@ user/
 reports/
 refer/
 backlog/
+.claude/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
