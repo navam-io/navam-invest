@@ -73,8 +73,11 @@ include = [
 ]
 exclude = [
     "/.claude",
+    "/.obsidian",
     "/backlog",
+    "/docs",
     "/refer",
+    "/reports",
     "/user",
     "/CLAUDE.md",
 ]
