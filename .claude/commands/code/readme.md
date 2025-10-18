@@ -1,0 +1,1 @@
+Create or update a professionally designed README.md based on popular PyPi packages and GitHub repos. Use advanced GitHub markdown which also works with PyPi rendering. The README.md should have updated information about the project. Prioritze readability, usability, information design, visual appeal, and progressive disclosure of information about the project.

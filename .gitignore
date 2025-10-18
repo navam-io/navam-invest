@@ -1,9 +1,7 @@
 # Private
 user/
 reports/
-refer/
-backlog/
-.claude/
+.obsidian/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
